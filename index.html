@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Гироскопический датчик</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Цветовая палитра */
+            --primary-color: #4e54c8; /* Основной синий */
+            --secondary-color: #8f94fb; /* Светлый синий для градиента */
+            --accent-color: #ff6b6b; /* Акцентный для кнопок и важных элементов */
+            --bg-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --success-color: #00b894;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--bg-gradient); /* Градиентный фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.95); /* Полупрозрачный белый */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-width: 550px;
+            width: 100%;
+            backdrop-filter: blur(10px); /* Эффект матового стекла */
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        /* Стили для прогресс-бара */
+        .progress-container {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .progress-text {
+             font-family: 'Poppins', sans-serif;
+             color: var(--text-light);
+             font-size: 0.9rem;
+             margin-bottom: 10px;
+             font-weight: 600;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #dfe6e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            width: 0%; /* Будет меняться через JS */
+            transition: width 0.4s ease-in-out;
+            border-radius: 10px;
+        }
+
+        .question-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            line-height: 1.4;
+            min-height: 70px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 18px 20px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: #f1f2f6;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 1.05rem;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            background: white;
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 15px rgba(78, 84, 200, 0.15);
+            transform: translateY(-3px);
+            color: var(--primary-color);
+        }
+        
+        .option:active {
+             transform: translateY(-1px);
+             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+
+        #result-screen {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .score {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            color: var(--success-color);
+            margin: 20px 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feedback-text {
+             font-size: 1.2rem;
+             color: var(--text-light);
+             margin-bottom: 35px;
+             line-height: 1.5;
+        }
+
+        .restart-btn {
+            padding: 15px 35px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .restart-btn:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 15px 25px rgba(255, 107, 107, 0.4);
+             filter: brightness(1.1);
+        }
+
+        /* Анимация появления */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Класс для анимации смены вопросов */
+        .fade-in-active {
+             animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-ui">
+        <h1>Робототехника: Гироскоп</h1>
+        
+        <div class="progress-container">
+             <div class="progress-text" id="progress-text">Вопрос 1 из 10</div>
+             <div class="progress-bar-bg">
+                 <div class="progress-bar-fill" id="progress-bar-fill"></div>
+             </div>
+        </div>
+
+        <div id="question-box" class="fade-in-active">
+            <div class="question-text" id="question-text">Загрузка вопроса...</div>
+            <div class="options" id="options">
+                </div>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h1>Результат теста</h1>
+        <div class="score" id="score">0 / 0</div>
+        <p class="feedback-text" id="feedback"></p>
+        <button class="restart-btn" onclick="location.reload()">Пройти еще раз</button>
+    </div>
+</div>
+
+<script>
+    // Данные теста (те же самые)
+    const quizData = [
+        { q: "Что измеряет гироскопический датчик?", a: ["Цвет", "Расстояние", "Угол поворота и вращение", "Температуру"], c: 2 },
+        { q: "Где чаще всего используется гироскопический датчик?", a: ["В тетради", "В роботах и смартфонах", "В книгах", "В линейке"], c: 1 },
+        { q: "Зачем гироскоп нужен роботу?", a: ["Чтобы видеть предметы", "Чтобы издавать звук", "Чтобы определять повороты и держать направление", "Чтобы менять цвет"], c: 2 },
+        { q: "Что произойдёт, если робот поворачивается?", a: ["Гироскоп измерит цвет", "Гироскоп измерит скорость", "Гироскоп измерит угол поворота", "Ничего не произойдёт"], c: 2 },
+        { q: "В каких единицах гироскоп измеряет угол?", a: ["Метры", "Градусы", "Секунды", "Ватты"], c: 1 },
+        { q: "Может ли гироскоп помочь роботу ехать прямо?", a: ["Нет, никогда", "Только иногда", "Да, помогает удерживать направление", "Только ночью"], c: 2 },
+        { q: "Что НЕ измеряет гироскопический датчик?", a: ["Угол поворота", "Вращение", "Цвет объекта", "Поворот робота"], c: 2 },
+        { q: "Если робот повернулся на 90°, что покажет гироскоп?", a: ["10°", "45°", "90°", "180°"], c: 2 },
+        { q: "Какой датчик лучше использовать для определения поворота робота?", a: ["Датчик цвета", "Ультразвуковой датчик", "Гироскопический датчик", "Датчик касания"], c: 2 },
+        { q: "Что означает значение «0°» у гироскопа?", a: ["Робот упал", "Робот не повернулся", "Робот едет быстро", "Робот остановился"], c: 1 }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    const questionBox = document.getElementById('question-box');
+
+    function updateProgressBar() {
+        // Обновляем текст
+        document.getElementById('progress-text').innerText = `Вопрос ${currentIdx + 1} из ${quizData.length}`;
+        // Вычисляем процент и обновляем ширину полоски
+        const progressPercent = ((currentIdx + 1) / quizData.length) * 100;
+        document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+    }
+
+    function showQuestion() {
+        // Сброс анимации для нового вопроса
+        questionBox.classList.remove('fade-in-active');
+        void questionBox.offsetWidth; // Трюк для перезапуска CSS анимации
+        questionBox.classList.add('fade-in-active');
+
+        updateProgressBar();
+        
+        const item = quizData[currentIdx];
+        document.getElementById('question-text').innerText = item.q;
+        
+        const optionsContainer = document.getElementById('options');
+        optionsContainer.innerHTML = '';
+        
+        item.a.forEach((text, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = text;
+            // Добавляем небольшую задержку перед переключением для плавности
+            btn.onclick = () => {
+                selectAnswer(i);
+            };
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(i) {
+        if (i === quizData[currentIdx].c) {
+            score++;
+        }
+        currentIdx++;
+        if (currentIdx < quizData.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('score').innerText = `${score} из ${quizData.length}`;
+        
+        let msg = "";
+        if (score === 10) msg = "Превосходно! Ты настоящий эксперт по датчикам! 🏆";
+        else if (score >= 8) msg = "Отличный результат! Ты хорошо разбираешься в теме. 👍";
+        else if (score >= 5) msg = "Неплохо, но стоит еще немного повторить теорию. 🤔";
+        else msg = "Попробуй изучить тему гироскопа еще раз, у тебя всё получится! 💪";
+        
+        document.getElementById('feedback').innerText = msg;
+    }
+
+    // Запуск теста
+    showQuestion();
+</script>
+
+</body>
+</html>
