@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Тест: Сакская царица Томирис (5 класс)</title>
+  <style>
+    :root{
+      --bg1:#0b1a13;
+      --bg2:#0f2a1d;
+      --card:#0f241aee;
+      --ink:#f6f1e6;
+      --muted:#d8cdb8;
+      --gold:#d9b25f;
+      --gold2:#b88a3b;
+      --accent:#8fe3c4;
+      --danger:#ff7b7b;
+      --ok:#7dffb2;
+      --shadow: 0 18px 40px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(217,178,95,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(143,227,196,.12), transparent 55%),
+        radial-gradient(1200px 700px at 60% 120%, rgba(184,138,59,.12), transparent 55%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* subtle "steppe sky" grain */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 5px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.02) 0 1px, transparent 1px 6px);
+      mix-blend-mode: overlay;
+      opacity:.25;
+      pointer-events:none;
+    }
+
+    .wrap{
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 26px 16px 42px;
+    }
+
+    header{
+      position:relative;
+      padding: 22px 18px 18px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(15,36,26,.92), rgba(10,23,16,.86));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(217,178,95,.25);
+      overflow:hidden;
+    }
+
+    /* "Saka-inspired" border pattern (geometric, not a copy of any artifact) */
+    header::before, header::after{
+      content:"";
+      position:absolute; left:0; right:0;
+      height: 14px;
+      background:
+        linear-gradient(90deg,
+          transparent 0 10px,
+          rgba(217,178,95,.75) 10px 12px,
+          transparent 12px 22px,
+          rgba(217,178,95,.75) 22px 24px,
+          transparent 24px 34px,
+          rgba(217,178,95,.75) 34px 36px,
+          transparent 36px 46px,
+          rgba(217,178,95,.75) 46px 48px,
+          transparent 48px 58px,
+          rgba(217,178,95,.75) 58px 60px,
+          transparent 60px 70px
+        );
+      opacity:.9;
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,.2));
+    }
+    header::before{ top:0; }
+    header::after{ bottom:0; transform: scaleY(-1); }
+
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      gap: 14px;
+    }
+
+    .emblem{
+      width: 58px; height: 58px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.18), transparent 55%),
+        conic-gradient(from 180deg, rgba(217,178,95,.85), rgba(184,138,59,.75), rgba(143,227,196,.35), rgba(217,178,95,.85));
+      border: 1px solid rgba(217,178,95,.35);
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+    }
+    .emblem svg{ opacity:.92; }
+    h1{
+      margin: 0;
+      font-size: clamp(20px, 3vw, 28px);
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height:1.35;
+      font-size: 14px;
+    }
+
+    .topMeta{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .pill{
+      font-size: 12px;
+      color: rgba(246,241,230,.92);
+      border: 1px solid rgba(217,178,95,.28);
+      background: rgba(217,178,95,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .pill b{ color: var(--gold); }
+
+    .card{
+      margin-top: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(15,36,26,.9), rgba(12,28,20,.88));
+      border: 1px solid rgba(217,178,95,.22);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .cardHead{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(217,178,95,.16);
+      background: rgba(0,0,0,.12);
+    }
+    .progressWrap{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      flex: 1 1 auto;
+      min-width: 220px;
+    }
+    .progressRow{
+      display:flex;
+      justify-content:space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(217,178,95,.12);
+      border: 1px solid rgba(217,178,95,.18);
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(217,178,95,.95), rgba(143,227,196,.6));
+      transition: width .35s ease;
+    }
+
+    .timer{
+      font-size: 12px;
+      color: rgba(246,241,230,.9);
+      border: 1px solid rgba(143,227,196,.25);
+      background: rgba(143,227,196,.08);
+      padding: 8px 10px;
+      border-radius: 12px;
+      white-space:nowrap;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .qArea{
+      padding: 16px;
+    }
+
+    .qTitle{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+    }
+    .qNum{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      background: rgba(217,178,95,.12);
+      border: 1px solid rgba(217,178,95,.28);
+      color: var(--gold);
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      flex:0 0 auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+    .qText{
+      margin: 2px 0 0;
+      font-size: 16px;
+      line-height:1.35;
+    }
+
+    .answers{
+      margin-top: 14px;
+      display:grid;
+      gap: 10px;
+    }
+
+    .option{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,178,95,.18);
+      background: rgba(0,0,0,.14);
+      cursor:pointer;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+      user-select:none;
+    }
+    .option:hover{
+      transform: translateY(-1px);
+      border-color: rgba(217,178,95,.35);
+      background: rgba(217,178,95,.06);
+    }
+
+    .radio{
+      margin-top: 2px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(217,178,95,.55);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+    }
+    .radio::after{
+      content:"";
+      width: 10px; height: 10px;
+      border-radius:50%;
+      background: transparent;
+      transform: scale(.7);
+      transition: background .18s ease;
+    }
+
+    .option.selected{
+      border-color: rgba(143,227,196,.5);
+      background: rgba(143,227,196,.08);
+    }
+    .option.selected .radio{
+      border-color: rgba(143,227,196,.75);
+    }
+    .option.selected .radio::after{
+      background: rgba(143,227,196,.75);
+    }
+
+    .controls{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(217,178,95,.16);
+      background: rgba(0,0,0,.10);
+    }
+
+    .btnRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      appearance:none;
+      border: 1px solid rgba(217,178,95,.28);
+      background: rgba(217,178,95,.08);
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 650;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+    }
+    button:hover{
+      background: rgba(217,178,95,.12);
+      border-color: rgba(217,178,95,.42);
+      transform: translateY(-1px);
+    }
+    button:disabled{
+      cursor:not-allowed;
+      opacity:.55;
+      transform:none;
+    }
+    .primary{
+      border-color: rgba(143,227,196,.45);
+      background: rgba(143,227,196,.10);
+    }
+    .primary:hover{
+      background: rgba(143,227,196,.14);
+      border-color: rgba(143,227,196,.62);
+    }
+    .danger{
+      border-color: rgba(255,123,123,.45);
+      background: rgba(255,123,123,.10);
+    }
+    .danger:hover{
+      background: rgba(255,123,123,.14);
+      border-color: rgba(255,123,123,.62);
+    }
+
+    .note{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.35;
+      max-width: 420px;
+    }
+
+    .result{
+      padding: 18px 16px 16px;
+      display:none;
+    }
+    .result.show{ display:block; }
+
+    .scoreBox{
+      border-radius: 18px;
+      border: 1px solid rgba(217,178,95,.22);
+      background: rgba(0,0,0,.14);
+      padding: 14px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap: 10px;
+    }
+    .scoreBig{
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .badge{
+      padding: 6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(217,178,95,.25);
+      background: rgba(217,178,95,.08);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .review{
+      margin-top: 14px;
+      display:grid;
+      gap: 10px;
+    }
+    .revItem{
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,178,95,.18);
+      background: rgba(0,0,0,.12);
+    }
+    .revTop{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .revQ{
+      margin:0;
+      font-size: 14px;
+      line-height:1.35;
+      color: rgba(246,241,230,.92);
+    }
+    .status{
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,178,95,.18);
+      background: rgba(217,178,95,.06);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .status.ok{
+      border-color: rgba(125,255,178,.35);
+      background: rgba(125,255,178,.10);
+      color: rgba(125,255,178,.95);
+    }
+    .status.bad{
+      border-color: rgba(255,123,123,.35);
+      background: rgba(255,123,123,.10);
+      color: rgba(255,123,123,.95);
+    }
+    .revAns{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.35;
+    }
+    .revAns b{ color: var(--gold); }
+
+    footer{
+      margin-top: 14px;
+      text-align:center;
+      color: rgba(216,205,184,.75);
+      font-size: 12px;
+    }
+
+    @media (max-width:520px){
+      .timer{ width:100%; justify-content:center; }
+      .controls{ gap: 12px; }
+      .note{ max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="titleRow">
+        <div class="emblem" aria-hidden="true">
+          <!-- simple emblem: "sun + steppe" -->
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.5l1.1 2.7 2.9.2-2.2 1.8.7 2.8-2.5-1.5-2.5 1.5.7-2.8-2.2-1.8 2.9-.2L12 2.5z" fill="rgba(246,241,230,.9)"/>
+            <path d="M4 16c2.2-2.1 4.7-3.2 8-3.2S17.8 13.9 20 16" stroke="rgba(246,241,230,.8)" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M6 18c1.7-1.2 3.5-1.8 6-1.8s4.3.6 6 1.8" stroke="rgba(143,227,196,.75)" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Тест по теме: «Сакская царица Томирис»</h1>
+          <p class="sub">История Казахстана • 5 класс • 15 вопросов • один правильный ответ</p>
+          <div class="topMeta">
+            <div class="pill"><span>⟡</span> Стиль: <b>Сакская культура</b></div>
+            <div class="pill"><span>⏳</span> Таймер: <b id="timerModeLabel">выключен</b></div>
+            <div class="pill"><span>✓</span> Проверка: <b>автоматическая</b></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="card" id="quizCard">
+      <div class="cardHead">
+        <div class="progressWrap">
+          <div class="progressRow">
+            <span id="qCounter">Вопрос 1 из 15</span>
+            <span id="answeredCounter">Отвечено: 0 / 15</span>
+          </div>
+          <div class="bar" aria-label="Прогресс">
+            <div id="barFill"></div>
+          </div>
+        </div>
+        <div class="timer" id="timerBox" title="Таймер (можно выключить в коде)">
+          ⏱️ <span id="timerText">—:—</span>
+        </div>
+      </div>
+
+      <div class="qArea" id="qArea">
+        <!-- question injected -->
+      </div>
+
+      <div class="controls">
+        <div class="btnRow">
+          <button id="prevBtn" type="button">← Назад</button>
+          <button id="nextBtn" type="button" class="primary">Далее →</button>
+          <button id="finishBtn" type="button" class="primary" style="display:none;">Завершить ✓</button>
+        </div>
+
+        <div class="btnRow">
+          <button id="restartBtn" type="button" class="danger">Начать заново</button>
+        </div>
+
+        <div class="note">
+          Подсказка: можно отвечать в любом порядке — ответы сохраняются. После завершения появится разбор.
+        </div>
+      </div>
+
+      <div class="result" id="resultBox">
+        <div class="scoreBox">
+          <div>
+            <div class="scoreBig" id="scoreBig">Результат: —</div>
+            <div class="badge" id="scoreBadge">—</div>
+          </div>
+          <div class="btnRow">
+            <button id="showReviewBtn" type="button">Показать разбор</button>
+            <button id="hideReviewBtn" type="button" style="display:none;">Скрыть разбор</button>
+          </div>
+        </div>
+
+        <div class="review" id="reviewBox" style="display:none;"></div>
+      </div>
+    </section>
+
+    <footer>
+      Сделано для размещения на GitHub Pages: просто загрузите этот файл как <b>index.html</b>.
+    </footer>
+  </div>
+
+  <script>
+    // =============================
+    // НАСТРОЙКИ
+    // =============================
+    const SETTINGS = {
+      // Таймер: 0 = выключен, иначе количество минут (например 12)
+      timerMinutes: 0,
+
+      // Показывать правильный ответ в разборе (да)
+      showCorrectInReview: true,
+
+      // Случайный порядок вопросов (false/true)
+      shuffleQuestions: false,
+
+      // Случайный порядок вариантов ответа (false/true)
+      shuffleOptions: false
+    };
+
+    // =============================
+    // ДАННЫЕ ТЕСТА (15 вопросов)
+    // correctIndex: 0..3
+    // =============================
+    const QUIZ_BASE = [
+      { q: "Кем была Томирис?", a: ["Царицей саков","Жрицей","Купцом","Полководцем Персии"], correctIndex: 0 },
+      { q: "К какому народу принадлежала Томирис?", a: ["Греки","Персы","Саки","Римляне"], correctIndex: 2 },
+      { q: "Какое государство возглавлял царь Кир II?", a: ["Египет","Персия","Китай","Индия"], correctIndex: 1 },
+      { q: "Почему Кир II начал поход против саков?", a: ["Хотел заключить союз","Хотел захватить земли саков","Хотел торговать","Хотел учиться у саков"], correctIndex: 1 },
+      { q: "Как Томирис отреагировала на предложение Кира II о браке?", a: ["Согласилась","Отказалась","Не ответила","Отправила послов"], correctIndex: 1 },
+      { q: "Чем закончилась битва между саками и войском Кира II?", a: ["Победой Кира","Мирным договором","Победой Томирис","Ничем не закончилась"], correctIndex: 2 },
+      { q: "Что случилось с Киром II в этой битве?", a: ["Он сбежал","Он был взят в плен","Он погиб","Он стал союзником"], correctIndex: 2 },
+      { q: "Какое качество характера Томирис особенно подчёркивается в легендах?", a: ["Хитрость","Жестокость","Мужество и решительность","Лень"], correctIndex: 2 },
+      { q: "Где в основном кочевали саки?", a: ["В Европе","В Южной Америке","В степях Центральной Азии","В Африке"], correctIndex: 2 },
+      { q: "Какой образ жизни вели саки?", a: ["Оседлый","Морской","Кочевой","Городской"], correctIndex: 2 },
+      { q: "Почему Томирис считается важной исторической личностью?", a: ["Она построила города","Она победила могущественного царя","Она была жрицей","Она правила недолго"], correctIndex: 1 },
+      { q: "Какие источники рассказывают о Томирис?", a: ["Современные новости","Древние историки (например, греческие)","Романы","Средневековые комиксы"], correctIndex: 1 },
+      { q: "Кого Томирис защищала в борьбе с Киром II?", a: ["Только себя","Персов","Свой народ","Соседние государства"], correctIndex: 2 },
+      { q: "Какое значение имеет образ Томирис для истории Казахстана?", a: ["Символ мудрости и силы","Символ торговли","Символ науки","Символ религии"], correctIndex: 0 },
+      { q: "Как можно охарактеризовать Томирис одним словом?", a: ["Слабая","Преданная","Смелая","Равнодушная"], correctIndex: 2 }
+    ];
+
+    // =============================
+    // УТИЛИТЫ
+    // =============================
+    const $ = (sel) => document.querySelector(sel);
+
+    function shuffleArray(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function formatTime(seconds){
+      const m = Math.floor(seconds/60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    // =============================
+    // СОСТОЯНИЕ
+    // =============================
+    let quiz = [];
+    let current = 0;
+    let answers = []; // stores chosen option index relative to current displayed options
+    let optionMaps = []; // maps displayed option index -> original option index for correctness
+
+    let timer = null;
+    let timeLeft = SETTINGS.timerMinutes > 0 ? SETTINGS.timerMinutes * 60 : 0;
+
+    // =============================
+    // ИНИЦИАЛИЗАЦИЯ ДАННЫХ
+    // =============================
+    function initQuiz(){
+      // Clone base
+      quiz = QUIZ_BASE.map(item => ({...item, a:[...item.a]}));
+
+      if(SETTINGS.shuffleQuestions){
+        quiz = shuffleArray(quiz);
+      }
+
+      answers = new Array(quiz.length).fill(null);
+      optionMaps = new Array(quiz.length).fill(null);
+
+      // Prepare maps (if shuffleOptions enabled, we create a per-question mapping)
+      quiz.forEach((item, idx) => {
+        const indices = [0,1,2,3];
+        const map = SETTINGS.shuffleOptions ? shuffleArray(indices) : indices;
+        optionMaps[idx] = map; // displayedIndex -> originalIndex
+      });
+
+      current = 0;
+
+      // Timer
+      if(SETTINGS.timerMinutes > 0){
+        timeLeft = SETTINGS.timerMinutes * 60;
+        $("#timerBox").style.display = "";
+        $("#timerModeLabel").textContent = SETTINGS.timerMinutes + " мин";
+        $("#timerText").textContent = formatTime(timeLeft);
+        startTimer();
+      }else{
+        $("#timerBox").style.display = "none";
+        $("#timerModeLabel").textContent = "выключен";
+        stopTimer();
+      }
+
+      // Hide result
+      $("#resultBox").classList.remove("show");
+      $("#resultBox").style.display = "none";
+      $("#reviewBox").style.display = "none";
+      $("#showReviewBtn").style.display = "";
+      $("#hideReviewBtn").style.display = "none";
+
+      render();
+      updateProgress();
+    }
+
+    // =============================
+    // РЕНДЕР ВОПРОСА
+    // =============================
+    function render(){
+      const total = quiz.length;
+      const item = quiz[current];
+
+      $("#qCounter").textContent = `Вопрос ${current+1} из ${total}`;
+
+      // Build options in displayed order
+      const map = optionMaps[current]; // displayed -> original
+      const displayedOptions = map.map(origIdx => item.a[origIdx]);
+
+      const chosen = answers[current]; // displayed index
+
+      const html = `
+        <div class="qTitle">
+          <div class="qNum">${current+1}</div>
+          <div>
+            <p class="qText">${escapeHtml(item.q)}</p>
+          </div>
+        </div>
+
+        <div class="answers" role="list">
+          ${displayedOptions.map((text, i) => `
+            <div class="option ${chosen===i ? "selected" : ""}" role="listitem" tabindex="0"
+                 data-opt="${i}" aria-label="Вариант ${String.fromCharCode(65+i)}">
+              <div class="radio" aria-hidden="true"></div>
+              <div>
+                <div><b>${String.fromCharCode(65+i)})</b> ${escapeHtml(text)}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+      $("#qArea").innerHTML = html;
+
+      // Attach listeners
+      document.querySelectorAll(".option").forEach(el=>{
+        el.addEventListener("click", ()=> selectOption(parseInt(el.dataset.opt,10)));
+        el.addEventListener("keydown", (e)=>{
+          if(e.key==="Enter" || e.key===" "){
+            e.preventDefault();
+            selectOption(parseInt(el.dataset.opt,10));
+          }
+        });
+      });
+
+      // Buttons
+      $("#prevBtn").disabled = current === 0;
+      const isLast = current === total - 1;
+      $("#nextBtn").style.display = isLast ? "none" : "";
+      $("#finishBtn").style.display = isLast ? "" : "none";
+      $("#finishBtn").disabled = !allAnswered();
+    }
+
+    function selectOption(displayedIndex){
+      answers[current] = displayedIndex;
+
+      // Update selection UI
+      document.querySelectorAll(".option").forEach(el=>{
+        el.classList.toggle("selected", parseInt(el.dataset.opt,10) === displayedIndex);
+      });
+
+      updateProgress();
+      // Enable finish if on last question and all answered
+      $("#finishBtn").disabled = !allAnswered();
+    }
+
+    function updateProgress(){
+      const total = quiz.length;
+      const answered = answers.filter(v=>v!==null).length;
+      $("#answeredCounter").textContent = `Отвечено: ${answered} / ${total}`;
+      $("#barFill").style.width = `${Math.round((answered/total)*100)}%`;
+
+      // If last question, refresh finish button state
+      if(current === total-1){
+        $("#finishBtn").disabled = !allAnswered();
+      }
+    }
+
+    function allAnswered(){
+      return answers.every(v => v !== null);
+    }
+
+    // =============================
+    // ПОДСЧЁТ РЕЗУЛЬТАТА
+    // =============================
+    function computeScore(){
+      let correct = 0;
+      const details = quiz.map((item, idx)=>{
+        const chosenDisplayed = answers[idx];
+        const map = optionMaps[idx];
+        const chosenOriginal = chosenDisplayed === null ? null : map[chosenDisplayed];
+        const isCorrect = chosenOriginal === item.correctIndex;
+        if(isCorrect) correct++;
+        return {
+          idx,
+          question: item.q,
+          chosenDisplayed,
+          chosenOriginal,
+          correctOriginal: item.correctIndex,
+          isCorrect,
+          map
+        };
+      });
+
+      return { correct, total: quiz.length, details };
+    }
+
+    function showResult(){
+      stopTimer();
+
+      const { correct, total, details } = computeScore();
+      const percent = Math.round((correct/total)*100);
+
+      $("#scoreBig").textContent = `Результат: ${correct} / ${total} (${percent}%)`;
+
+      let label = "Отлично!";
+      if(percent < 90) label = "Очень хорошо!";
+      if(percent < 75) label = "Хорошо!";
+      if(percent < 60) label = "Нужно повторить тему 🙂";
+      $("#scoreBadge").textContent = label;
+
+      // Build review
+      const reviewHtml = details.map(d=>{
+        const item = quiz[d.idx];
+        const chosenText = (d.chosenDisplayed===null)
+          ? "— (нет ответа)"
+          : `${String.fromCharCode(65+d.chosenDisplayed)}) ${item.a[d.chosenOriginal]}`;
+
+        // Find displayed letter for correct answer (depends on map)
+        const correctDisplayed = d.map.indexOf(d.correctOriginal);
+        const correctText = `${String.fromCharCode(65+correctDisplayed)}) ${item.a[d.correctOriginal]}`;
+
+        return `
+          <div class="revItem">
+            <div class="revTop">
+              <p class="revQ"><b>${d.idx+1}.</b> ${escapeHtml(item.q)}</p>
+              <span class="status ${d.isCorrect ? "ok" : "bad"}">
+                ${d.isCorrect ? "Верно" : "Неверно"}
+              </span>
+            </div>
+            <div class="revAns">
+              <div>Ваш ответ: <b>${escapeHtml(chosenText)}</b></div>
+              ${SETTINGS.showCorrectInReview ? `<div>Правильный ответ: <b>${escapeHtml(correctText)}</b></div>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      $("#reviewBox").innerHTML = reviewHtml;
+
+      $("#resultBox").style.display = "block";
+      $("#resultBox").classList.add("show");
+
+      // Scroll to result
+      $("#resultBox").scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    // =============================
+    // ТАЙМЕР
+    // =============================
+    function startTimer(){
+      stopTimer();
+      $("#timerText").textContent = formatTime(timeLeft);
+      timer = setInterval(()=>{
+        timeLeft--;
+        $("#timerText").textContent = formatTime(Math.max(0,timeLeft));
+        if(timeLeft <= 0){
+          stopTimer();
+          // Автозавершение
+          showResult();
+        }
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(timer){
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    // =============================
+    // БЕЗОПАСНЫЙ ВЫВОД ТЕКСТА
+    // =============================
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // =============================
+    // ОБРАБОТЧИКИ
+    // =============================
+    $("#prevBtn").addEventListener("click", ()=>{
+      if(current>0){ current--; render(); updateProgress(); }
+    });
+
+    $("#nextBtn").addEventListener("click", ()=>{
+      if(current<quiz.length-1){ current++; render(); updateProgress(); }
+    });
+
+    $("#finishBtn").addEventListener("click", ()=>{
+      if(!allAnswered()){
+        alert("Ответьте на все вопросы перед завершением.");
+        return;
+      }
+      showResult();
+    });
+
+    $("#restartBtn").addEventListener("click", ()=>{
+      if(confirm("Начать заново? Текущие ответы будут сброшены.")){
+        initQuiz();
+        window.scrollTo({top:0, behavior:"smooth"});
+      }
+    });
+
+    $("#showReviewBtn").addEventListener("click", ()=>{
+      $("#reviewBox").style.display = "grid";
+      $("#showReviewBtn").style.display = "none";
+      $("#hideReviewBtn").style.display = "";
+      $("#reviewBox").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+
+    $("#hideReviewBtn").addEventListener("click", ()=>{
+      $("#reviewBox").style.display = "none";
+      $("#showReviewBtn").style.display = "";
+      $("#hideReviewBtn").style.display = "none";
+    });
+
+    // =============================
+    // ЗАПУСК
+    // =============================
+    initQuiz();
+  </script>
+</body>
+</html>
