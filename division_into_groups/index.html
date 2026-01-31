@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Деление на группы — Информатика</title>
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.09);
+      --text: #e9eefc;
+      --muted: rgba(233,238,252,.7);
+      --accent: #79d2ff;
+      --accent2:#a78bfa;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(121,210,255,.18), transparent 60%),
+        radial-gradient(700px 500px at 85% 20%, rgba(167,139,250,.18), transparent 55%),
+        radial-gradient(900px 600px at 30% 90%, rgba(52,211,153,.12), transparent 60%),
+        linear-gradient(180deg, #070a14 0%, #0b1020 55%, #070a14 100%);
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    header{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 14px 18px;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom: 18px;
+    }
+
+    .title{
+      display:flex;
+      gap: 14px;
+      align-items:center;
+    }
+
+    .badge{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background:
+        radial-gradient(14px 14px at 30% 35%, rgba(255,255,255,.35), transparent 60%),
+        linear-gradient(135deg, rgba(121,210,255,.9), rgba(167,139,250,.85));
+      box-shadow: 0 12px 30px rgba(121,210,255,.15);
+      position:relative;
+      overflow:hidden;
+    }
+    .badge::after{
+      content:"</>";
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      letter-spacing:.5px;
+      color: rgba(7,10,20,.95);
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    h1{
+      margin:0;
+      font-size: 22px;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:flex-end;
+      justify-content:flex-end;
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .control-card{
+      padding: 12px 12px 10px;
+      display:flex;
+      gap: 10px;
+      align-items:flex-end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      min-width: 170px;
+    }
+    .label{
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      user-select:none;
+    }
+    .label .dot{
+      width: 8px; height: 8px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      opacity:.9;
+      box-shadow: 0 0 0 3px rgba(121,210,255,.12);
+    }
+    input{
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+    input:focus{
+      border-color: rgba(121,210,255,.55);
+      box-shadow: 0 0 0 4px rgba(121,210,255,.14);
+    }
+
+    .btns{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      padding-bottom: 1px;
+    }
+
+    button{
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing:.2px;
+      padding: 0 14px;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.22);
+      transform: translateY(-1px);
+    }
+    button:active{ transform: translateY(0px) scale(.99); }
+
+    .primary{
+      background: linear-gradient(135deg, rgba(121,210,255,.28), rgba(167,139,250,.22));
+      border-color: rgba(121,210,255,.35);
+    }
+    .primary:hover{
+      background: linear-gradient(135deg, rgba(121,210,255,.34), rgba(167,139,250,.28));
+    }
+    .ghost{
+      background: rgba(0,0,0,.18);
+    }
+
+    .status{
+      margin-top: 10px;
+      padding: 10px 12px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .status strong{ color: var(--text); }
+
+    /* Pool + groups layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .pool{
+      padding: 14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .pool-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .pool-title{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .pill{
+      font-size: 12px;
+      color: rgba(233,238,252,.8);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      min-height: 44px;
+      align-content:flex-start;
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,.16);
+      background: rgba(0,0,0,.12);
+    }
+
+    .groups{
+      padding: 14px;
+    }
+    .groups-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .groups-title{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .legend{
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .legend span{
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+    }
+    .legend i{
+      width: 10px; height: 10px; border-radius: 99px;
+      display:inline-block;
+    }
+    .i1{ background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+    .i2{ background: linear-gradient(135deg, var(--ok), var(--accent)); }
+
+    .group-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .group{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      position:relative;
+      overflow:hidden;
+      min-height: 120px;
+    }
+    .group::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(220px 120px at 20% 10%, rgba(121,210,255,.12), transparent 60%),
+                  radial-gradient(220px 120px at 80% 20%, rgba(167,139,250,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .group-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+      position:relative;
+      z-index:1;
+    }
+    .group-name{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      font-weight: 800;
+      letter-spacing:.25px;
+      font-size: 13px;
+    }
+    .chip-dot{
+      width:10px; height:10px; border-radius:99px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 3px rgba(121,210,255,.12);
+      opacity:.95;
+    }
+    .count{
+      font-size: 12px;
+      color: rgba(233,238,252,.75);
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+    }
+    .group-body{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      position:relative;
+      z-index:1;
+    }
+
+    /* Chip */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 34px;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing:.2px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+      transform: translateZ(0);
+      user-select:none;
+    }
+    .chip[data-state="pool"]{
+      background: linear-gradient(135deg, rgba(121,210,255,.18), rgba(167,139,250,.12));
+      border-color: rgba(121,210,255,.25);
+    }
+    .chip[data-state="group"]{
+      background: linear-gradient(135deg, rgba(52,211,153,.16), rgba(121,210,255,.10));
+      border-color: rgba(52,211,153,.26);
+    }
+
+    /* Floating animation layer */
+    .fly-layer{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index: 9999;
+    }
+
+    .hint{
+      margin-top: 10px;
+      color: rgba(233,238,252,.65);
+      font-size: 12px;
+      line-height:1.35;
+    }
+
+    .shake{
+      animation: shake .35s ease;
+    }
+    @keyframes shake{
+      0%{ transform: translateX(0); }
+      25%{ transform: translateX(-6px); }
+      50%{ transform: translateX(6px); }
+      75%{ transform: translateX(-4px); }
+      100%{ transform: translateX(0); }
+    }
+
+    @media (max-width: 640px){
+      .control-card{ width: 100%; }
+      .field{ min-width: 150px; flex: 1; }
+      .btns{ width: 100%; justify-content:space-between; }
+      button{ flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="fly-layer" id="flyLayer"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <div class="badge" aria-hidden="true"></div>
+        <div>
+          <h1>Деление учащихся на группы</h1>
+          <div class="sub">Введи количество учеников и групп — номера случайно перемешаются и “улетят” по группам.</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="card control-card" id="controlCard">
+          <div class="field">
+            <div class="label"><span class="dot"></span>Количество учеников</div>
+            <input id="students" type="number" min="1" max="60" value="25" />
+          </div>
+          <div class="field">
+            <div class="label"><span class="dot"></span>Количество групп</div>
+            <input id="groups" type="number" min="1" max="12" value="5" />
+          </div>
+          <div class="btns">
+            <button class="primary" id="btnSplit">Разделить</button>
+            <button class="ghost" id="btnReset">Сброс</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="status card" id="status">
+      <div>Статус: <strong id="statusText">готово</strong></div>
+      <div id="statsText">—</div>
+    </div>
+
+    <div class="grid">
+      <section class="card pool">
+        <div class="pool-top">
+          <h2 class="pool-title">Пул номеров</h2>
+          <div class="pill" id="poolPill">0 шт.</div>
+        </div>
+        <div class="chips" id="poolChips" aria-label="Пул номеров"></div>
+        <div class="hint">
+          Подсказка: заранее выдай ученикам номера от 1 до N. На уроке введи N и количество групп.
+        </div>
+      </section>
+
+      <section class="card groups">
+        <div class="groups-top">
+          <h2 class="groups-title">Группы</h2>
+          <div class="legend">
+            <span><i class="i1"></i> в пуле</span>
+            <span><i class="i2"></i> распределено</span>
+          </div>
+        </div>
+        <div class="group-grid" id="groupGrid"></div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const elStudents = document.getElementById('students');
+  const elGroups = document.getElementById('groups');
+  const btnSplit = document.getElementById('btnSplit');
+  const btnReset = document.getElementById('btnReset');
+
+  const poolChips = document.getElementById('poolChips');
+  const poolPill = document.getElementById('poolPill');
+  const groupGrid = document.getElementById('groupGrid');
+
+  const statusText = document.getElementById('statusText');
+  const statsText = document.getElementById('statsText');
+  const controlCard = document.getElementById('controlCard');
+
+  const flyLayer = document.getElementById('flyLayer');
+
+  let currentN = 0;
+  let currentG = 0;
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  function setStatus(text, kind="normal"){
+    statusText.textContent = text;
+    statusText.style.color =
+      kind === "ok" ? "var(--ok)" :
+      kind === "warn" ? "var(--warn)" :
+      kind === "danger" ? "var(--danger)" :
+      "var(--text)";
+  }
+
+  function clampInt(v, min, max){
+    const n = Math.floor(Number(v));
+    if (!Number.isFinite(n)) return null;
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function shuffle(arr){
+    // Fisher–Yates
+    for (let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function clearAll(){
+    poolChips.innerHTML = "";
+    groupGrid.innerHTML = "";
+    flyLayer.innerHTML = "";
+    poolPill.textContent = "0 шт.";
+    statsText.textContent = "—";
+    setStatus("готово");
+  }
+
+  function buildPool(n){
+    poolChips.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= n; i++){
+      const chip = document.createElement('div');
+      chip.className = "chip";
+      chip.dataset.state = "pool";
+      chip.textContent = i;
+      frag.appendChild(chip);
+    }
+    poolChips.appendChild(frag);
+    poolPill.textContent = `${n} шт.`;
+  }
+
+  function buildGroups(g){
+    groupGrid.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= g; i++){
+      const group = document.createElement('div');
+      group.className = "group";
+      group.innerHTML = `
+        <div class="group-head">
+          <div class="group-name"><span class="chip-dot"></span>Группа ${i}</div>
+          <div class="count" data-count>0</div>
+        </div>
+        <div class="group-body" data-body></div>
+      `;
+      frag.appendChild(group);
+    }
+    groupGrid.appendChild(frag);
+  }
+
+  function updateCounts(){
+    const poolCount = poolChips.querySelectorAll('.chip').length;
+    poolPill.textContent = `${poolCount} шт.`;
+
+    const groups = groupGrid.querySelectorAll('.group');
+    groups.forEach(g => {
+      const body = g.querySelector('[data-body]');
+      const count = body.querySelectorAll('.chip').length;
+      g.querySelector('[data-count]').textContent = count;
+    });
+
+    statsText.textContent = `Учеников: ${currentN} • Групп: ${currentG} • В пуле: ${poolCount}`;
+  }
+
+  function validate(){
+    const n = clampInt(elStudents.value, 1, 60);
+    const g = clampInt(elGroups.value, 1, 12);
+
+    if (n === null || g === null){
+      return { ok:false, msg:"введи корректные числа" };
+    }
+    if (g > n){
+      return { ok:false, msg:"групп не может быть больше, чем учеников" };
+    }
+    return { ok:true, n, g };
+  }
+
+  function shakeControls(){
+    controlCard.classList.remove('shake');
+    void controlCard.offsetWidth;
+    controlCard.classList.add('shake');
+  }
+
+  function makeFlyingChip(text, fromRect){
+    const chip = document.createElement('div');
+    chip.className = "chip";
+    chip.textContent = text;
+    chip.style.position = "fixed";
+    chip.style.left = `${fromRect.left}px`;
+    chip.style.top = `${fromRect.top}px`;
+    chip.style.width = `${fromRect.width}px`;
+    chip.style.height = `${fromRect.height}px`;
+    chip.style.margin = "0";
+    chip.style.zIndex = "9999";
+    chip.style.pointerEvents = "none";
+    chip.dataset.state = "group";
+    flyLayer.appendChild(chip);
+    return chip;
+  }
+
+  function animateTo(chipEl, toRect, opts={}){
+    const fromRect = chipEl.getBoundingClientRect();
+    const dx = toRect.left - fromRect.left;
+    const dy = toRect.top - fromRect.top;
+
+    const duration = opts.duration ?? 520;
+    const delay = opts.delay ?? 0;
+
+    // лёгкая дуга: добавим “подскок”
+    const arc = Math.max(16, Math.min(90, Math.abs(dx) * 0.08 + 24));
+    const keyframes = [
+      { transform: `translate(0px, 0px) scale(1)`, offset: 0 },
+      { transform: `translate(${dx * 0.55}px, ${dy * 0.55 - arc}px) scale(1.03)`, offset: 0.55 },
+      { transform: `translate(${dx}px, ${dy}px) scale(1)`, offset: 1 }
+    ];
+
+    return chipEl.animate(keyframes, {
+      duration,
+      delay,
+      easing: "cubic-bezier(.2,.9,.2,1)",
+      fill: "forwards"
+    });
+  }
+
+  async function split(){
+    const v = validate();
+    if (!v.ok){
+      setStatus(v.msg, "danger");
+      shakeControls();
+      return;
+    }
+
+    currentN = v.n;
+    currentG = v.g;
+
+    clearAll();
+    buildPool(currentN);
+    buildGroups(currentG);
+    updateCounts();
+
+    setStatus("перемешиваю и распределяю…", "warn");
+
+    // Собираем номера и перемешиваем
+    const nums = shuffle(Array.from({length: currentN}, (_, i) => i + 1));
+
+    // План распределения: round-robin
+    const buckets = Array.from({length: currentG}, () => []);
+    nums.forEach((num, idx) => buckets[idx % currentG].push(num));
+
+    // Анимация: берём чипы из пула по порядку nums, "вылетают" в целевую группу
+    // Чтобы было красиво — по очереди с небольшой задержкой.
+    const poolMap = new Map();
+    poolChips.querySelectorAll('.chip').forEach(ch => poolMap.set(Number(ch.textContent), ch));
+
+    // Создаём невидимые "якоря" в группах, чтобы знать куда лететь (в конец списка)
+    const groupBodies = Array.from(groupGrid.querySelectorAll('[data-body]'));
+
+    let flightIndex = 0;
+    const total = currentN;
+
+    for (let gi = 0; gi < currentG; gi++){
+      for (const num of buckets[gi]){
+        const sourceChip = poolMap.get(num);
+        if (!sourceChip) continue;
+
+        // позиция старта
+        const fromRect = sourceChip.getBoundingClientRect();
+
+        // создаём временный летающий чип
+        const flying = makeFlyingChip(String(num), fromRect);
+
+        // убираем исходный из пула (чтобы было ощущение "вылетел")
+        sourceChip.remove();
+        updateCounts();
+
+        // создаём временный "якорь" в нужной группе
+        const anchor = document.createElement('span');
+        anchor.style.display = "inline-block";
+        anchor.style.width = "34px";
+        anchor.style.height = "30px";
+        anchor.style.margin = "0";
+        anchor.style.borderRadius = "999px";
+        anchor.style.border = "1px dashed rgba(255,255,255,.14)";
+        anchor.style.background = "rgba(255,255,255,.03)";
+        groupBodies[gi].appendChild(anchor);
+
+        // даём браузеру отрисовать якорь
+        await sleep(0);
+
+        const toRect = anchor.getBoundingClientRect();
+
+        const anim = animateTo(flying, toRect, {
+          duration: 520,
+          delay: Math.min(120, flightIndex * 6)
+        });
+
+        // “такт” анимации — чтобы не всё одновременно
+        flightIndex++;
+        const progress = Math.round((flightIndex / total) * 100);
+        setStatus(`распределяю… ${progress}%`, "warn");
+
+        await anim.finished.catch(() => {});
+        // после прилёта — заменяем якорь на настоящий чип в группе
+        const finalChip = document.createElement('div');
+        finalChip.className = "chip";
+        finalChip.dataset.state = "group";
+        finalChip.textContent = String(num);
+
+        anchor.replaceWith(finalChip);
+        flying.remove();
+
+        updateCounts();
+
+        // небольшая пауза, чтобы "полет" читался
+        await sleep(40);
+      }
+    }
+
+    setStatus("готово — группы сформированы ✅", "ok");
+  }
+
+  btnSplit.addEventListener('click', split);
+  btnReset.addEventListener('click', () => {
+    clearAll();
+    const v = validate();
+    if (v.ok){
+      currentN = v.n;
+      currentG = v.g;
+      buildPool(currentN);
+      buildGroups(currentG);
+      updateCounts();
+    }
+    setStatus("готово");
+  });
+
+  // стартовое состояние
+  (() => {
+    const v = validate();
+    if (v.ok){
+      currentN = v.n;
+      currentG = v.g;
+      buildPool(currentN);
+      buildGroups(currentG);
+      updateCounts();
+    }
+  })();
+})();
+</script>
+</body>
+</html>
