@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Тест: Сортировка массива (Пузырёк + Выбор)</title>
+<meta name="description" content="Онлайн-тест по сортировке одномерных массивов: пузырьком и выбором. Есть подсказки с кодом и автопроверка." />
+
+<style>
+  :root{
+    --bg:#020407;
+    --card: rgba(2, 10, 6, .70);
+    --line: rgba(34, 197, 94, .25);
+    --text: #d1fae5;
+    --muted: rgba(209, 250, 229, .70);
+    --green: #22c55e;
+    --green2:#16a34a;
+    --green3:#86efac;
+    --bad:#fb7185;
+    --shadow: 0 18px 70px rgba(0,0,0,.55);
+    --radius: 18px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: var(--sans);
+    color: var(--text);
+    background: radial-gradient(900px 700px at 50% 20%, rgba(34,197,94,.10), transparent 60%),
+                radial-gradient(1200px 900px at 10% 90%, rgba(34,197,94,.08), transparent 55%),
+                linear-gradient(180deg, #000, var(--bg));
+    overflow-x:hidden;
+  }
+
+  /* Matrix canvas */
+  #matrix{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity: .80;
+    filter: contrast(1.05) saturate(1.15);
+    pointer-events:none;
+  }
+
+  /* Subtle vignette */
+  .vignette{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background: radial-gradient(1200px 900px at 50% 30%, transparent 40%, rgba(0,0,0,.55) 100%);
+  }
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width: 980px;
+    margin: 26px auto 60px;
+    padding: 0 16px;
+  }
+
+  header{
+    border:1px solid var(--line);
+    background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(2,10,6,.45));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(34,197,94,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,197,94,.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 70%);
+    pointer-events:none;
+  }
+
+  .head-inner{
+    padding: 18px 18px 14px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .title{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .badge{
+    width:44px; height:44px;
+    border-radius: 14px;
+    display:grid; place-items:center;
+    background: rgba(34,197,94,.14);
+    border:1px solid rgba(34,197,94,.35);
+    box-shadow: 0 10px 26px rgba(34,197,94,.12);
+    font-family: var(--mono);
+    color: var(--green3);
+    font-weight:900;
+  }
+  h1{
+    margin:0;
+    font-size: 20px;
+    letter-spacing:.2px;
+  }
+  .sub{
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .meta{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:flex-end;
+  }
+  .pill{
+    border:1px solid rgba(34,197,94,.25);
+    background: rgba(0,0,0,.35);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .bar-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    padding: 0 18px 16px;
+    flex-wrap:wrap;
+  }
+
+  .progress{
+    flex: 1 1 280px;
+    min-width: 260px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(34,197,94,.08);
+    border:1px solid rgba(34,197,94,.20);
+    overflow:hidden;
+  }
+  .progress span{
+    display:block;
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, rgba(34,197,94,1), rgba(134,239,172,.9));
+    border-radius: 999px;
+    transition: width .25s ease;
+  }
+
+  .btns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  button{
+    cursor:pointer;
+    border-radius: 14px;
+    padding: 10px 14px;
+    border:1px solid rgba(34,197,94,.35);
+    background: rgba(0,0,0,.35);
+    color: var(--text);
+    font-weight: 800;
+    letter-spacing:.2px;
+    font-family: var(--mono);
+    transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    user-select:none;
+  }
+  button:hover{
+    background: rgba(34,197,94,.10);
+    border-color: rgba(34,197,94,.50);
+  }
+  button:active{ transform: translateY(1px); }
+  button.primary{
+    background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(22,163,74,.85));
+    border-color: rgba(34,197,94,.65);
+    color:#02110a;
+    box-shadow: 0 16px 45px rgba(34,197,94,.16);
+  }
+  button.primary:hover{
+    background: linear-gradient(90deg, rgba(34,197,94,1), rgba(22,163,74,.92));
+  }
+
+  main{ margin-top: 16px; display:grid; gap: 14px; }
+
+  .card{
+    border-radius: var(--radius);
+    border:1px solid rgba(34,197,94,.22);
+    background: linear-gradient(180deg, rgba(0,0,0,.48), rgba(2,10,6,.38));
+    box-shadow: 0 14px 44px rgba(0,0,0,.40);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .card:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background: radial-gradient(700px 240px at 10% 0%, rgba(34,197,94,.10), transparent 55%);
+  }
+
+  .c-head{
+    padding: 14px 16px;
+    border-bottom:1px solid rgba(34,197,94,.14);
+    background: rgba(0,0,0,.30);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .c-title{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    line-height:1.25;
+  }
+  .num{
+    width:34px; height:34px;
+    border-radius: 12px;
+    display:grid; place-items:center;
+    font-family: var(--mono);
+    font-weight: 900;
+    color: var(--green3);
+    background: rgba(34,197,94,.12);
+    border:1px solid rgba(34,197,94,.30);
+  }
+  .tag{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 10px;
+    border-radius: 999px;
+    border:1px solid rgba(34,197,94,.18);
+    background: rgba(0,0,0,.25);
+    white-space:nowrap;
+  }
+
+  .c-body{ padding: 14px 16px 16px; }
+
+  details.hint{
+    border:1px solid rgba(34,197,94,.18);
+    border-radius: 14px;
+    background: rgba(0,0,0,.25);
+    padding: 10px 12px;
+  }
+  details.hint > summary{
+    cursor:pointer;
+    font-family: var(--mono);
+    color: var(--green3);
+    font-weight: 900;
+    list-style:none;
+    outline:none;
+  }
+  details.hint > summary::-webkit-details-marker{ display:none; }
+  .hint p{
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height:1.4;
+  }
+
+  pre.code{
+    margin: 10px 0 0;
+    border-radius: 14px;
+    padding: 12px 12px;
+    overflow:auto;
+    border:1px solid rgba(34,197,94,.18);
+    background: rgba(0,0,0,.45);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.35;
+    color: #86efac;
+    text-shadow: 0 0 10px rgba(34,197,94,.15);
+  }
+
+  .choices{
+    display:grid;
+    gap:10px;
+    margin-top: 12px;
+  }
+  label.choice{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border:1px solid rgba(34,197,94,.18);
+    background: rgba(0,0,0,.25);
+    cursor:pointer;
+    transition: background .2s ease, border-color .2s ease, transform .08s ease;
+  }
+  label.choice:hover{
+    background: rgba(34,197,94,.08);
+    border-color: rgba(34,197,94,.30);
+  }
+  label.choice:active{ transform: translateY(1px); }
+  input[type="radio"]{
+    margin-top: 3px;
+    accent-color: var(--green);
+    transform: scale(1.05);
+    cursor:pointer;
+  }
+
+  .feedback{
+    display:none;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border:1px dashed rgba(34,197,94,.25);
+    background: rgba(0,0,0,.25);
+    gap:10px;
+    align-items:flex-start;
+  }
+  .feedback.show{ display:flex; }
+  .ico{
+    width:24px; height:24px;
+    border-radius: 8px;
+    display:grid; place-items:center;
+    font-family: var(--mono);
+    font-weight: 900;
+    color:#02110a;
+    flex:0 0 auto;
+  }
+  .ico.good{ background: var(--green); }
+  .ico.bad{ background: var(--bad); color:#0b0610; }
+  .fb{
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .fb b{ color: var(--text); }
+
+  .result{
+    display:none;
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: var(--radius);
+    border:1px solid rgba(34,197,94,.28);
+    background: linear-gradient(180deg, rgba(0,0,0,.52), rgba(2,10,6,.40));
+    box-shadow: var(--shadow);
+  }
+  .result.show{ display:block; }
+  .score{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .score h2{
+    margin:0;
+    font-size: 18px;
+    font-family: var(--mono);
+  }
+  .big{
+    font-family: var(--mono);
+    font-weight: 900;
+    font-size: 22px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: rgba(34,197,94,.12);
+    border:1px solid rgba(34,197,94,.28);
+    color: var(--green3);
+  }
+  .hint2{
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height:1.4;
+  }
+
+  footer{
+    margin-top: 18px;
+    text-align:center;
+    font-size: 12px;
+    color: rgba(209,250,229,.70);
+    font-family: var(--mono);
+  }
+
+  .shake{ animation: shake .2s linear 0s 2; }
+  @keyframes shake{
+    0%{ transform: translateX(0); }
+    25%{ transform: translateX(-4px); }
+    50%{ transform: translateX(4px); }
+    75%{ transform: translateX(-3px); }
+    100%{ transform: translateX(0); }
+  }
+</style>
+</head>
+
+<body>
+<canvas id="matrix"></canvas>
+<div class="vignette"></div>
+
+<div class="wrap">
+  <header>
+    <div class="grid" aria-hidden="true"></div>
+
+    <div class="head-inner">
+      <div class="title">
+        <div class="badge">&gt;_</div>
+        <div>
+          <h1>Тест: Сортировка одномерного массива</h1>
+          <div class="sub">Пузырьком и выбором · с подсказкой-кодом · 12 вопросов · 1 правильный ответ</div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="pill" id="answeredPill">answered: 0/12</div>
+        <div class="pill">mode: matrix</div>
+        <div class="pill">lang: python</div>
+      </div>
+    </div>
+
+    <div class="bar-row">
+      <div class="progress" aria-label="Прогресс"><span id="progressBar"></span></div>
+      <div class="btns">
+        <button type="button" id="resetBtn">reset()</button>
+        <button type="button" class="primary" id="checkBtn">check()</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="result" id="resultBox" role="status" aria-live="polite">
+    <div class="score">
+      <h2>result</h2>
+      <div class="big" id="scoreText">0/12</div>
+    </div>
+    <div class="hint2" id="resultHint">Отметь ответы и нажми check().</div>
+  </div>
+
+  <main>
+    <section class="card">
+      <div class="c-head">
+        <div class="c-title">
+          <div class="num">🐍</div>
+          <div>
+            <div style="font-family:var(--mono);font-weight:900;color:var(--green3);">Подсказка: код сортировок</div>
+            <div style="margin-top:4px;color:var(--muted);font-size:13px;">Можно открывать и смотреть, чтобы отвечать было легче.</div>
+          </div>
+        </div>
+        <div class="tag">hint</div>
+      </div>
+      <div class="c-body">
+        <details class="hint" open>
+          <summary>Пузырьковая сортировка (как на уроке)</summary>
+<pre class="code">a = [2, 6, 1, 5, 9, 0]
+q = 0
+for i in range(0, len(a)):
+    for j in range(0, (len(a) - i - 1)):
+        if a[j] > a[j+1]:
+            q = a[j+1]
+            a[j+1] = a[j]
+            a[j] = q
+print(a)</pre>
+          <p>Идея: сравниваем <b>соседние</b> элементы и меняем местами, если стоят неправильно.</p>
+        </details>
+
+        <div style="height:12px"></div>
+
+        <details class="hint">
+          <summary>Сортировка выбором (как на уроке)</summary>
+<pre class="code">a = [5, 3, 4, 1]
+q = 0
+n = len(a)
+for i in range(n):
+    m_i = i
+    for j in range(i+1, n):
+        if a[j] < a[m_i]:
+            m_i = j
+    q = a[m_i]
+    a[m_i] = a[i]
+    a[i] = q
+print(a)</pre>
+          <p>Идея: на каждом шаге ищем <b>минимальный</b> элемент и ставим на позицию <b>i</b>.</p>
+        </details>
+      </div>
+    </section>
+
+    <div id="quiz"></div>
+  </main>
+
+  <footer>upload: index.html · GitHub Pages · matrix style</footer>
+</div>
+
+<script>
+/* =======================
+   MATRIX RAIN (canvas)
+   ======================= */
+(function matrixRain(){
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+
+  const chars = "01PYTHON{}[]()<>+=-*/;:.,!?@#$%^&";
+  let fontSize = 16;
+  let columns = 0;
+  let drops = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array.from({length: columns}, () => Math.floor(Math.random() * canvas.height / fontSize));
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function draw(){
+    // fade to create trailing effect
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+    for(let i=0;i<drops.length;i++){
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      // glow-ish green
+      ctx.fillStyle = "rgba(34, 197, 94, 0.9)";
+      ctx.fillText(text, x, y);
+
+      // reset drop randomly
+      if(y > canvas.height && Math.random() > 0.975){
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* =======================
+   QUIZ DATA (12 questions)
+   ======================= */
+const QUESTIONS = [
+  {
+    text: "Какой метод использует сравнение соседних элементов: if a[j] > a[j+1] ?",
+    choices: ["Пузырьком", "Выбором", "Вставками", "Слиянием"],
+    correct: 0,
+    explain: "Это пузырьковая сортировка: сравнение соседей a[j] и a[j+1]."
+  },
+  {
+    text: "Что делает пузырьковая сортировка на каждом шаге внутреннего цикла?",
+    choices: ["Ищет минимальный элемент", "Сравнивает соседние элементы и меняет местами", "Делит массив пополам", "Удаляет элементы массива"],
+    correct: 1,
+    explain: "В пузырьке сравнивают соседние элементы и при необходимости меняют местами."
+  },
+  {
+    text: "Для чего в коде используется переменная q?",
+    choices: ["Хранит длину массива", "Временно хранит значение при обмене", "Считает количество сравнений", "Печатает массив"],
+    correct: 1,
+    explain: "q — временная переменная для перестановки элементов."
+  },
+  {
+    text: "Какой метод сортировки использует переменную m_i?",
+    choices: ["Пузырёк", "Выбор", "Быстрая сортировка", "Нет такого метода"],
+    correct: 1,
+    explain: "m_i — индекс минимального элемента в сортировке выбором."
+  },
+  {
+    text: "Что означает m_i в сортировке выбором?",
+    choices: ["Минимальный элемент", "Индекс минимального элемента", "Максимальный элемент", "Сумма элементов"],
+    correct: 1,
+    explain: "m_i хранит индекс текущего минимального элемента среди оставшихся."
+  },
+  {
+    text: "На первом шаге выбора (i = 0) для массива [5, 3, 4, 1] какой элемент станет a[0]?",
+    choices: ["5", "3", "4", "1"],
+    correct: 3,
+    explain: "Минимальный элемент — 1, значит он встанет на позицию 0."
+  },
+  {
+    text: "Сколько раз выполнится внешний цикл for i in range(n) при n = 4?",
+    choices: ["3", "4", "5", "2"],
+    correct: 1,
+    explain: "range(4) даёт 4 значения: 0,1,2,3."
+  },
+  {
+    text: "Какой метод обычно делает много обменов соседних элементов?",
+    choices: ["Выбор", "Пузырёк", "Оба одинаково", "Ни один"],
+    correct: 1,
+    explain: "Пузырёк делает много обменов соседних элементов."
+  },
+  {
+    text: "Какой метод обычно делает 1 обмен (перестановку) на каждом шаге i?",
+    choices: ["Пузырёк", "Выбор", "Оба", "Ни один"],
+    correct: 1,
+    explain: "Выбор: нашёл минимум и сделал одну перестановку (обмен) за шаг."
+  },
+  {
+    text: "Какой будет результат сортировки выбором для массива a = [5, 3, 4, 1]?",
+    choices: ["[5, 3, 4, 1]", "[1, 3, 4, 5]", "[5, 4, 3, 1]", "[3, 1, 4, 5]"],
+    correct: 1,
+    explain: "После сортировки по возрастанию получится [1, 3, 4, 5]."
+  },
+  {
+    text: "Зачем нужен внутренний цикл for j in range(i+1, n) в сортировке выбором?",
+    choices: ["Чтобы печатать массив", "Чтобы найти минимальный элемент среди оставшихся", "Чтобы сравнивать только соседние элементы", "Чтобы вводить элементы массива"],
+    correct: 1,
+    explain: "Внутренний цикл ищет индекс минимального элемента среди оставшихся."
+  },
+  {
+    text: "Что будет, если убрать q и пытаться менять местами напрямую (как в ваших кодах)?",
+    choices: ["Ничего не изменится", "Можно потерять значение при обмене", "Код станет быстрее", "Массив удалится"],
+    correct: 1,
+    explain: "Без временной переменной одно значение может потеряться при перезаписи."
+  }
+];
+
+const quizEl = document.getElementById("quiz");
+const checkBtn = document.getElementById("checkBtn");
+const resetBtn = document.getElementById("resetBtn");
+const resultBox = document.getElementById("resultBox");
+const scoreText = document.getElementById("scoreText");
+const resultHint = document.getElementById("resultHint");
+const answeredPill = document.getElementById("answeredPill");
+const progressBar = document.getElementById("progressBar");
+
+function render(){
+  quizEl.innerHTML = "";
+  QUESTIONS.forEach((q, idx) => {
+    const card = document.createElement("section");
+    card.className = "card";
+    card.dataset.q = idx;
+
+    const head = document.createElement("div");
+    head.className = "c-head";
+
+    const left = document.createElement("div");
+    left.className = "c-title";
+
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = idx + 1;
+
+    const txt = document.createElement("div");
+    txt.style.marginTop = "3px";
+    txt.textContent = q.text;
+
+    left.appendChild(num);
+    left.appendChild(txt);
+
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = "one answer";
+
+    head.appendChild(left);
+    head.appendChild(tag);
+
+    const body = document.createElement("div");
+    body.className = "c-body";
+
+    const choices = document.createElement("div");
+    choices.className = "choices";
+
+    q.choices.forEach((c, ci) => {
+      const label = document.createElement("label");
+      label.className = "choice";
+      label.htmlFor = `q${idx}_c${ci}`;
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `q${idx}`;
+      radio.id = `q${idx}_c${ci}`;
+      radio.value = ci;
+      radio.addEventListener("change", updateProgress);
+
+      const span = document.createElement("div");
+      span.textContent = c;
+
+      label.appendChild(radio);
+      label.appendChild(span);
+      choices.appendChild(label);
+    });
+
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    fb.id = `fb${idx}`;
+    fb.innerHTML = `<div class="ico" aria-hidden="true"></div><div class="fb"></div>`;
+
+    body.appendChild(choices);
+    body.appendChild(fb);
+
+    card.appendChild(head);
+    card.appendChild(body);
+    quizEl.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+function getSelected(idx){
+  const checked = document.querySelector(`input[name="q${idx}"]:checked`);
+  return checked ? Number(checked.value) : null;
+}
+
+function updateProgress(){
+  let answered = 0;
+  for(let i=0;i<QUESTIONS.length;i++){
+    if(getSelected(i) !== null) answered++;
+  }
+  answeredPill.textContent = `answered: ${answered}/${QUESTIONS.length}`;
+  const pct = Math.round((answered / QUESTIONS.length) * 100);
+  progressBar.style.width = `${pct}%`;
+}
+
+function check(){
+  let score = 0;
+  let answered = 0;
+
+  for(let i=0;i<QUESTIONS.length;i++){
+    const selected = getSelected(i);
+    const fb = document.getElementById(`fb${i}`);
+    const ico = fb.querySelector(".ico");
+    const text = fb.querySelector(".fb");
+
+    if(selected === null){
+      fb.classList.remove("show");
+      continue;
+    }
+
+    answered++;
+    const ok = selected === QUESTIONS[i].correct;
+    if(ok) score++;
+
+    fb.classList.add("show");
+    ico.classList.toggle("good", ok);
+    ico.classList.toggle("bad", !ok);
+    ico.textContent = ok ? "✓" : "✕";
+
+    const correctLetter = ["A","B","C","D"][QUESTIONS[i].correct];
+    const chosenLetter  = ["A","B","C","D"][selected];
+
+    text.innerHTML = ok
+      ? `<b>Верно!</b> (${chosenLetter}) ${QUESTIONS[i].explain}`
+      : `<b>Неверно.</b> Выбрано (${chosenLetter}). Правильно: <b>${correctLetter}</b>. ${QUESTIONS[i].explain}`;
+  }
+
+  if(answered < QUESTIONS.length){
+    document.querySelector("header").classList.add("shake");
+    setTimeout(()=>document.querySelector("header").classList.remove("shake"), 350);
+    resultBox.classList.add("show");
+    scoreText.textContent = `${score}/${QUESTIONS.length}`;
+    resultHint.textContent = `Ты ответил только на ${answered}/${QUESTIONS.length}. Дополни ответы и нажми check() снова.`;
+    return;
+  }
+
+  resultBox.classList.add("show");
+  scoreText.textContent = `${score}/${QUESTIONS.length}`;
+
+  let msg = "";
+  if(score === 12) msg = "Идеально: 12/12 ✅ Ты уверенно знаешь пузырёк и выбор.";
+  else if(score >= 10) msg = "Очень хорошо 👍 Осталось чуть-чуть закрепить.";
+  else if(score >= 7) msg = "Неплохо! Повтори: где пузырёк, где выбор, и зачем q.";
+  else msg = "Нужно повторить алгоритмы: сравнение соседей (пузырёк) и поиск минимума (выбор).";
+
+  resultHint.textContent = msg;
+  resultBox.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function reset(){
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.querySelectorAll(".feedback").forEach(f => f.classList.remove("show"));
+  resultBox.classList.remove("show");
+  scoreText.textContent = "0/12";
+  resultHint.textContent = "Отметь ответы и нажми check().";
+  updateProgress();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+checkBtn.addEventListener("click", check);
+resetBtn.addEventListener("click", reset);
+
+render();
+</script>
+</body>
+</html>
