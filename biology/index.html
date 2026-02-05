@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Биология • Генетика (задачи) • Matrix</title>
+  <meta name="description" content="Задачи по генетике (доминирование) для школьников. Стиль Матрицы. Таймер 1 час. Ответы скрыты." />
+  <style>
+    :root{
+      --bg:#020407;
+      --card: rgba(2, 10, 6, .68);
+      --line: rgba(34, 197, 94, .26);
+      --text: #d1fae5;
+      --muted: rgba(209, 250, 229, .72);
+      --green: #22c55e;
+      --green2:#16a34a;
+      --green3:#86efac;
+      --bad:#fb7185;
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: radial-gradient(900px 700px at 50% 20%, rgba(34,197,94,.10), transparent 60%),
+                  radial-gradient(1200px 900px at 10% 90%, rgba(34,197,94,.08), transparent 55%),
+                  linear-gradient(180deg, #000, var(--bg));
+      overflow-x:hidden;
+    }
+
+    /* Matrix rain canvas */
+    #matrix{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      opacity:.82;
+      filter: contrast(1.05) saturate(1.15);
+      pointer-events:none;
+    }
+    .vignette{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background: radial-gradient(1200px 900px at 50% 30%, transparent 40%, rgba(0,0,0,.55) 100%);
+    }
+
+    .wrap{
+      position:relative;
+      z-index:2;
+      max-width: 980px;
+      margin: 24px auto 64px;
+      padding: 0 16px;
+    }
+
+    header{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(2,10,6,.45));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .grid{
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(34,197,94,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,197,94,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 70%);
+      pointer-events:none;
+    }
+    .head-inner{
+      padding: 18px 18px 14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .badge{
+      width:44px; height:44px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      background: rgba(34,197,94,.14);
+      border:1px solid rgba(34,197,94,.35);
+      box-shadow: 0 10px 26px rgba(34,197,94,.12);
+      font-family: var(--mono);
+      color: var(--green3);
+      font-weight:900;
+    }
+    h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .pill{
+      border:1px solid rgba(34,197,94,.25);
+      background: rgba(0,0,0,.35);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: var(--mono);
+      white-space:nowrap;
+    }
+
+    .bar-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 18px 16px;
+      flex-wrap:wrap;
+    }
+    .timer{
+      flex: 1 1 340px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .timer-display{
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing:.5px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(34,197,94,.35);
+      background: rgba(0,0,0,.35);
+      color: var(--green3);
+      min-width: 210px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .timer-display .label{
+      color: rgba(209,250,229,.65);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing:.2px;
+    }
+    .btns{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    button{
+      cursor:pointer;
+      border-radius: 14px;
+      padding: 10px 14px;
+      border:1px solid rgba(34,197,94,.35);
+      background: rgba(0,0,0,.35);
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing:.2px;
+      font-family: var(--mono);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{
+      background: rgba(34,197,94,.10);
+      border-color: rgba(34,197,94,.50);
+    }
+    button:active{ transform: translateY(1px); }
+    button.primary{
+      background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(22,163,74,.85));
+      border-color: rgba(34,197,94,.65);
+      color:#02110a;
+      box-shadow: 0 16px 45px rgba(34,197,94,.16);
+    }
+    button.primary:hover{
+      background: linear-gradient(90deg, rgba(34,197,94,1), rgba(22,163,74,.92));
+    }
+    button.danger{
+      border-color: rgba(251,113,133,.55);
+      color: #ffe4e6;
+    }
+    button.danger:hover{
+      background: rgba(251,113,133,.10);
+      border-color: rgba(251,113,133,.70);
+    }
+
+    main{ margin-top: 16px; display:grid; gap: 14px; }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(34,197,94,.22);
+      background: linear-gradient(180deg, rgba(0,0,0,.48), rgba(2,10,6,.38));
+      box-shadow: 0 14px 44px rgba(0,0,0,.40);
+      overflow:hidden;
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background: radial-gradient(700px 240px at 10% 0%, rgba(34,197,94,.10), transparent 55%);
+    }
+
+    .section{
+      padding: 14px 16px;
+      border-bottom:1px solid rgba(34,197,94,.14);
+      background: rgba(0,0,0,.30);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .section .left{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .icon{
+      width:34px; height:34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: var(--green3);
+      background: rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.30);
+      flex:0 0 auto;
+    }
+    .tag{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(34,197,94,.18);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    /* Tasks accordion */
+    .tasks{
+      padding: 12px 16px 16px;
+      display:grid;
+      gap:10px;
+    }
+    details.task{
+      border-radius: 16px;
+      border:1px solid rgba(34,197,94,.18);
+      background: rgba(0,0,0,.28);
+      overflow:hidden;
+    }
+    details.task[open]{
+      border-color: rgba(34,197,94,.32);
+      background: rgba(34,197,94,.06);
+    }
+    details.task > summary{
+      cursor:pointer;
+      list-style:none;
+      padding: 12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: var(--green3);
+      user-select:none;
+    }
+    details.task > summary::-webkit-details-marker{ display:none; }
+    .caret{
+      flex:0 0 auto;
+      width:28px; height:28px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      border:1px solid rgba(34,197,94,.22);
+      background: rgba(0,0,0,.25);
+      color: rgba(209,250,229,.75);
+      font-weight: 900;
+      transition: transform .18s ease;
+    }
+    details.task[open] .caret{ transform: rotate(90deg); }
+
+    .task-body{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.45;
+    }
+    .task-body b{ color: var(--text); }
+    .block{
+      margin-top: 10px;
+      border-radius: 14px;
+      border:1px solid rgba(34,197,94,.16);
+      background: rgba(0,0,0,.35);
+      padding: 10px 10px;
+    }
+    .mono{
+      font-family: var(--mono);
+      color: rgba(209,250,229,.85);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    details.answer{
+      margin-top: 10px;
+      border-radius: 14px;
+      border:1px dashed rgba(34,197,94,.26);
+      background: rgba(0,0,0,.22);
+      padding: 10px 10px;
+    }
+    details.answer > summary{
+      cursor:pointer;
+      list-style:none;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: rgba(209,250,229,.85);
+      user-select:none;
+    }
+    details.answer > summary::-webkit-details-marker{ display:none; }
+
+    .answer-text{
+      margin-top: 10px;
+      border-left: 3px solid rgba(34,197,94,.55);
+      padding-left: 10px;
+      color: rgba(209,250,229,.85);
+      font-size: 13px;
+      line-height:1.5;
+    }
+
+    .note{
+      padding: 12px 16px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.45;
+    }
+
+    footer{
+      margin-top: 18px;
+      text-align:center;
+      font-size: 12px;
+      color: rgba(209,250,229,.70);
+      font-family: var(--mono);
+    }
+
+    .shake{ animation: shake .2s linear 0s 2; }
+    @keyframes shake{
+      0%{ transform: translateX(0); }
+      25%{ transform: translateX(-4px); }
+      50%{ transform: translateX(4px); }
+      75%{ transform: translateX(-3px); }
+      100%{ transform: translateX(0); }
+    }
+  </style>
+</head>
+
+<body>
+<canvas id="matrix"></canvas>
+<div class="vignette"></div>
+
+<div class="wrap">
+  <header>
+    <div class="grid" aria-hidden="true"></div>
+
+    <div class="head-inner">
+      <div class="title">
+        <div class="badge">&gt;_</div>
+        <div>
+          <h1>Биология • Генетика • Задачи (доминирование)</h1>
+          <div class="sub">Кликни по «Задача N», чтобы открыть. Ответы спрятаны внутри «Ответ».</div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="pill" id="openPill">opened: 0/10</div>
+        <div class="pill">timer: 01:00:00</div>
+        <div class="pill">mode: matrix</div>
+      </div>
+    </div>
+
+    <div class="bar-row">
+      <div class="timer">
+        <div class="timer-display" id="timerBox" aria-live="polite">
+          <span class="label">time_left</span>
+          <span id="timerText">01:00:00</span>
+        </div>
+      </div>
+      <div class="btns">
+        <button type="button" class="primary" id="startBtn">start()</button>
+        <button type="button" id="pauseBtn">pause()</button>
+        <button type="button" class="danger" id="resetBtn">reset()</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="section">
+        <div class="left">
+          <div class="icon">i</div>
+          <div>
+            <div style="font-family:var(--mono);font-weight:900;color:var(--green3);">Как работать</div>
+            <div style="margin-top:4px;">
+              Открой задачу → реши в тетради → затем открой «Ответ» и проверь себя.
+              Таймер рассчитан на <b>1 час</b>.
+            </div>
+          </div>
+        </div>
+        <div class="tag">instructions</div>
+      </div>
+      <div class="note">
+        <b>Подсказка по записи скрещивания:</b> родительские генотипы → гаметы → потомство (F₁/F₂) → соотношения.
+        Для вероятностей удобно рисовать решётку Пеннета (Punnett).
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section">
+        <div class="left">
+          <div class="icon">#</div>
+          <div>
+            <div style="font-family:var(--mono);font-weight:900;color:var(--green3);">Задачи</div>
+            <div style="margin-top:4px;color:var(--muted);font-size:13px;">Всего 10 задач (как в списке). Каждая раскрывается кликом.</div>
+          </div>
+        </div>
+        <div class="tag">tasks</div>
+      </div>
+
+      <div class="tasks" id="tasks">
+
+        <!-- 1 -->
+        <details class="task">
+          <summary>
+            <span>Задача 1. Полное доминирование (моногибрид)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У гороха жёлтая окраска семян (A) доминирует над зелёной (a). Скрестили AA × aa.
+а) Генотипы F₁?
+б) Фенотипы F₁?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Родители: <b>AA × aa</b><br/>
+                Гаметы: A и a<br/>
+                F₁: все потомки <b>Aa (100%)</b><br/>
+                Фенотип F₁: все <b>жёлтые семена (100%)</b>.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 2 -->
+        <details class="task">
+          <summary>
+            <span>Задача 2. Полное доминирование (человек)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У человека карие глаза (B) доминируют над голубыми (b). Мама Bb, папа bb.
+а) Каковы возможные генотипы детей?
+б) Какова вероятность голубых глаз?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Скрещивание: <b>Bb × bb</b><br/>
+                Гаметы: у мамы B и b; у папы только b<br/>
+                Потомство: <b>50% Bb</b> (карие), <b>50% bb</b> (голубые)<br/>
+                Вероятность голубых глаз: <b>50%</b>.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 3 -->
+        <details class="task">
+          <summary>
+            <span>Задача 3. Неполное доминирование</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У ночной красавицы: RR — красные, rr — белые, Rr — розовые. Скрестили Rr × rr.
+а) Соотношение фенотипов потомства?
+б) Процент розовых?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Скрещивание: <b>Rr × rr</b><br/>
+                Гаметы: у Rr — R и r; у rr — r<br/>
+                Потомство: <b>50% Rr (розовые)</b>, <b>50% rr (белые)</b><br/>
+                Соотношение фенотипов: <b>розовые : белые = 1 : 1</b><br/>
+                Процент розовых: <b>50%</b>.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 4 -->
+        <details class="task">
+          <summary>
+            <span>Задача 4. Неполное доминирование (Rr × Rr)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">Скрестили розовый (Rr) × розовый (Rr).
+а) Соотношение генотипов?
+б) Соотношение фенотипов (красные : розовые : белые)?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Скрещивание: <b>Rr × Rr</b><br/>
+                Генотипы F₁: <b>RR : Rr : rr = 1 : 2 : 1</b><br/>
+                Фенотипы: <b>красные : розовые : белые = 1 : 2 : 1</b><br/>
+                (RR — красные, Rr — розовые, rr — белые).
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 5 -->
+        <details class="task">
+          <summary>
+            <span>Задача 5. Полное доминирование (по фенотипу найти генотип)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У мышей чёрная шерсть (A) доминирует над белой (a). Чёрную мышь скрестили с белой (aa) и получили: 12 чёрных и 12 белых.
+а) Определи генотип чёрной мыши.
+б) Запиши схему скрещивания.</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Если при скрещивании с <b>aa</b> получаем <b>1:1</b> чёрные и белые, значит чёрная мышь <b>гетерозиготна Aa</b>.<br/>
+                Схема: <b>Aa × aa</b><br/>
+                Потомство: <b>50% Aa (чёрные)</b>, <b>50% aa (белые)</b>.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 6 -->
+        <details class="task">
+          <summary>
+            <span>Задача 6. Полное доминирование (обратная задача)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У растения высокий стебель (T) доминирует над низким (t). Высокое растение скрестили с низким (tt), и среди потомства 80% высоких и 20% низких.
+а) Возможна ли такая пропорция при одном гене с полным доминированием?
+б) Если нет — какое минимальное объяснение можно предложить (ошибка учёта, влияние среды, летальность генотипа и т.п.)?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                а) Для одного гена и скрещивания с <b>tt</b> возможны только две классические пропорции:<br/>
+                • <b>TT × tt → 100% Tt</b> (все высокие)<br/>
+                • <b>Tt × tt → 50% Tt</b> (высокие) и <b>50% tt</b> (низкие)<br/>
+                <b>80% : 20%</b> строго по Менделю здесь не получается.<br/><br/>
+                б) Минимальные объяснения (любое подходит):<br/>
+                • <b>ошибка учёта/маленькая выборка</b> (случайные отклонения, перепутали часть растений);<br/>
+                • <b>влияние среды</b> (часть «высоких» не выросла и записана как низкая);<br/>
+                • <b>летальность/пониженная жизнеспособность</b> одного из генотипов, из-за чего наблюдаемое соотношение сместилось.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 7 -->
+        <details class="task">
+          <summary>
+            <span>Задача 7. Неполное доминирование + количество</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У цветка: RR — красный, Rr — розовый, rr — белый. Скрестили RR × rr, затем все F₁ скрестили между собой. В итоге получили 320 растений F₂.
+а) Сколько будет красных, розовых и белых в F₂?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                1) RR × rr → все F₁: <b>Rr</b> (розовые).<br/>
+                2) F₁ × F₁: Rr × Rr → фенотипы <b>1 : 2 : 1</b> (красные : розовые : белые).<br/>
+                Из 320 растений:<br/>
+                • красные: 1/4 · 320 = <b>80</b><br/>
+                • розовые: 2/4 · 320 = <b>160</b><br/>
+                • белые: 1/4 · 320 = <b>80</b>
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 8 -->
+        <details class="task">
+          <summary>
+            <span>Задача 8. Неполное доминирование (определить родителей)</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У растения окраска цветков наследуется по неполному доминированию: AA — тёмно-красные, Aa — светло-красные, aa — белые.
+Известно, что у пары растений получилось потомство: 25% тёмно-красных, 50% светло-красных, 25% белых.
+а) Определи генотипы родителей.
+б) Какие фенотипы были у родителей?</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                Соотношение <b>25% : 50% : 25%</b> соответствует <b>1 : 2 : 1</b>, что типично для скрещивания <b>Aa × Aa</b>.<br/>
+                а) Родители: <b>Aa и Aa</b><br/>
+                б) Фенотипы родителей: оба <b>светло-красные</b> (потому что Aa — светло-красные).
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 9 -->
+        <details class="task">
+          <summary>
+            <span>Задача 9. Полное доминирование + условие «не меньше»</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У растения гладкие семена (A) доминируют над морщинистыми (a). В питомнике есть две гладкосеменные линии:
+Линия 1 точно AA (чистая),
+Линия 2 фенотипически гладкая, но генотип неизвестен (AA или Aa).
+Скрещивают растение из линии 2 с aa и получают 120 семян.
+а) Какие два результата по фенотипам могут получиться (распределения)?
+б) Если среди 120 семян оказалось 72 гладких и 48 морщинистых — какой генотип у линии 2?
+в) Если морщинистых оказалось 0 — докажи генотип линии 2 и объясни, может ли это быть случайностью.</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                а) Если линия 2 = <b>AA</b>, то AA × aa → все <b>Aa</b> → <b>100% гладкие</b>.<br/>
+                Если линия 2 = <b>Aa</b>, то Aa × aa → <b>50% гладких</b> и <b>50% морщинистых</b> (1:1).<br/><br/>
+                б) 72 гладких и 48 морщинистых = <b>60% : 40%</b>. Это ближе к ожидаемому <b>1:1</b>, чем к 100:0, значит линия 2 — <b>Aa</b> (гетерозигота).<br/>
+                (Отклонение от 50/50 возможно из-за случайности и/или ошибок учёта.)<br/><br/>
+                в) Если морщинистых <b>0</b> из 120, то наиболее логично: линия 2 = <b>AA</b> (тогда морщинистых не бывает вообще).<br/>
+                Может ли это быть случайностью при Aa × aa? Теоретически вероятность «0 морщинистых» при ожидаемом 50% = (1/2)<sup>120</sup> — <b>крайне мала</b> (практически ноль). Значит это не случайность, а признак <b>AA</b>.
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- 10 -->
+        <details class="task">
+          <summary>
+            <span>Задача 10. Неполное доминирование + план скрещиваний</span>
+            <span class="caret">›</span>
+          </summary>
+          <div class="task-body">
+            <div class="block mono">У растения цвет определяется неполным доминированием: RR — красный, Rr — розовый, rr — белый.
+В наличии 3 растения: одно красное, одно розовое, одно белое.
+а) Составь план скрещиваний (2 шага максимум), чтобы получить потомство, где не менее 75% будут розовыми.
+б) Для каждого шага укажи генотипы родителей и ожидаемое распределение фенотипов.
+в) Если во втором шаге получилось только 60% розовых, предложи два биологических/организационных объяснения, не противоречащих генетике (например, случайная выборка, перепыление, ошибки маркировки и т.п.).</div>
+
+            <details class="answer">
+              <summary>Ответ</summary>
+              <div class="answer-text">
+                а) План (2 шага):<br/>
+                <b>Шаг 1:</b> скрестить красное с белым: <b>RR × rr</b> → все F₁: <b>Rr</b> (100% розовые).<br/>
+                <b>Шаг 2:</b> использовать полученные розовые (Rr) как «потомство», цель уже достигнута: <b>100% розовых</b> (это ≥ 75%).<br/><br/>
+                б) Распределения:<br/>
+                • Шаг 1: RR × rr → <b>100% Rr</b> → <b>100% розовые</b><br/>
+                • Шаг 2: не обязателен; если нужно «второй шаг», можно просто повторить RR × rr для получения очередной партии <b>100% розовых</b>.<br/><br/>
+                в) Почему могло получиться 60% розовых (2 объяснения):<br/>
+                • <b>перепыление</b> (пыльца попала от другого растения, не того генотипа);<br/>
+                • <b>ошибка маркировки/перепутали растения</b> или <b>нечистая линия</b> (например, «красное» оказалось не RR);<br/>
+                • <b>случайная выборка</b> при малом числе потомков (если считали немного растений, процент может сильно прыгать).
+              </div>
+            </details>
+          </div>
+        </details>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>upload: index.html · GitHub Pages · matrix style · 1h timer</footer>
+</div>
+
+<script>
+/* =======================
+   MATRIX RAIN (canvas)
+   ======================= */
+(function matrixRain(){
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+  const chars = "01BIOGENETICS{}[]()<>+=-*/;:.,!?@#$%^&AaRrTtBb";
+  const fontSize = 16;
+  let columns = 0;
+  let drops = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array.from({length: columns}, () => Math.floor(Math.random() * canvas.height / fontSize));
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function draw(){
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0;i<drops.length;i++){
+      const text = chars[Math.floor(Math.random()*chars.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      ctx.fillStyle = "rgba(34, 197, 94, 0.92)";
+      ctx.fillText(text, x, y);
+
+      if(y > canvas.height && Math.random() > 0.975){
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* =======================
+   OPENED TASKS COUNTER
+   ======================= */
+const tasksEl = document.getElementById("tasks");
+const openPill = document.getElementById("openPill");
+
+function updateOpened(){
+  const all = tasksEl.querySelectorAll("details.task").length;
+  const opened = tasksEl.querySelectorAll("details.task[open]").length;
+  openPill.textContent = `opened: ${opened}/${all}`;
+}
+tasksEl.addEventListener("toggle", (e) => {
+  // событие toggle всплывает от details
+  if(e.target && e.target.classList && e.target.classList.contains("task")){
+    updateOpened();
+  }
+});
+updateOpened();
+
+/* =======================
+   TIMER (1 hour)
+   ======================= */
+const timerText = document.getElementById("timerText");
+const timerBox = document.getElementById("timerBox");
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+const TOTAL_SECONDS = 60 * 60; // 1 hour
+let remaining = TOTAL_SECONDS;
+let intervalId = null;
+
+function fmt(sec){
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const hh = String(h).padStart(2,'0');
+  const mm = String(m).padStart(2,'0');
+  const ss = String(s).padStart(2,'0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+function renderTimer(){
+  timerText.textContent = fmt(remaining);
+  // лёгкая тревога в последние 5 минут
+  if(remaining <= 5*60){
+    timerText.style.color = "rgba(251,113,133,.95)";
+    timerBox.style.borderColor = "rgba(251,113,133,.65)";
+  }else{
+    timerText.style.color = "var(--green3)";
+    timerBox.style.borderColor = "rgba(34,197,94,.35)";
+  }
+}
+
+function tick(){
+  if(remaining <= 0){
+    stop();
+    remaining = 0;
+    renderTimer();
+    // лёгкая «сигнализация»
+    document.querySelector("header").classList.add("shake");
+    setTimeout(()=>document.querySelector("header").classList.remove("shake"), 450);
+    return;
+  }
+  remaining--;
+  renderTimer();
+}
+
+function start(){
+  if(intervalId) return;
+  intervalId = setInterval(tick, 1000);
+}
+
+function stop(){
+  if(!intervalId) return;
+  clearInterval(intervalId);
+  intervalId = null;
+}
+
+function reset(){
+  stop();
+  remaining = TOTAL_SECONDS;
+  renderTimer();
+}
+
+startBtn.addEventListener("click", start);
+pauseBtn.addEventListener("click", stop);
+resetBtn.addEventListener("click", reset);
+
+renderTimer();
+</script>
+</body>
+</html>
