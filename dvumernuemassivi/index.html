@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Тест: Одномерные массивы (Python)</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0f1b3a;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --text:#e9eefc;
+      --muted:rgba(233,238,252,.75);
+      --accent:#6ee7ff;
+      --accent2:#a78bfa;
+      --ok:#34d399;
+      --bad:#fb7185;
+      --warn:#fbbf24;
+      --border:rgba(255,255,255,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius:22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(110,231,255,.18), transparent 60%),
+        radial-gradient(900px 500px at 85% 20%, rgba(167,139,250,.18), transparent 60%),
+        radial-gradient(900px 500px at 50% 90%, rgba(52,211,153,.10), transparent 65%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .title h1{
+      margin:0;
+      font-size: clamp(20px, 2.3vw, 30px);
+      letter-spacing:.2px;
+    }
+
+    .title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .badge-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .badge{
+      background: linear-gradient(135deg, rgba(110,231,255,.15), rgba(167,139,250,.15));
+      border:1px solid var(--border);
+      border-radius: 999px;
+      padding:8px 12px;
+      color: var(--text);
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size: 13px;
+      user-select:none;
+      backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, var(--accent), transparent 55%),
+                  radial-gradient(circle at 70% 70%, var(--accent2), transparent 55%),
+                  rgba(255,255,255,.25);
+      box-shadow: 0 0 12px rgba(110,231,255,.35);
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+
+    .progress{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width: 180px;
+    }
+
+    .progress-line{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      position:relative;
+    }
+    .progress-line > span{
+      position:absolute; left:0; top:0; bottom:0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 18px rgba(110,231,255,.28);
+      transition: width .35s ease;
+    }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 13px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      user-select:none;
+    }
+    .pill strong{ color:var(--text); font-weight:700; }
+
+    .content{
+      padding: 18px 16px 16px;
+    }
+
+    .qcard{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      margin: 12px 0;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .qcard:hover{
+      transform: translateY(-1px);
+      border-color: rgba(110,231,255,.22);
+      background: rgba(255,255,255,.04);
+    }
+
+    .qhead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .qnum{
+      font-weight:800;
+      color: rgba(110,231,255,.95);
+      letter-spacing:.3px;
+      min-width: 70px;
+    }
+
+    .qtext{
+      flex:1;
+      color: var(--text);
+      line-height:1.35;
+      margin-top:-2px;
+    }
+
+    pre{
+      margin:10px 0 0;
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 12px;
+      overflow:auto;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      color: rgba(233,238,252,.92);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+
+    .options{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top: 12px;
+    }
+
+    .opt{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      cursor:pointer;
+      transition: border-color .15s ease, background .15s ease, transform .08s ease;
+      user-select:none;
+    }
+    .opt:hover{
+      border-color: rgba(110,231,255,.22);
+      background: rgba(255,255,255,.04);
+    }
+    .opt:active{ transform: scale(.995); }
+
+    .opt input{ margin-top: 3px; accent-color: var(--accent); }
+
+    .opt .letter{
+      width: 26px;
+      height: 26px;
+      display:grid;
+      place-items:center;
+      border-radius: 9px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-weight:800;
+      color: rgba(233,238,252,.88);
+      flex:0 0 auto;
+    }
+    .opt .label{
+      color: rgba(233,238,252,.92);
+      line-height:1.25;
+      flex: 1 1 auto;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      padding: 14px 16px 16px;
+      border-top:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+    }
+
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .08s ease, border-color .15s ease, background .15s ease;
+    }
+    button:hover{
+      border-color: rgba(110,231,255,.28);
+      background: rgba(255,255,255,.07);
+    }
+    button:active{ transform: scale(.99); }
+
+    .primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.18), rgba(167,139,250,.18));
+    }
+
+    .danger{
+      border-color: rgba(251,113,133,.35);
+    }
+
+    .muted{
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.35;
+      margin:0;
+    }
+
+    .result{
+      display:none;
+      padding: 16px;
+      border-top:1px solid var(--border);
+      background: rgba(0,0,0,.16);
+    }
+
+    .result.show{ display:block; }
+
+    .score{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .score h2{
+      margin:0;
+      font-size: 18px;
+    }
+
+    .score .big{
+      font-size: 24px;
+      font-weight:900;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .review{
+      margin-top: 12px;
+      display:grid;
+      gap:10px;
+    }
+
+    .review .row{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.03);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+
+    .tag{
+      font-size:12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      flex:0 0 auto;
+      user-select:none;
+    }
+    .tag.ok{
+      border-color: rgba(52,211,153,.35);
+      color: rgba(52,211,153,.95);
+    }
+    .tag.bad{
+      border-color: rgba(251,113,133,.35);
+      color: rgba(251,113,133,.95);
+    }
+
+    .small{
+      font-size: 13px;
+      color: var(--muted);
+      margin: 6px 0 0;
+      line-height:1.35;
+    }
+
+    footer{
+      margin-top: 14px;
+      color: rgba(233,238,252,.6);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    @media (min-width: 760px){
+      .options{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Highlight when checked */
+    .opt.checked{
+      border-color: rgba(110,231,255,.35);
+      background: rgba(110,231,255,.08);
+    }
+    .opt.correct{
+      border-color: rgba(52,211,153,.45);
+      background: rgba(52,211,153,.10);
+    }
+    .opt.wrong{
+      border-color: rgba(251,113,133,.45);
+      background: rgba(251,113,133,.10);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Тест: Одномерные массивы (Python)</h1>
+        <p>Выбери один вариант ответа в каждом вопросе и нажми «Проверить». Можно проходить несколько раз.</p>
+      </div>
+      <div class="badge-row">
+        <div class="badge"><span class="dot"></span> <span>Подходит для 9 класса</span></div>
+        <div class="badge"><span class="dot"></span> <span>15 вопросов</span></div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="topbar">
+        <div class="progress">
+          <div class="muted">Прогресс: <strong id="progressText">0/15</strong></div>
+          <div class="progress-line"><span id="progressBar"></span></div>
+        </div>
+        <div class="meta">
+          <div class="pill">Отвечено: <strong id="answered">0</strong></div>
+          <div class="pill">Баллы: <strong id="liveScore">—</strong></div>
+        </div>
+      </div>
+
+      <div class="content" id="quiz"></div>
+
+      <div class="actions">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="primary" id="checkBtn">Проверить</button>
+          <button id="resetBtn">Сбросить</button>
+        </div>
+        <p class="muted" style="max-width: 520px;">
+          Подсказка: после проверки правильные ответы подсветятся зелёным, неправильные — красным.
+        </p>
+      </div>
+
+      <div class="result" id="result">
+        <div class="score">
+          <div>
+            <h2>Результат</h2>
+            <div class="small" id="resultMsg"></div>
+          </div>
+          <div class="big" id="scoreBig">0/15</div>
+        </div>
+
+        <div class="review" id="review"></div>
+
+        <div class="actions" style="border-top:0; padding: 14px 0 0;">
+          <button class="primary" id="retryBtn">Пройти ещё раз</button>
+          <button id="scrollTopBtn">Наверх</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>© Тест для обучения. Можно свободно загружать на GitHub Pages.</footer>
+  </div>
+
+<script>
+  // === Вопросы ===
+  const QUESTIONS = [
+    {
+      text: "Что такое одномерный массив?",
+      options: [
+        "Таблица из строк и столбцов",
+        "Набор несвязанных переменных",
+        "Упорядоченный набор элементов, к которым обращаются по индексу",
+        "Любая переменная"
+      ],
+      correct: 2
+    },
+    {
+      text: "Как правильно создать массив в Python?",
+      options: [
+        "a = (1,2,3)",
+        "a = [1,2,3]",
+        "a = {1,2,3}",
+        "array = 1,2,3"
+      ],
+      correct: 1
+    },
+    {
+      text: "Чему равен первый индекс массива в Python?",
+      options: ["1","0","-1","Зависит от длины массива"],
+      correct: 1
+    },
+    {
+      text: "Что выведет программа?",
+      code: `a = [5, 10, 15]\nprint(a[1])`,
+      options: ["5","10","15","Ошибка"],
+      correct: 1
+    },
+    {
+      text: "Как узнать длину массива a?",
+      options: ["size(a)","length(a)","len(a)","a.length"],
+      correct: 2
+    },
+    {
+      text: "Что сделает команда a.append(7)?",
+      options: [
+        "Удалит 7",
+        "Добавит 7 в начало",
+        "Добавит 7 в конец массива",
+        "Заменит последний элемент"
+      ],
+      correct: 2
+    },
+    {
+      text: "Что выведет программа?",
+      code: `a = [2, 4, 6]\na.insert(1, 3)\nprint(a)`,
+      options: ["[2, 4, 6, 3]","[3, 2, 4, 6]","[2, 3, 4, 6]","[2, 4, 3, 6]"],
+      correct: 2
+    },
+    {
+      text: "Что произойдёт?",
+      code: `a = [1, 2, 3]\na.remove(2)\nprint(a)`,
+      options: ["[1, 3]","[2, 3]","[1, 2]","Ошибка"],
+      correct: 0
+    },
+    {
+      text: "Что делает команда a.pop(1)?",
+      options: [
+        "Удаляет элемент со значением 1",
+        "Удаляет элемент с индексом 1",
+        "Удаляет последний элемент",
+        "Добавляет элемент"
+      ],
+      correct: 1
+    },
+    {
+      text: "Что выведет программа?",
+      code: `a = [1, 2, 3]\nprint(a[-1])`,
+      options: ["1","2","3","Ошибка"],
+      correct: 2
+    },
+    {
+      text: "Что выведет программа?",
+      code: `a = [1, 2, 3]\ns = 0\nfor i in a:\n    s += i\nprint(s)`,
+      options: ["3","5","6","123"],
+      correct: 2
+    },
+    {
+      text: "Что выведет программа?",
+      code: `a = [4, 1, 7]\nprint(min(a))`,
+      options: ["4","1","7","Ошибка"],
+      correct: 1
+    },
+    {
+      text: "Что произойдёт?",
+      code: `a = [1, 2, 3]\nprint(a[5])`,
+      options: ["5","3","None","Ошибка (IndexError)"],
+      correct: 3
+    },
+    {
+      text: "Что будет результатом?",
+      code: `a = [3, 2, 1]\na[0], a[2] = a[2], a[0]\nprint(a)`,
+      options: ["[1, 2, 3]","[3, 2, 1]","[2, 3, 1]","Ошибка"],
+      correct: 0
+    },
+    {
+      text: "Сколько элементов в массиве?",
+      code: `a = [5, 8, 2, 9, 1]`,
+      options: ["4","5","6","Зависит от индексов"],
+      correct: 1
+    }
+  ];
+
+  const quizEl = document.getElementById("quiz");
+  const answeredEl = document.getElementById("answered");
+  const progressText = document.getElementById("progressText");
+  const progressBar = document.getElementById("progressBar");
+  const liveScoreEl = document.getElementById("liveScore");
+
+  const resultEl = document.getElementById("result");
+  const scoreBig = document.getElementById("scoreBig");
+  const resultMsg = document.getElementById("resultMsg");
+  const reviewEl = document.getElementById("review");
+
+  const letters = ["A", "B", "C", "D"];
+
+  function buildQuiz(){
+    quizEl.innerHTML = "";
+    QUESTIONS.forEach((q, idx) => {
+      const qWrap = document.createElement("div");
+      qWrap.className = "qcard";
+      qWrap.dataset.q = idx;
+
+      const head = document.createElement("div");
+      head.className = "qhead";
+
+      const num = document.createElement("div");
+      num.className = "qnum";
+      num.textContent = `Вопрос ${idx + 1}`;
+
+      const txt = document.createElement("div");
+      txt.className = "qtext";
+      txt.textContent = q.text;
+
+      head.appendChild(num);
+      head.appendChild(txt);
+      qWrap.appendChild(head);
+
+      if (q.code){
+        const pre = document.createElement("pre");
+        pre.textContent = q.code;
+        qWrap.appendChild(pre);
+      }
+
+      const opts = document.createElement("div");
+      opts.className = "options";
+
+      q.options.forEach((opt, oi) => {
+        const label = document.createElement("label");
+        label.className = "opt";
+        label.dataset.oi = oi;
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `q_${idx}`;
+        input.value = oi;
+
+        input.addEventListener("change", () => {
+          // highlight checked
+          opts.querySelectorAll(".opt").forEach(el => el.classList.remove("checked"));
+          label.classList.add("checked");
+          updateProgress();
+        });
+
+        const letter = document.createElement("div");
+        letter.className = "letter";
+        letter.textContent = letters[oi];
+
+        const lab = document.createElement("div");
+        lab.className = "label";
+        lab.textContent = opt;
+
+        label.appendChild(input);
+        label.appendChild(letter);
+        label.appendChild(lab);
+
+        opts.appendChild(label);
+      });
+
+      qWrap.appendChild(opts);
+      quizEl.appendChild(qWrap);
+    });
+
+    updateProgress();
+    clearResult();
+  }
+
+  function getAnswers(){
+    return QUESTIONS.map((_, idx) => {
+      const checked = document.querySelector(`input[name="q_${idx}"]:checked`);
+      return checked ? Number(checked.value) : null;
+    });
+  }
+
+  function updateProgress(){
+    const answers = getAnswers();
+    const answered = answers.filter(v => v !== null).length;
+    answeredEl.textContent = answered;
+
+    progressText.textContent = `${answered}/${QUESTIONS.length}`;
+    progressBar.style.width = `${(answered / QUESTIONS.length) * 100}%`;
+
+    // live score if already checked? we show "—" until checked
+    if (!resultEl.classList.contains("show")){
+      liveScoreEl.textContent = "—";
+    }
+  }
+
+  function checkQuiz(){
+    const answers = getAnswers();
+    const unanswered = answers.findIndex(v => v === null);
+
+    // Mark styles
+    let score = 0;
+
+    QUESTIONS.forEach((q, idx) => {
+      const qCard = document.querySelector(`.qcard[data-q="${idx}"]`);
+      const opts = qCard.querySelectorAll(".opt");
+      opts.forEach(o => o.classList.remove("correct","wrong"));
+
+      const picked = answers[idx];
+      if (picked === null) return;
+
+      if (picked === q.correct) score++;
+
+      // color picked
+      opts[picked].classList.add(picked === q.correct ? "correct" : "wrong");
+      // also color correct (if different)
+      if (picked !== q.correct){
+        opts[q.correct].classList.add("correct");
+      }
+    });
+
+    liveScoreEl.textContent = `${score}/${QUESTIONS.length}`;
+
+    showResult(score);
+
+    // If there are unanswered, gently scroll to first one
+    if (unanswered !== -1){
+      const first = document.querySelector(`.qcard[data-q="${unanswered}"]`);
+      first.scrollIntoView({behavior:"smooth", block:"center"});
+    } else {
+      // scroll to results
+      resultEl.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  }
+
+  function showResult(score){
+    const total = QUESTIONS.length;
+    scoreBig.textContent = `${score}/${total}`;
+
+    const percent = Math.round((score/total)*100);
+
+    let msg = `Ты набрал(а) ${percent}%. `;
+    if (percent >= 90) msg += "Очень круто! Отличное понимание массивов ✅";
+    else if (percent >= 70) msg += "Хороший результат! Есть пара мест, которые можно повторить 👍";
+    else if (percent >= 50) msg += "Неплохо! Повтори команды и индексы — будет легче 💡";
+    else msg += "Стоит повторить основы: индексы, len, append/insert/remove/pop 🙂";
+
+    resultMsg.textContent = msg;
+
+    // Build review list
+    reviewEl.innerHTML = "";
+    const answers = getAnswers();
+
+    QUESTIONS.forEach((q, idx) => {
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const left = document.createElement("div");
+      left.style.flex = "1 1 auto";
+
+      const t = document.createElement("div");
+      t.style.fontWeight = "800";
+      t.textContent = `Вопрос ${idx+1}`;
+
+      const s = document.createElement("div");
+      s.className = "small";
+      const picked = answers[idx];
+      if (picked === null){
+        s.textContent = `Нет ответа. Правильный: ${letters[q.correct]} — ${q.options[q.correct]}`;
+      } else if (picked === q.correct){
+        s.textContent = `Верно: ${letters[picked]} — ${q.options[picked]}`;
+      } else {
+        s.textContent = `Твой ответ: ${letters[picked]} — ${q.options[picked]} • Правильный: ${letters[q.correct]} — ${q.options[q.correct]}`;
+      }
+
+      left.appendChild(t);
+      left.appendChild(s);
+
+      const tag = document.createElement("div");
+      const picked = answers[idx];
+      if (picked === null){
+        tag.className = "tag bad";
+        tag.textContent = "нет ответа";
+      } else if (picked === q.correct){
+        tag.className = "tag ok";
+        tag.textContent = "верно";
+      } else {
+        tag.className = "tag bad";
+        tag.textContent = "ошибка";
+      }
+
+      row.appendChild(left);
+      row.appendChild(tag);
+
+      reviewEl.appendChild(row);
+    });
+
+    resultEl.classList.add("show");
+  }
+
+  function clearResult(){
+    resultEl.classList.remove("show");
+    reviewEl.innerHTML = "";
+    scoreBig.textContent = `0/${QUESTIONS.length}`;
+    resultMsg.textContent = "";
+    liveScoreEl.textContent = "—";
+
+    // clear highlights
+    document.querySelectorAll(".opt").forEach(o => {
+      o.classList.remove("correct","wrong");
+    });
+  }
+
+  function resetQuiz(){
+    // clear inputs
+    QUESTIONS.forEach((_, idx) => {
+      document.querySelectorAll(`input[name="q_${idx}"]`).forEach(i => i.checked = false);
+    });
+    document.querySelectorAll(".opt").forEach(o => o.classList.remove("checked","correct","wrong"));
+    updateProgress();
+    clearResult();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  // Buttons
+  document.getElementById("checkBtn").addEventListener("click", checkQuiz);
+  document.getElementById("resetBtn").addEventListener("click", resetQuiz);
+  document.getElementById("retryBtn").addEventListener("click", resetQuiz);
+  document.getElementById("scrollTopBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  // Init
+  buildQuiz();
+</script>
+</body>
+</html>
