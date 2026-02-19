@@ -1,234 +1,278 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Тест: Одномерные массивы</title>
 
 <style>
-body{
+  body{
     margin:0;
     font-family:Arial, sans-serif;
     background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
     color:white;
-}
-
-.container{
-    max-width:900px;
+  }
+  .container{
+    max-width:950px;
     margin:40px auto;
     background:rgba(255,255,255,0.08);
     padding:30px;
     border-radius:20px;
     box-shadow:0 0 30px rgba(0,0,0,0.4);
-}
-
-h1{
+  }
+  h1{ text-align:center; margin:0 0 20px; }
+  .hint{
     text-align:center;
-}
-
-.question{
+    color:rgba(255,255,255,.75);
+    margin:0 0 18px;
+    font-size:14px;
+  }
+  .question{
     margin-bottom:25px;
     padding:15px;
     background:rgba(255,255,255,0.05);
     border-radius:12px;
-}
-
-.answers label{
+  }
+  .answers label{
     display:block;
     margin:8px 0;
     padding:6px;
     cursor:pointer;
-}
-
-button{
+    border-radius:8px;
+  }
+  pre{
+    background:#1e1e1e;
+    padding:14px;
+    border-radius:10px;
+    overflow-x:auto;
+    font-family:Consolas, monospace;
+    font-size:15px;
+    color:#00ffcc;
+    margin:12px 0 6px;
+    white-space:pre;        /* сохраняет отступы */
+    tab-size:4;             /* табы как 4 пробела */
+  }
+  button{
     padding:10px 20px;
     border:none;
     border-radius:10px;
     cursor:pointer;
     font-weight:bold;
     margin-right:10px;
-}
+  }
+  #checkBtn{ background:#00c6ff; color:white; }
+  #resetBtn{ background:#ff4b5c; color:white; }
 
-#checkBtn{
-    background:#00c6ff;
-    color:white;
-}
+  .correct{ background:rgba(0,255,0,0.22); }
+  .wrong{ background:rgba(255,0,0,0.22); }
 
-#resetBtn{
-    background:#ff4b5c;
-    color:white;
-}
-
-.correct{
-    background:rgba(0,255,0,0.3);
-}
-
-.wrong{
-    background:rgba(255,0,0,0.3);
-}
-
-#result{
+  #result{
     font-size:20px;
-    margin-top:20px;
+    margin-top:22px;
     font-weight:bold;
     text-align:center;
-}
+  }
+
+  /* Диагностика */
+  #debug{
+    margin:12px 0 0;
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.15);
+    color:rgba(255,255,255,.85);
+    font-size:13px;
+    display:none;
+    white-space:pre-wrap;
+  }
 </style>
 </head>
 
 <body>
+  <div class="container">
+    <h1>Тест: Одномерные массивы (Python)</h1>
+    <p class="hint">Если вопросов не видно — проверь, что файл называется <b>index.html</b> и лежит в нужной папке.</p>
 
-<div class="container">
-<h1>Тест: Одномерные массивы (Python)</h1>
-<div id="quiz"></div>
+    <div id="quiz"></div>
 
-<button id="checkBtn">Проверить</button>
-<button id="resetBtn">Сбросить</button>
+    <button id="checkBtn">Проверить</button>
+    <button id="resetBtn">Сбросить</button>
 
-<div id="result"></div>
-</div>
+    <div id="result"></div>
+    <div id="debug"></div>
+  </div>
 
 <script>
+(() => {
+  const debugEl = () => document.getElementById("debug");
+  const showDebug = (msg) => {
+    const el = debugEl();
+    el.style.display = "block";
+    el.textContent = msg;
+  };
 
-const questions = [
-{
-text:"1. Что такое одномерный массив?",
-answers:["Таблица","Упорядоченный набор элементов с индексами","Любая переменная","Функция"],
-correct:1
-},
-{
-text:"2. Как создать массив?",
-answers:["a=(1,2,3)","a=[1,2,3]","a={1,2,3}","array=1,2,3"],
-correct:1
-},
-{
-text:"3. Первый индекс в Python?",
-answers:["1","0","-1","Зависит от длины"],
-correct:1
-},
-{
-text:"4. Что выведет код?\n a=[5,10,15]\n print(a[1])",
-answers:["5","10","15","Ошибка"],
-correct:1
-},
-{
-text:"5. Как узнать длину массива?",
-answers:["size(a)","length(a)","len(a)","a.length"],
-correct:2
-},
-{
-text:"6. Что делает append()?",
-answers:["Удаляет","Добавляет в начало","Добавляет в конец","Меняет элемент"],
-correct:2
-},
-{
-text:"7. Что делает remove(2)?",
-answers:["Удаляет по значению","Удаляет по индексу","Добавляет","Ничего"],
-correct:0
-},
-{
-text:"8. Что делает pop(1)?",
-answers:["Удаляет по индексу","Удаляет по значению","Добавляет","Сортирует"],
-correct:0
-},
-{
-text:"9. Что выведет?\n a=[1,2,3]\n print(a[-1])",
-answers:["1","2","3","Ошибка"],
-correct:2
-},
-{
-text:"10. Что выведет?\n a=[1,2,3]\n s=0\n for i in a:\n  s+=i\n print(s)",
-answers:["3","5","6","123"],
-correct:2
-},
-{
-text:"11. min([4,1,7])",
-answers:["4","1","7","Ошибка"],
-correct:1
-},
-{
-text:"12. print([1,2,3][5])",
-answers:["5","3","None","Ошибка"],
-correct:3
-},
-{
-text:"13. Обмен элементов a[0],a[2]=a[2],a[0] — что произойдёт?",
-answers:["Поменяются местами","Удалятся","Добавятся","Ошибка"],
-correct:0
-},
-{
-text:"14. Сколько элементов в [5,8,2,9,1]?",
-answers:["4","5","6","7"],
-correct:1
-},
-{
-text:"15. Индекс последнего элемента a длины n?",
-answers:["n","n-1","n+1","0"],
-correct:1
-}
-];
+  const questions = [
+    { text:"1. Что такое одномерный массив?",
+      answers:["Таблица","Упорядоченный набор элементов с индексами","Любая переменная","Функция"], correct:1 },
 
-const quiz=document.getElementById("quiz");
+    { text:"2. Как создать массив в Python?",
+      answers:["a=(1,2,3)","a=[1,2,3]","a={1,2,3}","array=1,2,3"], correct:1 },
 
-function loadQuiz(){
-quiz.innerHTML="";
-questions.forEach((q,index)=>{
-const div=document.createElement("div");
-div.className="question";
+    { text:"3. Первый индекс в Python?",
+      answers:["1","0","-1","Зависит от длины"], correct:1 },
 
-div.innerHTML=`<strong>${q.text}</strong>`;
+    { text:"4. Что выведет программа?",
+      code:`a = [5, 10, 15]
+print(a[1])`,
+      answers:["5","10","15","Ошибка"], correct:1 },
 
-const ansDiv=document.createElement("div");
-ansDiv.className="answers";
+    { text:"5. Как узнать длину массива a?",
+      answers:["size(a)","length(a)","len(a)","a.length"], correct:2 },
 
-q.answers.forEach((a,i)=>{
-ansDiv.innerHTML+=`
-<label>
-<input type="radio" name="q${index}" value="${i}">
-${a}
-</label>
-`;
-});
+    { text:"6. Что делает команда append()?",
+      answers:["Удаляет","Добавляет в начало","Добавляет в конец","Меняет элемент"], correct:2 },
 
-div.appendChild(ansDiv);
-quiz.appendChild(div);
-});
-}
+    { text:"7. Что делает remove(2)?",
+      answers:["Удаляет по значению","Удаляет по индексу","Добавляет","Ничего"], correct:0 },
 
-function checkAnswers(){
-let score=0;
+    { text:"8. Что делает pop(1)?",
+      answers:["Удаляет по индексу","Удаляет по значению","Добавляет","Сортирует"], correct:0 },
 
-questions.forEach((q,index)=>{
-const selected=document.querySelector(`input[name="q${index}"]:checked`);
-const labels=document.querySelectorAll(`input[name="q${index}"]`);
+    { text:"9. Что выведет программа?",
+      code:`a = [1, 2, 3]
+print(a[-1])`,
+      answers:["1","2","3","Ошибка"], correct:2 },
 
-labels.forEach(l=>l.parentElement.classList.remove("correct","wrong"));
+    { text:"10. Что выведет программа?",
+      code:`a = [1, 2, 3]
+s = 0
 
-if(selected){
-if(Number(selected.value)===q.correct){
-score++;
-selected.parentElement.classList.add("correct");
-}else{
-selected.parentElement.classList.add("wrong");
-labels[q.correct].parentElement.classList.add("correct");
-}
-}
-});
+for i in a:
+    s += i
 
-document.getElementById("result").innerText=`Результат: ${score} из ${questions.length}`;
-}
+print(s)`,
+      answers:["3","5","6","123"], correct:2 },
 
-function resetQuiz(){
-loadQuiz();
-document.getElementById("result").innerText="";
-}
+    { text:"11. Что выведет программа?",
+      code:`a = [4, 1, 7]
+print(min(a))`,
+      answers:["4","1","7","Ошибка"], correct:1 },
 
-document.getElementById("checkBtn").addEventListener("click",checkAnswers);
-document.getElementById("resetBtn").addEventListener("click",resetQuiz);
+    { text:"12. Что произойдёт?",
+      code:`a = [1, 2, 3]
+print(a[5])`,
+      answers:["5","3","None","Ошибка (IndexError)"], correct:3 },
 
-loadQuiz();
+    { text:"13. Что будет результатом?",
+      code:`a = [3, 2, 1]
 
+a[0], a[2] = a[2], a[0]
+
+print(a)`,
+      answers:["[1, 2, 3]","[3, 2, 1]","[2, 3, 1]","Ошибка"], correct:0 },
+
+    { text:"14. Сколько элементов в массиве?",
+      code:`a = [5, 8, 2, 9, 1]`,
+      answers:["4","5","6","7"], correct:1 },
+
+    { text:"15. Индекс последнего элемента массива длины n?",
+      answers:["n","n-1","n+1","0"], correct:1 }
+  ];
+
+  function loadQuiz(){
+    const quiz = document.getElementById("quiz");
+    if (!quiz) {
+      showDebug("Не найден блок #quiz. Проверь, что HTML вставлен полностью.");
+      return;
+    }
+
+    quiz.innerHTML = "";
+    questions.forEach((q, index) => {
+      const div = document.createElement("div");
+      div.className = "question";
+
+      const title = document.createElement("div");
+      title.innerHTML = `<strong>${q.text}</strong>`;
+      div.appendChild(title);
+
+      if (q.code){
+        const pre = document.createElement("pre");
+        pre.textContent = q.code;
+        div.appendChild(pre);
+      }
+
+      const ansDiv = document.createElement("div");
+      ansDiv.className = "answers";
+
+      q.answers.forEach((a, i) => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="radio" name="q${index}" value="${i}"> ${a}`;
+        ansDiv.appendChild(label);
+      });
+
+      div.appendChild(ansDiv);
+      quiz.appendChild(div);
+    });
+  }
+
+  function checkAnswers(){
+    let score = 0;
+
+    questions.forEach((q, index) => {
+      const selected = document.querySelector(`input[name="q${index}"]:checked`);
+      const inputs = document.querySelectorAll(`input[name="q${index}"]`);
+
+      inputs.forEach(inp => inp.parentElement.classList.remove("correct","wrong"));
+
+      if (selected){
+        if (Number(selected.value) === q.correct){
+          score++;
+          selected.parentElement.classList.add("correct");
+        } else {
+          selected.parentElement.classList.add("wrong");
+          inputs[q.correct].parentElement.classList.add("correct");
+        }
+      }
+    });
+
+    document.getElementById("result").innerText = `Результат: ${score} из ${questions.length}`;
+  }
+
+  function resetQuiz(){
+    loadQuiz();
+    document.getElementById("result").innerText = "";
+  }
+
+  // Запуск строго после загрузки DOM
+  window.addEventListener("DOMContentLoaded", () => {
+    try {
+      loadQuiz();
+
+      const checkBtn = document.getElementById("checkBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+      if (!checkBtn || !resetBtn) {
+        showDebug("Не найдены кнопки. Проверь, что файл не обрезан при вставке.");
+        return;
+      }
+
+      checkBtn.addEventListener("click", checkAnswers);
+      resetBtn.addEventListener("click", resetQuiz);
+
+      // Контроль: если вдруг не отрисовалось
+      const quiz = document.getElementById("quiz");
+      if (!quiz || quiz.children.length === 0) {
+        showDebug(
+          "Вопросы не отрисовались.\n" +
+          "Почти наверняка открыт не index.html, а Markdown (README.md / index.md).\n" +
+          "Убедись: dvumernuemassivi/index.html существует и по ссылке открывается именно он."
+        );
+      }
+    } catch (e) {
+      showDebug("Ошибка JS:\n" + (e && e.stack ? e.stack : e));
+    }
+  });
+})();
 </script>
-
 </body>
 </html>
