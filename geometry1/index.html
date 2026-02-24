@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Решение треугольников (9.1.3.9)</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f7fa;
+            --text-color: #333;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header & Timer */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .timer {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            background: #eef2f7;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen h1 {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #357abd;
+        }
+
+        /* Question Styles */
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background: #eef6ff;
+        }
+
+        .option.correct {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .option.wrong {
+            background-color: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
+
+        .option.disabled {
+            pointer-events: none;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .feedback {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #eee;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Math formatting helper */
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="header">
+        <div id="questionCounter">Вопрос 1 из 10</div>
+        <div class="timer" id="timer">10:00</div>
+    </div>
+
+    <!-- Start Screen -->
+    <div class="screen start-screen active" id="startScreen">
+        <h1>Тест по геометрии</h1>
+        <p><strong>Тема:</strong> Решение треугольников</p>
+        <p><strong>Цель:</strong> 9.1.3.9 знать и применять формулы для нахождения радиуса окружности (вписанной и описанной) через площадь.</p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>Время: 10 минут</li>
+            <li>Вопросов: 10</li>
+            <li>Вам понадобятся формулы: <br>
+                <span class="math">r = S/p</span> и <span class="math">R = abc/4S</span>
+            </li>
+        </ul>
+        <br>
+        <button class="btn" onclick="startQuiz()">Начать тест</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div class="screen" id="quizScreen">
+        <div class="question-text" id="questionText">Текст вопроса</div>
+        <div class="options" id="optionsContainer">
+            <!-- Options will be injected here -->
+        </div>
+        <button class="btn" id="nextBtn" style="display: none; float: right;" onclick="nextQuestion()">Далее</button>
+    </div>
+
+    <!-- Result Screen -->
+    <div class="screen result-screen" id="resultScreen">
+        <div class="score-circle" id="finalScore">0/10</div>
+        <h2>Тест завершен!</h2>
+        <p class="feedback" id="feedbackText">Ваш результат...</p>
+        <button class="btn" onclick="location.reload()">Пройти заново</button>
+    </div>
+</div>
+
+<script>
+    // --- Data: Questions ---
+    const questions = [
+        {
+            question: "Какая формула связывает радиус <span class='math'>r</span> вписанной окружности, площадь треугольника <span class='math'>S</span> и полупериметр <span class='math'>p</span>?",
+            options: [
+                "r = S · p",
+                "r = S / p",
+                "r = p / S",
+                "r = 2S / p"
+            ],
+            correct: 1
+        },
+        {
+            question: "Какая формула используется для нахождения радиуса <span class='math'>R</span> описанной окружности через стороны <span class='math'>a, b, c</span> и площадь <span class='math'>S</span>?",
+            options: [
+                "R = abc / 4S",
+                "R = 4S / abc",
+                "R = abc / 2S",
+                "R = (a + b + c) / 3"
+            ],
+            correct: 0
+        },
+        {
+            question: "Стороны треугольника равны 3, 4 и 5. Чему равен радиус <span class='math'>R</span> описанной окружности?",
+            options: [
+                "2.5",
+                "3",
+                "5",
+                "1.5"
+            ],
+            correct: 0 // R = (3*4*5)/(4*6) = 60/24 = 2.5
+        },
+        {
+            question: "Стороны треугольника равны 3, 4 и 5. Чему равен радиус <span class='math'>r</span> вписанной окружности?",
+            options: [
+                "2",
+                "1.5",
+                "1",
+                "0.5"
+            ],
+            correct: 2 // S=6, p=6. r = 6/6 = 1
+        },
+        {
+            question: "В равностороннем треугольнике со стороной <span class='math'>a</span>, как соотносятся радиусы <span class='math'>R</span> и <span class='math'>r</span>?",
+            options: [
+                "R = r",
+                "R = 3r",
+                "R = 2r",
+                "r = 2R"
+            ],
+            correct: 2
+        },
+        {
+            question: "Площадь треугольника равна 24 см², а полупериметр равен 12 см. Найдите радиус вписанной окружности.",
+            options: [
+                "4 см",
+                "2 см",
+                "12 см",
+                "0.5 см"
+            ],
+            correct: 1 // r = 24 / 12 = 2
+        },
+        {
+            question: "Дан прямоугольный треугольник с катетами 6 и 8. Найдите радиус описанной окружности.",
+            options: [
+                "3",
+                "4",
+                "5",
+                "10"
+            ],
+            correct: 2 // Гипотенуза = 10. R = c/2 = 5
+        },
+        {
+            question: "Если площадь треугольника <span class='math'>S = 30</span>, а стороны <span class='math'>a=5, b=12, c=13</span>, чему равен радиус описанной окружности?",
+            options: [
+                "6.5",
+                "5",
+                "13",
+                "3.25"
+            ],
+            correct: 0 // R = (5*12*13)/(4*30) = 780/120 = 6.5
+        },
+        {
+            question: "В каком треугольнике центр описанной окружности лежит на гипотенузе?",
+            options: [
+                "В остроугольном",
+                "В тупоугольном",
+                "В прямоугольном",
+                "В равностороннем"
+            ],
+            correct: 2
+        },
+        {
+            question: "Площадь треугольника <span class='math'>S</span> можно выразить через радиус вписанной окружности <span class='math'>r</span> и периметр <span class='math'>P</span> как:",
+            options: [
+                "S = r · P",
+                "S = 0.5 · r · P",
+                "S = r² · P",
+                "S = r / P"
+            ],
+            correct: 1 // S = r * p = r * (P/2)
+        }
+    ];
+
+    // --- State Variables ---
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 600; // 10 minutes in seconds
+    let timerInterval;
+
+    // --- DOM Elements ---
+    const startScreen = document.getElementById('startScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const nextBtn = document.getElementById('nextBtn');
+    const timerDisplay = document.getElementById('timer');
+    const questionCounter = document.getElementById('questionCounter');
+    const progressBar = document.getElementById('progressBar');
+
+    // --- Functions ---
+
+    function startQuiz() {
+        startScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = 600;
+        
+        startTimer();
+        showQuestion();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            
+            // Format time
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                finishQuiz();
+            }
+        }, 1000);
+    }
+
+    function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        
+        // Update UI
+        questionText.innerHTML = currentQuestion.question;
+        questionCounter.textContent = `Вопрос ${currentQuestionIndex + 1} из ${questions.length}`;
+        
+        // Update Progress Bar
+        const progress = ((currentQuestionIndex) / questions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        // Render Options
+        optionsContainer.innerHTML = '';
+        nextBtn.style.display = 'none';
+
+        currentQuestion.options.forEach((option, index) => {
+            const button = document.createElement('div');
+            button.classList.add('option');
+            button.innerHTML = option;
+            button.onclick = () => selectAnswer(index, button);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function selectAnswer(selectedIndex, selectedButton) {
+        const currentQuestion = questions[currentQuestionIndex];
+        const allOptions = optionsContainer.children;
+
+        // Disable all clicks
+        for (let btn of allOptions) {
+            btn.classList.add('disabled');
+        }
+
+        // Check correctness
+        if (selectedIndex === currentQuestion.correct) {
+            selectedButton.classList.add('correct');
+            score++;
+        } else {
+            selectedButton.classList.add('wrong');
+            // Highlight the correct answer
+            allOptions[currentQuestion.correct].classList.add('correct');
+        }
+
+        nextBtn.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        clearInterval(timerInterval);
+        quizScreen.classList.remove('active');
+        resultScreen.classList.add('active');
+        
+        // Final Score UI
+        document.getElementById('finalScore').textContent = `${score}/${questions.length}`;
+        
+        // Feedback text
+        const feedbackText = document.getElementById('feedbackText');
+        const percentage = (score / questions.length) * 100;
+        
+        if (percentage === 100) {
+            feedbackText.textContent = "Отлично! Вы полностью усвоили тему.";
+            feedbackText.style.color = "var(--success-color)";
+        } else if (percentage >= 70) {
+            feedbackText.textContent = "Хороший результат! Но стоит повторить формулы.";
+            feedbackText.style.color = "#f39c12";
+        } else {
+            feedbackText.textContent = "Вам нужно повторить тему 9.1.3.9.";
+            feedbackText.style.color = "var(--error-color)";
+        }
+        
+        progressBar.style.width = '100%';
+    }
+</script>
+
+</body>
+</html>
