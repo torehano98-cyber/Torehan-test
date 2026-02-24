@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тест 10 минут — Решение треугольников (r и R)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121a33;
+      --muted:#9fb0ff;
+      --text:#eef2ff;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --line:rgba(255,255,255,.12);
+      --btn:#2b3a7a;
+      --btn2:#1f2b5a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(79,70,229,.35), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 30%, rgba(34,211,238,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding:18px;
+    }
+    .wrap{max-width:980px;margin:0 auto;display:grid;gap:14px}
+    header{
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+      padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(18,26,51,.75);
+      backdrop-filter: blur(6px);
+    }
+    header h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .sub{margin:2px 0 0;color:rgba(238,242,255,.8);font-size:13px}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;
+      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(0,0,0,.15);font-size:13px
+    }
+    .grid{display:grid;grid-template-columns: 1.4fr .6fr;gap:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{
+      border:1px solid var(--line);
+      background:rgba(18,26,51,.75);
+      border-radius:16px;
+      padding:14px 16px;
+      backdrop-filter: blur(6px);
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      border:none;cursor:pointer;color:var(--text);
+      background:linear-gradient(180deg, var(--btn), var(--btn2));
+      padding:10px 12px;border-radius:12px;
+      font-weight:600;letter-spacing:.2px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+      transition: transform .06s ease, filter .2s ease;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.secondary{background: rgba(255,255,255,.06); border:1px solid var(--line); box-shadow:none}
+    .btn.danger{background: rgba(251,113,133,.16); border:1px solid rgba(251,113,133,.35); box-shadow:none}
+    .btn:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.7)}
+    .kpi{
+      display:grid;grid-template-columns: repeat(3, 1fr);gap:10px;margin-top:10px
+    }
+    .kpi .box{
+      border:1px solid var(--line);border-radius:14px;padding:10px 12px;
+      background: rgba(0,0,0,.14)
+    }
+    .box .lab{font-size:12px;color:rgba(238,242,255,.7)}
+    .box .val{font-size:18px;font-weight:800;margin-top:2px}
+    .progress{
+      height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--line);
+    }
+    .bar{height:100%;width:0%;background:linear-gradient(90deg, rgba(52,211,153,.85), rgba(34,211,238,.85))}
+    .qhead{
+      display:flex;gap:10px;justify-content:space-between;align-items:flex-start;margin-bottom:8px
+    }
+    .qtitle{font-size:16px;font-weight:800;margin:0}
+    .qmeta{font-size:12px;color:rgba(238,242,255,.7)}
+    .prompt{
+      margin:10px 0 12px;
+      padding:10px 12px;border-radius:14px;
+      background: rgba(0,0,0,.15); border:1px solid var(--line);
+      line-height:1.35;
+    }
+    .answers{display:grid;gap:10px}
+    .opt{
+      text-align:left;
+      padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      cursor:pointer; transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    .opt:hover{background: rgba(255,255,255,.075)}
+    .opt:active{transform: translateY(1px)}
+    .opt.correct{border-color: rgba(52,211,153,.6); background: rgba(52,211,153,.12)}
+    .opt.wrong{border-color: rgba(251,113,133,.6); background: rgba(251,113,133,.10)}
+    .opt.lock{cursor:not-allowed;opacity:.95}
+    .note{
+      margin-top:10px;
+      padding:10px 12px;border-radius:14px;border:1px dashed rgba(255,255,255,.18);
+      color: rgba(238,242,255,.85);
+      background: rgba(0,0,0,.10);
+      font-size:13px; line-height:1.35;
+    }
+    .small{font-size:12px;color:rgba(238,242,255,.7)}
+    .formula{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      padding:8px 10px;border-radius:12px;border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      display:inline-block
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background: rgba(0,0,0,.12);
+      font-size:12px;color:rgba(238,242,255,.85)
+    }
+    .badge.good{border-color: rgba(52,211,153,.45); background: rgba(52,211,153,.10)}
+    .badge.warn{border-color: rgba(251,191,36,.45); background: rgba(251,191,36,.10)}
+    .badge.bad{border-color: rgba(251,113,133,.45); background: rgba(251,113,133,.10)}
+    footer{opacity:.85}
+    .hidden{display:none}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+    .line{height:1px;background:var(--line);margin:10px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Интерактивный тест (10 минут): Решение треугольников — радиусы <span class="mono">r</span> и <span class="mono">R</span></h1>
+        <div class="sub">ЦО 9.1.3.9 — применение формул радиуса вписанной/описанной окружности через площадь треугольника</div>
+      </div>
+      <div class="row">
+        <span class="pill">⏱️ Время: <b id="time">10:00</b></span>
+        <span class="pill">🎯 Баллы: <b id="score">0</b>/10</span>
+        <button class="btn" id="startBtn">Старт</button>
+        <button class="btn secondary" id="restartBtn" disabled>Сброс</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="qhead">
+          <div>
+            <p class="qtitle" id="qTitle">Нажмите «Старт», чтобы начать</p>
+            <div class="qmeta" id="qMeta">10 вопросов · 10 минут · 1 балл за вопрос</div>
+          </div>
+          <div class="row">
+            <span class="badge" id="lvlBadge">Уровень: —</span>
+          </div>
+        </div>
+
+        <div class="progress" aria-label="progress">
+          <div class="bar" id="bar"></div>
+        </div>
+
+        <div class="prompt" id="prompt">
+          <div class="small">Подсказка формул:</div>
+          <div class="row" style="margin-top:8px">
+            <span class="formula">r = S / p</span>
+            <span class="formula">R = abc / (4S)</span>
+            <span class="formula">S = √(p(p-a)(p-b)(p-c))</span>
+          </div>
+          <div class="line"></div>
+          <div class="small">Тут появится условие вопроса.</div>
+        </div>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="note hidden" id="explain"></div>
+
+        <div class="row" style="margin-top:12px; justify-content:space-between">
+          <button class="btn secondary" id="prevBtn" disabled>← Назад</button>
+          <div class="row">
+            <span class="small" id="status">Статус: ожидание</span>
+            <button class="btn" id="nextBtn" disabled>Далее →</button>
+            <button class="btn danger hidden" id="finishBtn">Завершить</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="small">Панель контроля</div>
+            <div style="font-weight:800; font-size:16px; margin-top:2px">Прогресс</div>
+          </div>
+          <span class="pill">🧠 <b id="answered">0</b>/10</span>
+        </div>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="lab">Текущий вопрос</div>
+            <div class="val"><span id="qNum">—</span>/10</div>
+          </div>
+          <div class="box">
+            <div class="lab">Верно</div>
+            <div class="val" style="color:var(--good)"><span id="ok">0</span></div>
+          </div>
+          <div class="box">
+            <div class="lab">Ошибки</div>
+            <div class="val" style="color:var(--bad)"><span id="bad">0</span></div>
+          </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="small">Навигация по вопросам:</div>
+        <div class="row" id="nav" style="margin-top:8px"></div>
+
+        <div class="line"></div>
+
+        <div class="small">Рекомендация:</div>
+        <div class="note" id="tip">
+          Если застрял — сначала найди <b>S</b> и <b>p</b>, потом считай <span class="mono">r</span> или <span class="mono">R</span>.
+          Не геройствуй: порядок действий — твой командир.
+        </div>
+
+        <footer class="small">
+          Работает офлайн: просто открой файл <span class="mono">.html</span> в браузере.
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const quiz = [
+    { level:"A", text:"Формула радиуса вписанной окружности через площадь S и полупериметр p:",
+      options:["r = S·p","r = S / p","r = p / S","r = 2S / p"], correctIndex:1,
+      explain:"Для любого треугольника: r = S/p, где p = (a+b+c)/2." },
+    { level:"A", text:"Формула радиуса описанной окружности через стороны a,b,c и площадь S:",
+      options:["R = abc / (4S)","R = 4S / abc","R = (a+b+c)/S","R = S / (abc)"], correctIndex:0,
+      explain:"Классическая формула: R = abc/(4S)." },
+    { level:"A", text:"Дан треугольник со сторонами 6, 8, 10. Найдите r (вписанная окружность).",
+      options:["1","2","3","4"], correctIndex:1,
+      explain:"6-8-10 — прямоугольный. S = 6·8/2 = 24. p = (6+8+10)/2=12. r=S/p=24/12=2." },
+    { level:"A", text:"Если площадь треугольника S = 24 см², а полупериметр p = 12 см, то r = ?",
+      options:["1","2","3","4"], correctIndex:1,
+      explain:"r = S/p = 24/12 = 2." },
+    { level:"B", text:"Треугольник со сторонами 5, 12, 13. Найдите R (описанная окружность).",
+      options:["13/2","5/2","12/2","65/12"], correctIndex:0,
+      explain:"5-12-13 — прямоугольный. Для прямоугольного треугольника R = гипотенуза/2 = 13/2." },
+    { level:"B", text:"Треугольник со сторонами 7, 8, 9. Найдите r.",
+      options:["√5","√6","2","3"], correctIndex:0,
+      explain:"p=12. S=√(12·5·4·3)=√720=12√5. r=S/p=12√5/12=√5." },
+    { level:"B", text:"Дан треугольник: a=6, b=7, c=8. Если S = 6√15, найдите R.",
+      options:["14/√15","28/√15","56/√15","7/√15"], correctIndex:0,
+      explain:"R=abc/(4S)=336/(4·6√15)=336/(24√15)=14/√15." },
+    { level:"C", text:"Треугольник равносторонний со стороной 6. Найдите r.",
+      options:["√3","3/2","2","3√3/2"], correctIndex:0,
+      explain:"S = a²√3/4 = 9√3, p=9, r=S/p=√3." },
+    { level:"B", text:"Если треугольник прямоугольный и гипотенуза c=10, то R равен:",
+      options:["10","5","2.5","20"], correctIndex:1,
+      explain:"Для прямоугольного треугольника центр описанной окружности — середина гипотенузы, поэтому R = c/2 = 5." },
+    { level:"C", text:"Дан треугольник со сторонами 9, 10, 17. Полупериметр p=18. Площадь S=18. Найдите r.",
+      options:["1","2","3","4"], correctIndex:0,
+      explain:"r = S/p = 18/18 = 1." }
+  ];
+
+  let started=false, idx=0, score=0, ok=0, bad=0;
+  let answers=Array(quiz.length).fill(null);
+  let locked=Array(quiz.length).fill(false);
+  let remaining=10*60, timer=null;
+
+  const timeEl=$("time"), scoreEl=$("score"), startBtn=$("startBtn"), restartBtn=$("restartBtn");
+  const prevBtn=$("prevBtn"), nextBtn=$("nextBtn"), finishBtn=$("finishBtn");
+  const qTitle=$("qTitle"), qMeta=$("qMeta"), lvlBadge=$("lvlBadge");
+  const promptEl=$("prompt"), answersEl=$("answers"), explainEl=$("explain");
+  const barEl=$("bar"), statusEl=$("status"), answeredEl=$("answered"), qNumEl=$("qNum");
+  const okEl=$("ok"), badEl=$("bad"), navEl=$("nav"), tipEl=$("tip");
+
+  function buildNav(){
+    navEl.innerHTML="";
+    for(let i=0;i<quiz.length;i++){
+      const b=document.createElement("button");
+      b.className="btn secondary";
+      b.style.padding="8px 10px";
+      b.style.borderRadius="12px";
+      b.textContent=(i+1);
+      b.addEventListener("click",()=>{ if(!started) return; idx=i; render(); });
+      navEl.appendChild(b);
+    }
+  }
+  buildNav();
+
+  function fmtTime(s){ const m=Math.floor(s/60), r=s%60; return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`; }
+  function setTimerUI(){
+    timeEl.textContent=fmtTime(remaining);
+    if(remaining<=60) timeEl.style.color="var(--warn)";
+    if(remaining<=20) timeEl.style.color="var(--bad)";
+  }
+  function startTimer(){
+    setTimerUI();
+    timer=setInterval(()=>{
+      remaining--; setTimerUI();
+      if(remaining<=0){ remaining=0; clearInterval(timer); timer=null; finish(true); }
+    },1000);
+  }
+
+  function setLevelBadge(level){
+    lvlBadge.className="badge";
+    if(level==="A"){ lvlBadge.classList.add("good"); lvlBadge.textContent="Уровень: A"; }
+    if(level==="B"){ lvlBadge.classList.add("warn"); lvlBadge.textContent="Уровень: B"; }
+    if(level==="C"){ lvlBadge.classList.add("bad");  lvlBadge.textContent="Уровень: C"; }
+  }
+
+  function render(){
+    const q=quiz[idx];
+    qTitle.textContent=`Вопрос ${idx+1}`;
+    qMeta.textContent="Выберите один вариант ответа";
+    setLevelBadge(q.level);
+    qNumEl.textContent=(idx+1);
+
+    const done=answers.filter(x=>x!==null).length;
+    answeredEl.textContent=done;
+    barEl.style.width=`${(done/quiz.length)*100}%`;
+
+    promptEl.innerHTML=`<div class="small">Фокус вопроса: <b>${q.level}</b> · тема <span class="mono">r</span> и <span class="mono">R</span></div>
+      <div class="line"></div><div>${q.text}</div>`;
+
+    answersEl.innerHTML="";
+    explainEl.classList.add("hidden");
+    explainEl.textContent="";
+
+    const chosen=answers[idx];
+    const isLocked=locked[idx];
+
+    q.options.forEach((optText,j)=>{
+      const b=document.createElement("button");
+      b.className="opt";
+      b.innerHTML=`<b>${String.fromCharCode(65+j)}.</b> ${optText}`;
+      if(isLocked) b.classList.add("lock");
+      if(isLocked){
+        if(j===q.correctIndex) b.classList.add("correct");
+        if(chosen!==null && j===chosen && chosen!==q.correctIndex) b.classList.add("wrong");
+      }
+      b.addEventListener("click",()=>{
+        if(!started||locked[idx]) return;
+        answers[idx]=j; locked[idx]=true;
+        if(j===q.correctIndex){ score++; ok++; statusEl.textContent="Статус: ✅ верно"; }
+        else { bad++; statusEl.textContent="Статус: ❌ неверно"; }
+        scoreEl.textContent=score; okEl.textContent=ok; badEl.textContent=bad;
+        explainEl.textContent="Разбор: "+q.explain; explainEl.classList.remove("hidden");
+        render();
+        nextBtn.disabled=(idx===quiz.length-1);
+        finishBtn.classList.toggle("hidden", idx!==quiz.length-1);
+        if(idx===quiz.length-1) nextBtn.disabled=true;
+      });
+      answersEl.appendChild(b);
+    });
+
+    prevBtn.disabled=(idx===0);
+    nextBtn.disabled=(idx===quiz.length-1)||(answers[idx]===null);
+
+    if(isLocked){
+      explainEl.textContent="Разбор: "+q.explain;
+      explainEl.classList.remove("hidden");
+      statusEl.textContent=(answers[idx]===q.correctIndex)?"Статус: ✅ верно":"Статус: ❌ неверно";
+    } else statusEl.textContent="Статус: выберите ответ";
+
+    [...navEl.children].forEach((btn,i)=>{
+      btn.style.opacity=answers[i]===null?".75":"1";
+      btn.style.borderColor=answers[i]===null?"var(--line)":"rgba(52,211,153,.35)";
+      btn.style.background=(i===idx)?"rgba(255,255,255,.09)":"rgba(255,255,255,.06)";
+    });
+
+    tipEl.innerHTML = idx<4
+      ? `База: помни <span class="mono">r = S/p</span> и <span class="mono">R = abc/(4S)</span>.`
+      : idx<8 ? `Прямоугольный треугольник часто спасает: <b>R = c/2</b>.`
+      : `Финиш: формулы — это дисциплина.`;
+  }
+
+  function start(){
+    if(started) return;
+    started=true;
+    startBtn.disabled=true;
+    restartBtn.disabled=false;
+    idx=0; score=0; ok=0; bad=0;
+    answers=Array(quiz.length).fill(null);
+    locked=Array(quiz.length).fill(false);
+    remaining=10*60;
+
+    scoreEl.textContent=score; okEl.textContent=ok; badEl.textContent=bad; answeredEl.textContent="0";
+    timeEl.style.color="var(--text)";
+    prevBtn.disabled=true; nextBtn.disabled=true; finishBtn.classList.add("hidden");
+
+    if(timer){ clearInterval(timer); timer=null; }
+    startTimer();
+    render();
+  }
+
+  function restart(){
+    if(timer){ clearInterval(timer); timer=null; }
+    started=false;
+    startBtn.disabled=false;
+    restartBtn.disabled=true;
+    prevBtn.disabled=true; nextBtn.disabled=true; finishBtn.classList.add("hidden");
+
+    qTitle.textContent="Нажмите «Старт», чтобы начать";
+    qMeta.textContent="10 вопросов · 10 минут · 1 балл за вопрос";
+    lvlBadge.className="badge"; lvlBadge.textContent="Уровень: —";
+    barEl.style.width="0%";
+    promptEl.innerHTML=`<div class="small">Подсказка формул:</div>
+      <div class="row" style="margin-top:8px">
+        <span class="formula">r = S / p</span>
+        <span class="formula">R = abc / (4S)</span>
+        <span class="formula">S = √(p(p-a)(p-b)(p-c))</span>
+      </div>
+      <div class="line"></div>
+      <div class="small">Тут появится условие вопроса.</div>`;
+    answersEl.innerHTML="";
+    explainEl.classList.add("hidden");
+    statusEl.textContent="Статус: ожидание";
+
+    score=0; ok=0; bad=0;
+    scoreEl.textContent="0"; okEl.textContent="0"; badEl.textContent="0";
+    answeredEl.textContent="0"; qNumEl.textContent="—";
+    remaining=10*60; setTimerUI(); buildNav();
+  }
+
+  function finish(fromTimer=false){
+    for(let i=0;i<quiz.length;i++){
+      if(answers[i]===null) answers[i]=-1;
+      locked[i]=true;
+    }
+    if(timer){ clearInterval(timer); timer=null; }
+    render();
+
+    const done=answers.filter(x=>x!==null && x!==-1).length;
+    const percent=Math.round((score/quiz.length)*100);
+    const badge = percent>=80 ? "🟢" : percent>=50 ? "🟡" : "🔴";
+    qTitle.textContent=`Результат: ${score}/10 (${percent}%) ${badge}`;
+    qMeta.textContent=fromTimer ? "Время вышло. Разбор доступен в каждом вопросе." : "Тест завершён. Разбор доступен в каждом вопросе.";
+
+    explainEl.classList.remove("hidden");
+    explainEl.innerHTML=`<b>Итог:</b> верно — <b>${ok}</b>, ошибок — <b>${bad}</b>, отвечено — <b>${done}</b>/10.<br>
+      <span class="small">Совет:</span> закрепи <span class="mono">r = S/p</span> и <span class="mono">R = abc/(4S)</span>, затем потренируйся на прямоугольных треугольниках (<span class="mono">R = c/2</span>).`;
+    statusEl.textContent="Статус: завершено";
+    nextBtn.disabled=true; prevBtn.disabled=false; finishBtn.classList.add("hidden");
+  }
+
+  startBtn.addEventListener("click", start);
+  restartBtn.addEventListener("click", restart);
+  prevBtn.addEventListener("click", ()=>{ if(!started) return; idx=Math.max(0,idx-1); render(); });
+  nextBtn.addEventListener("click", ()=>{ if(!started) return; idx=Math.min(quiz.length-1,idx+1); render(); });
+  finishBtn.addEventListener("click", ()=>finish(false));
+
+  setTimerUI();
+})();
+</script>
+</body>
+</html>
