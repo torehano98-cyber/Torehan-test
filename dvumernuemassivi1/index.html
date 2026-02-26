@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Актуализация знаний: Двумерный массив</title>
+  <style>
+    :root{
+      --bg1:#0f2027;
+      --bg2:#203a43;
+      --bg3:#2c5364;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,.75);
+      --accent: #00c6ff;
+      --accent2:#a78bfa;
+      --ok: rgba(0,255,0,.22);
+      --bad: rgba(255,0,0,.22);
+      --border: rgba(255,255,255,.14);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 38px auto;
+      padding: 0 16px 50px;
+    }
+
+    .header{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 18px 14px;
+      box-shadow: 0 0 30px rgba(0,0,0,.35);
+    }
+
+    h1{
+      margin:0 0 6px;
+      text-align:center;
+      font-size: 24px;
+      letter-spacing:.2px;
+    }
+
+    .sub{
+      margin:0;
+      text-align:center;
+      color:var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .bar{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: 13px;
+      user-select:none;
+    }
+    .pill strong{ color:var(--text); }
+
+    .card{
+      margin-top: 16px;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 0 30px rgba(0,0,0,.35);
+    }
+
+    .q{
+      background: var(--card2);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .qtitle{
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    pre{
+      margin: 10px 0 6px;
+      background: #1e1e1e;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 12px;
+      overflow-x:auto;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: #00ffcc;
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:8px;
+      margin-top: 10px;
+    }
+
+    .ans{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .08s ease, border-color .15s ease, background .15s ease;
+    }
+    .ans:hover{
+      border-color: rgba(0,198,255,.28);
+      background: rgba(255,255,255,.06);
+    }
+    .ans:active{ transform: scale(.995); }
+    .ans input{ margin-top: 3px; accent-color: var(--accent); }
+
+    .ans.correct{ background: var(--ok); border-color: rgba(0,255,0,.35); }
+    .ans.wrong{ background: var(--bad); border-color: rgba(255,0,0,.35); }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      margin-top: 14px;
+    }
+
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    button{
+      padding:10px 16px;
+      border:none;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 800;
+      color: white;
+    }
+    #checkBtn{ background: var(--accent); }
+    #resetBtn{ background: #ff4b5c; }
+    #checkBtn:hover{ filter:brightness(1.05); }
+    #resetBtn:hover{ filter:brightness(1.05); }
+
+    #result{
+      text-align:center;
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    #debug{
+      display:none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    @media (min-width: 760px){
+      .answers{ grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>Актуализация знаний: Двумерный массив</h1>
+      <p class="sub">10 вопросов по теме из презентации. Выбери один вариант в каждом вопросе и нажми «Проверить».</p>
+      <div class="bar">
+        <div class="pill">Вопросов: <strong id="totalQ">10</strong></div>
+        <div class="pill">Отвечено: <strong id="answered">0</strong></div>
+        <div class="pill">Баллы: <strong id="scoreLive">—</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="quiz"></div>
+
+      <div class="controls">
+        <div class="btns">
+          <button id="checkBtn">Проверить</button>
+          <button id="resetBtn">Сбросить</button>
+        </div>
+        <div class="pill">Подсветка: зелёный — верно, красный — ошибка</div>
+      </div>
+
+      <div id="result"></div>
+      <div id="debug"></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const QUESTIONS = [
+    {
+      text: "1. Что такое двумерный массив?",
+      options: ["Список чисел", "Таблица из строк и столбцов", "Любая переменная", "Один столбец данных"],
+      correct: 1
+    },
+    {
+      text: "2. Сколько индексов используется в двумерном массиве?",
+      options: ["Один", "Два", "Три", "Ни одного"],
+      correct: 1
+    },
+    {
+      text: "3. В записи a[1][2] число 1 означает:",
+      options: ["Номер столбца", "Номер строки", "Количество элементов", "Размер массива"],
+      correct: 1
+    },
+    {
+      text: "4. В записи a[1][2] число 2 означает:",
+      options: ["Номер строки", "Номер столбца", "Индекс массива", "Длину строки"],
+      correct: 1
+    },
+    {
+      text: "5. Чем двумерный массив отличается от одномерного?",
+      options: ["Цветом", "Количеством элементов", "Наличием двух индексов вместо одного", "Размером памяти"],
+      correct: 2
+    },
+    {
+      text: "6. Если массив имеет 2 строки и 3 столбца, сколько в нём элементов?",
+      options: ["5", "6", "9", "3"],
+      correct: 1
+    },
+    {
+      text: "7. Что можно хранить в двумерном массиве?",
+      options: ["Только числа", "Только строки", "Табличные данные (например, оценки)", "Только формулы"],
+      correct: 2
+    },
+    {
+      text: "8. Дан массив. Чему равен элемент a[1][1]?",
+      code: `a = [
+  [1, 2],
+  [3, 4]
+]`,
+      options: ["1", "2", "3", "4"],
+      correct: 3
+    },
+    {
+      text: "9. Визуально двумерный массив похож на:",
+      options: ["Линейку", "Таблицу", "Формулу", "Переменную"],
+      correct: 1
+    },
+    {
+      text: "10. Где в реальной жизни можно встретить пример двумерного массива?",
+      options: ["Температура за день", "Список покупок", "Таблица оценок в журнале", "Возраст человека"],
+      correct: 2
+    }
+  ];
+
+  const quizEl = document.getElementById("quiz");
+  const answeredEl = document.getElementById("answered");
+  const scoreLiveEl = document.getElementById("scoreLive");
+  const resultEl = document.getElementById("result");
+  const debugEl = document.getElementById("debug");
+  document.getElementById("totalQ").textContent = QUESTIONS.length;
+
+  function showDebug(msg){
+    debugEl.style.display = "block";
+    debugEl.textContent = msg;
+  }
+
+  function buildQuiz(){
+    quizEl.innerHTML = "";
+    QUESTIONS.forEach((q, idx) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "q";
+
+      const title = document.createElement("div");
+      title.className = "qtitle";
+      title.textContent = q.text;
+      qDiv.appendChild(title);
+
+      if (q.code){
+        const pre = document.createElement("pre");
+        pre.textContent = q.code;
+        qDiv.appendChild(pre);
+      }
+
+      const answers = document.createElement("div");
+      answers.className = "answers";
+
+      q.options.forEach((opt, oi) => {
+        const label = document.createElement("label");
+        label.className = "ans";
+        label.innerHTML = `
+          <input type="radio" name="q${idx}" value="${oi}">
+          <span>${opt}</span>
+        `;
+
+        label.querySelector("input").addEventListener("change", () => {
+          updateAnswered();
+        });
+
+        answers.appendChild(label);
+      });
+
+      qDiv.appendChild(answers);
+      quizEl.appendChild(qDiv);
+    });
+
+    updateAnswered();
+    scoreLiveEl.textContent = "—";
+    resultEl.textContent = "";
+    debugEl.style.display = "none";
+  }
+
+  function getUserAnswers(){
+    return QUESTIONS.map((_, idx) => {
+      const checked = document.querySelector(`input[name="q${idx}"]:checked`);
+      return checked ? Number(checked.value) : null;
+    });
+  }
+
+  function updateAnswered(){
+    const ans = getUserAnswers();
+    answeredEl.textContent = ans.filter(v => v !== null).length;
+  }
+
+  function check(){
+    const user = getUserAnswers();
+    let score = 0;
+
+    // clear old classes
+    document.querySelectorAll(".ans").forEach(el => el.classList.remove("correct","wrong"));
+
+    QUESTIONS.forEach((q, idx) => {
+      const picked = user[idx];
+      const labels = document.querySelectorAll(`input[name="q${idx}"]`);
+      if (!labels.length) return;
+
+      if (picked === null) return;
+
+      if (picked === q.correct) score++;
+
+      // mark picked
+      labels[picked].parentElement.classList.add(picked === q.correct ? "correct" : "wrong");
+      // mark correct (if wrong)
+      if (picked !== q.correct){
+        labels[q.correct].parentElement.classList.add("correct");
+      }
+    });
+
+    scoreLiveEl.textContent = `${score}/${QUESTIONS.length}`;
+    resultEl.textContent = `Результат: ${score} из ${QUESTIONS.length}`;
+
+    // scroll to result
+    resultEl.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+
+  function reset(){
+    buildQuiz();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    try{
+      buildQuiz();
+
+      document.getElementById("checkBtn").addEventListener("click", check);
+      document.getElementById("resetBtn").addEventListener("click", reset);
+
+      // If quiz empty -> likely wrong file
+      if (!quizEl || quizEl.children.length === 0){
+        showDebug(
+          "Вопросы не отрисовались.\n" +
+          "Проверь, что файл называется index.html (а не README.md / index.md),\n" +
+          "и лежит в нужной папке репозитория.\n\n" +
+          "Открой напрямую: .../dvumernuemassivi/index.html"
+        );
+      }
+    } catch(e){
+      showDebug("Ошибка JS:\n" + (e && e.stack ? e.stack : e));
+    }
+  });
+})();
+</script>
+</body>
+</html>
