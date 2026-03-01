@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Рефлексия — Шкала Пэ Пэ</title>
+  <style>
+    :root{
+      --bg1:#b8f1ff;
+      --bg2:#ffe7c7;
+      --card:#ffffffcc;
+      --text:#1c1c1c;
+      --shadow: 0 12px 30px rgba(0,0,0,.12);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 700px at 20% 10%, var(--bg1), transparent 60%),
+                  radial-gradient(1200px 700px at 80% 20%, #ffeaa9, transparent 60%),
+                  linear-gradient(135deg, #aee8ff, #ffd7fb 55%, var(--bg2));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    header{
+      padding:22px 22px 10px;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    h1{
+      margin:0;
+      font-size: clamp(20px, 3vw, 30px);
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin:0;
+      opacity:.85;
+      font-size: 14px;
+      line-height:1.35;
+    }
+
+    .badge{
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      font-weight:700;
+      font-size: 14px;
+      white-space:nowrap;
+    }
+
+    main{
+      padding: 16px 22px 22px;
+      display:grid;
+      gap:18px;
+    }
+
+    .levels{
+      display:grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap:10px;
+    }
+
+    .level-btn{
+      border:0;
+      border-radius: 16px;
+      padding: 14px 10px;
+      cursor:pointer;
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 6px 14px rgba(0,0,0,.08);
+      transition: transform .08s ease, box-shadow .12s ease, outline .12s ease;
+      outline: 2px solid transparent;
+      text-align:center;
+      user-select:none;
+    }
+    .level-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0,0,0,.12);
+    }
+    .level-btn:active{
+      transform: translateY(0px) scale(.99);
+    }
+
+    .num{
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size: 18px;
+      color:#111;
+      border: 2px solid rgba(0,0,0,.15);
+      background: var(--c, #fff);
+    }
+
+    .label{
+      font-weight: 800;
+      font-size: 13px;
+      line-height:1.1;
+    }
+
+    .level-btn.active{
+      outline-color: rgba(0,0,0,.25);
+      box-shadow: 0 12px 22px rgba(0,0,0,.14);
+      transform: translateY(-1px);
+    }
+
+    .panel{
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.06);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 860px){
+      .levels{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    .prompt{
+      margin:0 0 10px;
+      font-weight:800;
+    }
+
+    textarea{
+      width:100%;
+      min-height: 120px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.15);
+      padding: 12px 12px;
+      font-size: 15px;
+      outline:none;
+      background: rgba(255,255,255,.95);
+    }
+    textarea:focus{
+      border-color: rgba(0,0,0,.35);
+      box-shadow: 0 0 0 4px rgba(0,0,0,.06);
+    }
+
+    .result{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .bubble{
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.1);
+      background: #fff;
+      padding: 12px 12px;
+      font-size: 15px;
+      line-height:1.35;
+      min-height: 120px;
+      white-space: pre-wrap;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight:800;
+      background: rgba(0,0,0,.08);
+      transition: transform .08s ease, background .12s ease;
+    }
+    .btn:hover{ background: rgba(0,0,0,.12); }
+    .btn:active{ transform: scale(.99); }
+
+    .btn.primary{
+      background: rgba(30, 144, 255, .18);
+    }
+    .btn.primary:hover{
+      background: rgba(30, 144, 255, .26);
+    }
+
+    .hint{
+      margin:0;
+      font-size: 13px;
+      opacity:.8;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.78);
+      color:#fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight:700;
+      font-size: 14px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .small{
+      font-size: 12px;
+      opacity:.75;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Рефлексия: «Шкала Пэ Пэ»</h1>
+        <p class="subtitle">
+          Выбери уровень понимания темы от <b>0</b> до <b>5</b> и дополни фразу ответом на вопрос <b>«почему?»</b><br>
+          Пример: «Я сегодня на уровне Ко Ко Шнейне, потому что…»
+        </p>
+      </div>
+      <div class="badge" id="badge">Уровень: не выбран</div>
+    </header>
+
+    <main>
+      <section class="levels" aria-label="Выбор уровня">
+        <button class="level-btn" data-level="0" style="--c:#ff6b6b">
+          <div class="num">0</div>
+          <div class="label">Пэ Пэ</div>
+        </button>
+        <button class="level-btn" data-level="1" style="--c:#ffa94d">
+          <div class="num">1</div>
+          <div class="label">Фа</div>
+        </button>
+        <button class="level-btn" data-level="2" style="--c:#ffd43b">
+          <div class="num">2</div>
+          <div class="label">Вота Фа</div>
+        </button>
+        <button class="level-btn" data-level="3" style="--c:#8ce99a">
+          <div class="num">3</div>
+          <div class="label">Ко Ко Шнейне</div>
+        </button>
+        <button class="level-btn" data-level="4" style="--c:#74c0fc">
+          <div class="num">4</div>
+          <div class="label">Осознанный человек</div>
+        </button>
+        <button class="level-btn" data-level="5" style="--c:#b197fc">
+          <div class="num">5</div>
+          <div class="label">Легенда</div>
+        </button>
+      </section>
+
+      <section class="row">
+        <div class="panel">
+          <p class="prompt">Допиши «потому что…»</p>
+          <textarea id="why" placeholder="потому что… (напиши 1–2 предложения)"></textarea>
+          <p class="small">Подсказка: что было легко/сложно? что понял? что нужно повторить?</p>
+        </div>
+
+        <div class="panel result">
+          <p class="prompt">Готовая фраза</p>
+          <div class="bubble" id="output">Выбери уровень 👈</div>
+          <div class="actions">
+            <button class="btn primary" id="copyBtn">Скопировать</button>
+            <button class="btn" id="resetBtn">Сброс</button>
+          </div>
+          <p class="hint" id="hint">Сначала выбери уровень, потом допиши «почему?»</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Скопировано ✅</div>
+
+  <script>
+    const labels = {
+      0: "Пэ Пэ",
+      1: "Фа",
+      2: "Вота Фа",
+      3: "Ко Ко Шнейне",
+      4: "Осознанный человек",
+      5: "Легенда"
+    };
+
+    const btns = Array.from(document.querySelectorAll(".level-btn"));
+    const badge = document.getElementById("badge");
+    const why = document.getElementById("why");
+    const output = document.getElementById("output");
+    const hint = document.getElementById("hint");
+    const toast = document.getElementById("toast");
+
+    let selectedLevel = null;
+
+    function buildText() {
+      if (selectedLevel === null) {
+        output.textContent = "Выбери уровень 👈";
+        badge.textContent = "Уровень: не выбран";
+        hint.textContent = "Сначала выбери уровень, потом допиши «почему?»";
+        return;
+      }
+
+      const label = labels[selectedLevel];
+      const reason = (why.value || "").trim();
+
+      badge.textContent = `Уровень: ${selectedLevel} — ${label}`;
+
+      const base = `Я сегодня на уровне ${label}, потому что`;
+      if (!reason) {
+        output.textContent = base + " …";
+        hint.textContent = "Теперь напиши причину (почему ты выбрал этот уровень).";
+      } else {
+        // Если ученик начал с "потому что", не дублируем.
+        const normalized = reason.toLowerCase().startsWith("потому что")
+          ? reason.slice("потому что".length).trim()
+          : reason;
+
+        output.textContent = `${base} ${normalized}`;
+        hint.textContent = "Готово! Можно скопировать фразу и отправить/сказать.";
+      }
+    }
+
+    function setActive(level) {
+      selectedLevel = Number(level);
+      btns.forEach(b => b.classList.toggle("active", Number(b.dataset.level) === selectedLevel));
+      buildText();
+    }
+
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => setActive(btn.dataset.level));
+    });
+
+    why.addEventListener("input", buildText);
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const text = output.textContent.trim();
+      if (!text || text === "Выбери уровень 👈") return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1200);
+      } catch {
+        // запасной вариант
+        const tmp = document.createElement("textarea");
+        tmp.value = text;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        document.body.removeChild(tmp);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1200);
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      selectedLevel = null;
+      btns.forEach(b => b.classList.remove("active"));
+      why.value = "";
+      buildText();
+    });
+
+    buildText();
+  </script>
+</body>
+</html>
