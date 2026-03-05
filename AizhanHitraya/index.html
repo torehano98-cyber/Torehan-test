@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Финансовая грамотность — Игра «Магазин»</title>
+  <style>
+    :root{
+      --bg1:#0b1026;
+      --bg2:#111a3a;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.14);
+      --text:#eef2ff;
+      --muted:#b9c2ff;
+      --good:#35f0b5;
+      --warn:#ffd166;
+      --bad:#ff5c7a;
+      --accent:#7c5cff;
+      --accent2:#22d3ee;
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --r: 20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(124,92,255,.45), transparent 60%),
+        radial-gradient(1000px 700px at 90% 30%, rgba(34,211,238,.35), transparent 60%),
+        radial-gradient(1000px 700px at 50% 110%, rgba(53,240,181,.25), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* декоративные пузырьки */
+    .bubbles{
+      position:fixed; inset:0; pointer-events:none; opacity:.8;
+      filter: blur(.0px);
+    }
+    .bubble{
+      position:absolute; border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), rgba(255,255,255,.08));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      animation: floatUp linear infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(30vh) translateX(0) scale(1); opacity:.0}
+      10%{opacity:.85}
+      to{ transform: translateY(-120vh) translateX(40px) scale(1.08); opacity:0}
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 16px 60px;
+    }
+
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:46px; height:46px; border-radius:14px;
+      background:
+        linear-gradient(135deg, rgba(124,92,255,.9), rgba(34,211,238,.85));
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.18);
+      display:grid; place-items:center;
+    }
+    .logo span{font-size:22px}
+    .title h1{
+      margin:0; font-size:18px; letter-spacing:.2px;
+    }
+    .title p{margin:2px 0 0; color:var(--muted); font-size:13px}
+
+    .hud{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 45px rgba(0,0,0,.25);
+      backdrop-filter: blur(8px);
+      font-size:13px;
+    }
+    .pill b{font-weight:700}
+    .money{
+      background: linear-gradient(135deg, rgba(53,240,181,.18), rgba(34,211,238,.10));
+      border-color: rgba(53,240,181,.25);
+    }
+    .score{
+      background: linear-gradient(135deg, rgba(124,92,255,.18), rgba(255,209,102,.10));
+      border-color: rgba(124,92,255,.25);
+    }
+    .stage{
+      background: linear-gradient(135deg, rgba(255,209,102,.18), rgba(255,92,122,.08));
+      border-color: rgba(255,209,102,.25);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding:16px 16px 10px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.08);
+    }
+    .cardHeader h2{
+      margin:0; font-size:16px;
+    }
+    .cardHeader small{display:block; margin-top:4px; color:var(--muted); font-size:12.5px; line-height:1.35}
+    .cardBody{padding:16px}
+
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    button{
+      appearance:none; border:none;
+      color:var(--text);
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      font-weight:650;
+    }
+    button:hover{background: rgba(255,255,255,.14)}
+    button:active{transform: translateY(1px)}
+    button.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(34,211,238,.75));
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 12px 40px rgba(124,92,255,.22);
+    }
+    button.good{
+      background: linear-gradient(135deg, rgba(53,240,181,.85), rgba(34,211,238,.65));
+      color: #081226;
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 12px 40px rgba(53,240,181,.20);
+    }
+    button.ghost{
+      background: transparent;
+      border-color: rgba(255,255,255,.18);
+    }
+    button.danger{
+      background: linear-gradient(135deg, rgba(255,92,122,.9), rgba(255,209,102,.55));
+      border-color: rgba(255,255,255,.22);
+    }
+    button:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{
+      font-size:12px; color:var(--muted);
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.10);
+    }
+    .chip strong{color:var(--text)}
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 560px){ .split{grid-template-columns:1fr} }
+
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      margin:10px 0;
+    }
+    label{font-size:12px; color:var(--muted)}
+    input[type="text"], input[type="number"]{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+    }
+
+    .items{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width: 700px){ .items{grid-template-columns:1fr} }
+
+    .item{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.10);
+      padding:12px;
+      display:flex; gap:12px;
+      align-items:flex-start;
+      position:relative;
+      overflow:hidden;
+    }
+    .item::after{
+      content:"";
+      position:absolute; inset:-40% -40%;
+      background: radial-gradient(circle at 30% 30%, rgba(124,92,255,.20), transparent 55%),
+                  radial-gradient(circle at 70% 60%, rgba(34,211,238,.14), transparent 50%);
+      opacity:.7;
+      pointer-events:none;
+    }
+    .emoji{
+      width:44px; height:44px;
+      display:grid; place-items:center;
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      flex: 0 0 auto;
+      font-size:22px;
+      position:relative;
+      z-index:1;
+    }
+    .meta{position:relative; z-index:1}
+    .meta h3{margin:0; font-size:14px}
+    .meta p{margin:4px 0 8px; color:var(--muted); font-size:12.5px; line-height:1.35}
+    .tags{display:flex; gap:6px; flex-wrap:wrap}
+    .tag{
+      font-size:11.5px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+    }
+    .tag.need{border-color: rgba(53,240,181,.25); color: #c8fff1; background: rgba(53,240,181,.08)}
+    .tag.want{border-color: rgba(255,209,102,.25); color: #fff1c8; background: rgba(255,209,102,.08)}
+    .tag.risk{border-color: rgba(255,92,122,.25); color: #ffd6de; background: rgba(255,92,122,.08)}
+    .price{
+      margin-left:auto;
+      display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+      position:relative; z-index:1;
+      text-align:right;
+    }
+    .price b{font-size:14px}
+    .mini{font-size:11.5px; color:var(--muted)}
+    .qty{
+      display:flex; align-items:center; gap:6px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      padding:6px;
+      border-radius: 14px;
+    }
+    .qty button{
+      padding:6px 10px; border-radius: 12px; font-weight:800;
+    }
+    .qty span{min-width:18px; display:inline-block; text-align:center}
+
+    .side{
+      display:flex; flex-direction:column; gap:16px;
+    }
+
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+      max-height: 360px;
+      overflow:auto;
+      padding-right: 6px;
+    }
+    .list::-webkit-scrollbar{width:10px}
+    .list::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.14);
+      border-radius:999px;
+      border: 2px solid rgba(0,0,0,.2);
+    }
+
+    .line{
+      display:flex; justify-content:space-between; gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(0,0,0,.12);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .line small{color:var(--muted)}
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    @media (max-width: 560px){ .kpi{grid-template-columns:1fr} }
+    .k{
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.10);
+    }
+    .k .n{font-size:12px; color:var(--muted)}
+    .k .v{margin-top:6px; font-size:16px; font-weight:900}
+
+    .note{
+      padding:12px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.10);
+      color: var(--muted);
+      font-size:12.5px;
+      line-height:1.45;
+    }
+
+    .toast{
+      position:fixed; left:50%; bottom:18px;
+      transform: translateX(-50%);
+      padding:12px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+      opacity:0; pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      max-width: min(760px, calc(100% - 24px));
+      font-size:13px;
+    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px)}
+    .toast b{color:var(--text)}
+    .toast .ok{color:var(--good); font-weight:800}
+    .toast .warn{color:var(--warn); font-weight:800}
+    .toast .bad{color:var(--bad); font-weight:800}
+
+    .progress{
+      height:10px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(53,240,181,.9), rgba(34,211,238,.8), rgba(124,92,255,.85));
+      transition: width .35s ease;
+    }
+
+    .quizQ{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.10);
+      padding:12px;
+      margin: 10px 0 12px;
+    }
+    .quizQ h3{margin:0 0 8px; font-size:14px}
+    .opt{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      margin:8px 0;
+      cursor:pointer;
+      user-select:none;
+      transition: background .2s ease, border-color .2s ease, transform .08s ease;
+    }
+    .opt:hover{background: rgba(255,255,255,.08)}
+    .opt:active{transform: translateY(1px)}
+    .opt input{margin-top:2px}
+    .footer{
+      margin-top: 14px;
+      color: rgba(255,255,255,.6);
+      font-size:12px;
+      text-align:center;
+    }
+
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .spark{
+      display:inline-block;
+      width:10px; height:10px;
+      border-radius:999px;
+      background: var(--good);
+      box-shadow: 0 0 0 0 rgba(53,240,181,.55);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(53,240,181,.45)}
+      70%{box-shadow:0 0 0 10px rgba(53,240,181,0)}
+      100%{box-shadow:0 0 0 0 rgba(53,240,181,0)}
+    }
+  </style>
+</head>
+<body>
+  <div class="bubbles" id="bubbles"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"><span>🛒</span></div>
+        <div class="title">
+          <h1>Игра: «Магазин финансовой грамотности»</h1>
+          <p>Покупай с умом: нужды, желания, скидки, подушка безопасности</p>
+        </div>
+      </div>
+
+      <div class="hud">
+        <div class="pill stage"><span>Этап:</span> <b id="hudStage">1/5</b></div>
+        <div class="pill money"><span>Бюджет:</span> <b id="hudMoney">0 ₸</b></div>
+        <div class="pill score"><span>Очки:</span> <b id="hudScore">0</b></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <h2 id="cardTitle">Этап 1. Старт</h2>
+            <small id="cardHint">Выбери персонажа и бюджет. Твоя цель — купить важное и сохранить резерв.</small>
+          </div>
+          <div class="chips">
+            <span class="chip">👤 <strong id="hudName">Гость</strong></span>
+            <span class="chip">🎯 Цель: <strong>резерв ≥ 10%</strong></span>
+          </div>
+        </div>
+
+        <div class="cardBody" id="main">
+          <!-- динамический контент -->
+        </div>
+      </div>
+
+      <!-- SIDE -->
+      <div class="side">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <h2>Корзина</h2>
+              <small>Следи за нуждами, желаниями и балансом</small>
+            </div>
+            <span class="badge"><span class="spark"></span> live</span>
+          </div>
+          <div class="cardBody">
+            <div class="kpi">
+              <div class="k">
+                <div class="n">Нужды</div>
+                <div class="v" id="kNeeds">0 ₸</div>
+              </div>
+              <div class="k">
+                <div class="n">Желания</div>
+                <div class="v" id="kWants">0 ₸</div>
+              </div>
+              <div class="k">
+                <div class="n">Резерв</div>
+                <div class="v" id="kReserve">0 ₸</div>
+              </div>
+            </div>
+
+            <div style="margin:12px 0 10px">
+              <div style="display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; font-size:12px; color:var(--muted)">
+                <span>Прогресс к цели (резерв 10%)</span>
+                <span id="goalText">0%</span>
+              </div>
+              <div class="progress"><div class="bar" id="goalBar"></div></div>
+            </div>
+
+            <div class="list" id="cartList"></div>
+
+            <div class="btnRow">
+              <button class="ghost" id="btnClear">Очистить</button>
+              <button class="danger" id="btnRestart">Сначала</button>
+            </div>
+
+            <div class="note" style="margin-top:12px">
+              <b>Подсказка:</b> сначала покупают <b>нужды</b> (еда/проезд/учёба),
+              потом — желания. Всегда держи <b>резерв</b> на неожиданности.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <h2>Мини-правила</h2>
+              <small>За правильные решения ты получаешь очки</small>
+            </div>
+          </div>
+          <div class="cardBody">
+            <div class="line"><span>✅ Купил важное</span> <small>+10</small></div>
+            <div class="line"><span>🏷️ Выбрал выгоднее</span> <small>+10</small></div>
+            <div class="line"><span>🛟 Сохранил резерв</span> <small>+15</small></div>
+            <div class="line"><span>⚠️ Потратил всё на желания</span> <small>-10</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">© Учебная игра. Можно редактировать товары и вопросы прямо в коде.</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ------------------ DECOR ------------------ */
+(function bubbles(){
+  const root = document.getElementById('bubbles');
+  const n = 18;
+  for(let i=0;i<n;i++){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 34 + Math.random()*120;
+    b.style.width = size+'px';
+    b.style.height = size+'px';
+    b.style.left = (Math.random()*100)+'%';
+    b.style.top = (60 + Math.random()*70)+'%';
+    b.style.animationDuration = (10 + Math.random()*14)+'s';
+    b.style.animationDelay = (-Math.random()*18)+'s';
+    root.appendChild(b);
+  }
+})();
+
+/* ------------------ GAME DATA ------------------ */
+const ITEMS = [
+  { id:'bread',  name:'Хлеб + молоко', emoji:'🥖', desc:'Набор на завтрак. Базовая еда.', type:'need', price:450 },
+  { id:'bus',    name:'Проездной (1 неделя)', emoji:'🚌', desc:'Добираться в школу/кружок.', type:'need', price:900 },
+  { id:'copy',   name:'Тетради и ручки', emoji:'📒', desc:'Для учебы и домашних заданий.', type:'need', price:700 },
+  { id:'fruit',  name:'Фрукты', emoji:'🍎', desc:'Полезный перекус.', type:'need', price:600 },
+
+  { id:'soda',   name:'Газировка', emoji:'🥤', desc:'Вкусно, но не обязательно.', type:'want', price:350 },
+  { id:'chips',  name:'Чипсы', emoji:'🍟', desc:'Желание. Быстро заканчивается.', type:'want', price:500 },
+  { id:'toy',    name:'Игрушка/сувенир', emoji:'🧸', desc:'Приятно, но можно отложить.', type:'want', price:1200 },
+  { id:'game',   name:'Скин/донат в игре', emoji:'🎮', desc:'Дорогое желание без пользы.', type:'risk', price:1500 },
+];
+
+const DEALS = [
+  { id:'deal1', title:'Сравнение цен: тетради', a:{label:'Магазин А', price:700}, b:{label:'Магазин B', price:540}, right:'b', tip:'Сравнивай цены: одинаковый товар может стоить по-разному.' },
+  { id:'deal2', title:'Акция: проездной', a:{label:'Купить сейчас (900 ₸)', price:900}, b:{label:'Подождать и купить 2 раза по 500 ₸', price:1000}, right:'a', tip:'Если точно нужно — выгоднее взять сразу.' },
+  { id:'deal3', title:'Скидка: фрукты', a:{label:'-20% по карте (600 → 480 ₸)', price:480}, b:{label:'Без скидки (600 ₸)', price:600}, right:'a', tip:'Скидки полезны, если ты покупаешь нужное, а не лишнее.' },
+];
+
+const QUIZ = [
+  {
+    q:'Что такое «финансовая подушка безопасности»?',
+    opts:[
+      'Деньги, которые тратят на развлечения',
+      'Запас денег на неожиданные ситуации',
+      'Список покупок в магазине',
+      'Банковская карта'
+    ],
+    right:1,
+    explain:'Подушка — это резерв на поломку телефона, лекарства, срочные траты.'
+  },
+  {
+    q:'Что лучше сделать перед покупкой дорогой вещи?',
+    opts:[
+      'Купить сразу, пока хочется',
+      'Сравнить цены и подумать, нужна ли вещь',
+      'Попросить друга купить за тебя',
+      'Купить две, чтобы было наверняка'
+    ],
+    right:1,
+    explain:'Сравнение цен и пауза защищают от импульсивных покупок.'
+  },
+  {
+    q:'Какая покупка относится к «нуждам»?',
+    opts:[
+      'Чипсы',
+      'Скин в игре',
+      'Проездной',
+      'Сувенир'
+    ],
+    right:2,
+    explain:'Нужды — то, без чего сложно: еда, проезд, учеба.'
+  },
+];
+
+/* ------------------ STATE ------------------ */
+const state = {
+  stage: 1, // 1..5
+  name: 'Гость',
+  role: 'Ученик',
+  budget: 0,
+  startBudget: 0,
+  score: 0,
+  cart: {}, // id -> qty
+  dealsDone: 0,
+  quizIndex: 0,
+  quizCorrect: 0,
+  shockDone: false,
+};
+
+const el = (id)=>document.getElementById(id);
+
+function fmt(n){ return `${Math.max(0, Math.round(n))} ₸`; }
+
+function toast(html){
+  const t = el('toast');
+  t.innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function calcTotals(){
+  let needs=0, wants=0, reserve=state.budget;
+  for (const it of ITEMS){
+    const q = state.cart[it.id] || 0;
+    const sum = q * it.price;
+    if(q>0){
+      if(it.type==='need') needs += sum;
+      else wants += sum;
+    }
+  }
+  return {needs, wants, reserve};
+}
+
+function updateHUD(){
+  el('hudStage').textContent = `${state.stage}/5`;
+  el('hudMoney').textContent = fmt(state.budget);
+  el('hudScore').textContent = state.score;
+  el('hudName').textContent = state.name;
+
+  const {needs, wants, reserve} = calcTotals();
+  el('kNeeds').textContent = fmt(needs);
+  el('kWants').textContent = fmt(wants);
+  el('kReserve').textContent = fmt(reserve);
+
+  // цель: резерв >= 10% от стартового бюджета
+  const goal = Math.round(state.startBudget * 0.10);
+  const pct = state.startBudget>0 ? Math.min(100, Math.round((reserve/goal)*100)) : 0;
+  el('goalText').textContent = `${isFinite(pct)?pct:0}%`;
+  el('goalBar').style.width = `${Math.min(100, Math.max(0, pct))}%`;
+}
+
+function renderCart(){
+  const root = el('cartList');
+  root.innerHTML = '';
+  const entries = Object.entries(state.cart).filter(([,q])=>q>0);
+  if(entries.length===0){
+    root.innerHTML = `<div class="note">Корзина пуста. Добавь товары на этапе покупки.</div>`;
+    return;
+  }
+  for(const [id,q] of entries){
+    const it = ITEMS.find(x=>x.id===id);
+    const row = document.createElement('div');
+    row.className = 'line';
+    row.innerHTML = `
+      <div>
+        <b>${it.emoji} ${it.name}</b><br/>
+        <small>${q} × ${fmt(it.price)} • <span style="opacity:.9">${it.type==='need'?'Нужда':(it.type==='want'?'Желание':'Риск')}</span></small>
+      </div>
+      <div><b>${fmt(q*it.price)}</b></div>
+    `;
+    root.appendChild(row);
+  }
+}
+
+/* ------------------ CART OPS ------------------ */
+function canAfford(delta){
+  return (state.budget - delta) >= 0;
+}
+
+function addItem(id){
+  const it = ITEMS.find(x=>x.id===id);
+  if(!it) return;
+
+  if(!canAfford(it.price)){
+    toast(`<b>Не хватает бюджета.</b> <span class="warn">Подумай:</span> убери желания или выбери дешевле.`);
+    state.score = Math.max(0, state.score - 2);
+    updateHUD();
+    return;
+  }
+
+  state.cart[id] = (state.cart[id]||0) + 1;
+  state.budget -= it.price;
+
+  // очки: нужды = +10, желания = +3, риск = -5
+  if(it.type==='need'){ state.score += 10; toast(`<span class="ok">+10</span> Нужная покупка: <b>${it.name}</b>`); }
+  else if(it.type==='want'){ state.score += 3; toast(`<span class="warn">+3</span> Желание: <b>${it.name}</b> (проверь, не мешает ли резерву)`); }
+  else { state.score = Math.max(0, state.score - 5); toast(`<span class="bad">-5</span> Риск-покупка: <b>${it.name}</b> (импульсивные траты)`); }
+
+  updateHUD(); renderCart();
+}
+
+function removeItem(id){
+  const it = ITEMS.find(x=>x.id===id);
+  const q = state.cart[id]||0;
+  if(!it || q<=0) return;
+  state.cart[id] = q-1;
+  state.budget += it.price;
+
+  toast(`<b>Возврат:</b> ${it.name} (+${fmt(it.price)})`);
+  updateHUD(); renderCart();
+}
+
+/* ------------------ STAGES RENDER ------------------ */
+function setStage(n){
+  state.stage = n;
+  updateHUD();
+  renderStage();
+}
+
+function cardHead(title, hint){
+  el('cardTitle').textContent = title;
+  el('cardHint').textContent = hint;
+}
+
+function renderStage(){
+  const root = el('main');
+
+  if(state.stage===1){
+    cardHead('Этап 1. Старт: персонаж и бюджет',
+      'Выбери имя, роль и стартовый бюджет. Старайся оставить резерв (минимум 10%).');
+    root.innerHTML = `
+      <div class="split">
+        <div>
+          <div class="field">
+            <label>Твоё имя (или команда)</label>
+            <input id="inpName" type="text" placeholder="Например: Команда «Капибары»" value="${state.name==='Гость'?'':state.name}">
+          </div>
+          <div class="field">
+            <label>Роль</label>
+            <select id="selRole" style="padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:var(--text);outline:none">
+              <option ${state.role==='Ученик'?'selected':''}>Ученик</option>
+              <option ${state.role==='Староста'?'selected':''}>Староста</option>
+              <option ${state.role==='Супер-эконом'?'selected':''}>Супер-эконом</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="field">
+            <label>Стартовый бюджет (₸)</label>
+            <input id="inpBudget" type="number" min="1000" step="100" placeholder="Например: 5000" value="${state.startBudget||5000}">
+          </div>
+
+          <div class="note">
+            <b>Задание:</b> на следующих этапах ты будешь покупать товары.  
+            Сначала закрывай <b>нужды</b>, затем желания.  
+            <b>Цель:</b> оставить резерв ≥ 10% от бюджета.
+          </div>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="primary" id="btnStart">Начать игру ▶</button>
+        <button class="ghost" id="btnDemo">Быстрый старт (5000 ₸)</button>
+      </div>
+    `;
+
+    el('btnStart').onclick = ()=>{
+      const name = (el('inpName').value||'Гость').trim();
+      const role = el('selRole').value;
+      const b = Math.max(1000, Number(el('inpBudget').value||5000));
+      state.name = name;
+      state.role = role;
+      state.startBudget = b;
+      state.budget = b;
+      state.score = 0;
+      state.cart = {};
+      state.dealsDone = 0;
+      state.quizIndex = 0;
+      state.quizCorrect = 0;
+      state.shockDone = false;
+      toast(`<b>Старт!</b> У тебя <span class="ok">${fmt(b)}</span>. Покупай умно.`);
+      setStage(2);
+      renderCart();
+    };
+
+    el('btnDemo').onclick = ()=>{
+      el('inpName').value = 'Команда «Умники»';
+      el('inpBudget').value = 5000;
+      el('selRole').value = 'Ученик';
+      el('btnStart').click();
+    };
+    return;
+  }
+
+  if(state.stage===2){
+    cardHead('Этап 2. Магазин: нужды и желания',
+      'Добавляй товары в корзину. Следи за бюджетом и резервом.');
+    root.innerHTML = `
+      <div class="items" id="items"></div>
+      <div class="btnRow">
+        <button class="ghost" id="btnBack1">← Назад</button>
+        <button class="primary" id="btnNext2">Дальше: скидки и выгода →</button>
+      </div>
+    `;
+
+    const itemsRoot = el('items');
+    for(const it of ITEMS){
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div class="emoji">${it.emoji}</div>
+        <div class="meta">
+          <h3>${it.name}</h3>
+          <p>${it.desc}</p>
+          <div class="tags">
+            ${it.type==='need' ? `<span class="tag need">Нужда</span>` : it.type==='want' ? `<span class="tag want">Желание</span>` : `<span class="tag risk">Риск</span>`}
+            <span class="tag">Цена: <b>${fmt(it.price)}</b></span>
+          </div>
+        </div>
+        <div class="price">
+          <b>${fmt(it.price)}</b>
+          <div class="qty">
+            <button class="ghost" data-act="minus" data-id="${it.id}">−</button>
+            <span id="q_${it.id}">${state.cart[it.id]||0}</span>
+            <button class="good" data-act="plus" data-id="${it.id}">+</button>
+          </div>
+          <div class="mini">в корзине</div>
+        </div>
+      `;
+      itemsRoot.appendChild(div);
+    }
+
+    itemsRoot.onclick = (e)=>{
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const id = btn.dataset.id;
+      const act = btn.dataset.act;
+      if(act==='plus') addItem(id);
+      if(act==='minus') removeItem(id);
+      const qEl = document.getElementById(`q_${id}`);
+      if(qEl) qEl.textContent = state.cart[id]||0;
+    };
+
+    el('btnBack1').onclick = ()=>setStage(1);
+
+    el('btnNext2').onclick = ()=>{
+      // лёгкая проверка: если в нуждах 0 -> подсказка
+      const {needs, wants, reserve} = calcTotals();
+      if(needs===0){
+        toast(`<span class="warn">Совет:</span> Начни хотя бы с одной <b>нужды</b> (проезд/еда/учёба).`);
+        state.score = Math.max(0, state.score - 3);
+        updateHUD();
+      }
+      if(wants>needs && wants>0){
+        toast(`<span class="warn">Осторожно:</span> Желаний больше, чем нужд. Проверь приоритеты.`);
+      }
+      setStage(3);
+    };
+    return;
+  }
+
+  if(state.stage===3){
+    cardHead('Этап 3. Скидки и сравнение цен',
+      'Выбирай более выгодное предложение. Это реальный навык покупателя!');
+    const deal = DEALS[state.dealsDone];
+
+    if(!deal){
+      root.innerHTML = `
+        <div class="note">
+          Отлично! Ты прошёл сравнение цен. Теперь проверим, есть ли у тебя резерв на неожиданности.
+        </div>
+        <div class="btnRow">
+          <button class="ghost" id="btnBack2">← Назад к магазину</button>
+          <button class="primary" id="btnNext3">Дальше: неожиданная трата →</button>
+        </div>
+      `;
+      el('btnBack2').onclick = ()=>setStage(2);
+      el('btnNext3').onclick = ()=>setStage(4);
+      return;
+    }
+
+    root.innerHTML = `
+      <div class="quizQ">
+        <h3>${deal.title}</h3>
+        <div class="note" style="margin:10px 0 0">
+          Выбери вариант, который <b>выгоднее</b> (меньше итоговая стоимость).
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="item" style="cursor:pointer" id="optA">
+          <div class="emoji">🅰️</div>
+          <div class="meta">
+            <h3>${deal.a.label}</h3>
+            <p>Цена: <b>${fmt(deal.a.price)}</b></p>
+            <div class="tags"><span class="tag">выбор A</span></div>
+          </div>
+        </div>
+
+        <div class="item" style="cursor:pointer" id="optB">
+          <div class="emoji">🅱️</div>
+          <div class="meta">
+            <h3>${deal.b.label}</h3>
+            <p>Цена: <b>${fmt(deal.b.price)}</b></p>
+            <div class="tags"><span class="tag">выбор B</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="ghost" id="btnBack3">← Назад</button>
+      </div>
+    `;
+
+    el('btnBack3').onclick = ()=>setStage(2);
+
+    const choose = (pick)=>{
+      const ok = pick===deal.right;
+      if(ok){
+        state.score += 10;
+        toast(`<span class="ok">+10</span> Верно! ${deal.tip}`);
+      }else{
+        state.score = Math.max(0, state.score - 5);
+        toast(`<span class="bad">-5</span> Не самый выгодный вариант. ${deal.tip}`);
+      }
+      state.dealsDone++;
+      updateHUD();
+      setTimeout(()=>renderStage(), 350);
+    };
+
+    el('optA').onclick = ()=>choose('a');
+    el('optB').onclick = ()=>choose('b');
+    return;
+  }
+
+  if(state.stage===4){
+    cardHead('Этап 4. Неожиданная трата',
+      'В жизни бывают сюрпризы. Посмотрим, поможет ли тебе резерв.');
+
+    if(!state.shockDone){
+      // случайная неожиданность
+      const shocks = [
+        {title:'Сломались наушники', cost:800, why:'Нужно заменить, чтобы учиться/слушать.'},
+        {title:'Аптечка (лекарство)', cost:900, why:'Здоровье важнее импульсивных покупок.'},
+        {title:'Проезд срочно (внепланово)', cost:600, why:'Вдруг нужно ехать.'},
+      ];
+      const shock = shocks[Math.floor(Math.random()*shocks.length)];
+      state._shock = shock;
+      state.shockDone = true;
+    }
+    const shock = state._shock;
+
+    root.innerHTML = `
+      <div class="item">
+        <div class="emoji">⚡</div>
+        <div class="meta">
+          <h3>${shock.title}</h3>
+          <p>Сумма: <b>${fmt(shock.cost)}</b><br/>Почему: ${shock.why}</p>
+          <div class="tags"><span class="tag risk">неожиданно</span><span class="tag">проверь резерв</span></div>
+        </div>
+        <div class="price">
+          <b>${fmt(shock.cost)}</b>
+          <div class="mini">сейчас</div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:12px">
+        Выбери решение:
+        <br/>1) Заплатить из <b>резерва</b> (если хватает бюджета).
+        <br/>2) Отказаться от части <b>желаний</b>, чтобы покрыть расход.
+      </div>
+
+      <div class="btnRow">
+        <button class="good" id="payNow">Оплатить сейчас</button>
+        <button class="primary" id="fixWants">Убрать желания и оплатить</button>
+        <button class="ghost" id="btnBack4">← Назад</button>
+      </div>
+    `;
+
+    el('btnBack4').onclick = ()=>setStage(3);
+
+    el('payNow').onclick = ()=>{
+      if(state.budget >= shock.cost){
+        state.budget -= shock.cost;
+        state.score += 15;
+        toast(`<span class="ok">+15</span> Отлично! Резерв спасает от стресса.`);
+        updateHUD(); renderCart();
+        setStage(5);
+      }else{
+        state.score = Math.max(0, state.score - 8);
+        toast(`<span class="bad">-8</span> Денег не хватает. Придётся сократить желания.`);
+        updateHUD();
+      }
+    };
+
+    el('fixWants').onclick = ()=>{
+      // удаляем "want" и "risk" из корзины (по одной), пока не хватит
+      let removed = 0;
+      const wantIds = ITEMS.filter(i=>i.type!=='need').map(i=>i.id);
+      while(state.budget < shock.cost){
+        // найти любой товар желания в корзине
+        const id = wantIds.find(x => (state.cart[x]||0) > 0);
+        if(!id) break;
+        removeItem(id);
+        removed++;
+      }
+      if(state.budget >= shock.cost){
+        state.budget -= shock.cost;
+        state.score += (removed>0 ? 10 : 5);
+        toast(`<span class="ok">+${removed>0?10:5}</span> Ты освободил бюджет, убрав желания. Это осознанно!`);
+        updateHUD(); renderCart();
+        setStage(5);
+      }else{
+        state.score = Math.max(0, state.score - 5);
+        toast(`<span class="warn">Не хватает даже после сокращения желаний.</span> Значит, резерв был слишком маленький.`);
+        updateHUD();
+      }
+    };
+    return;
+  }
+
+  if(state.stage===5){
+    cardHead('Этап 5. Викторина + итог',
+      'Ответь на вопросы и получи финальную оценку.');
+
+    const q = QUIZ[state.quizIndex];
+    if(q){
+      root.innerHTML = `
+        <div class="quizQ">
+          <h3>Вопрос ${state.quizIndex+1}/${QUIZ.length}</h3>
+          <div style="font-size:14px; line-height:1.4; margin-top:6px">${q.q}</div>
+        </div>
+        <div id="opts"></div>
+        <div class="btnRow">
+          <button class="ghost" id="btnBack5">← Назад</button>
+        </div>
+      `;
+      el('btnBack5').onclick = ()=>setStage(4);
+
+      const opts = el('opts');
+      q.opts.forEach((t,idx)=>{
+        const div = document.createElement('label');
+        div.className = 'opt';
+        div.innerHTML = `<input type="radio" name="q" value="${idx}"/> <div>${t}</div>`;
+        div.onclick = ()=>answerQuiz(idx);
+        opts.appendChild(div);
+      });
+      return;
+    }
+
+    // итог
+    const {needs, wants, reserve} = calcTotals();
+    const goal = Math.round(state.startBudget*0.10);
+    const goalOk = reserve >= goal;
+    const needsOk = needs > 0;
+    const wantsTooMuch = wants > needs && wants>0;
+
+    let grade = 'Молодец!';
+    let badge = '🏆';
+    if(goalOk && needsOk && !wantsTooMuch && state.quizCorrect>=2) { grade='Финансовый мастер'; badge='💎'; }
+    else if(goalOk && needsOk) { grade='Уверенный покупатель'; badge='⭐'; }
+    else if(needsOk) { grade='Неплохо, но нужен резерв'; badge='🛟'; }
+    else { grade='Начинающий: начни с нужд'; badge='🌱'; }
+
+    const tips = [];
+    if(!needsOk) tips.push('Сначала покупай 1–2 нужды (еда/проезд/учёба).');
+    if(!goalOk) tips.push('Старайся оставлять резерв: хотя бы 10% бюджета.');
+    if(wantsTooMuch) tips.push('Желаний оказалось больше, чем нужд — проверь приоритеты.');
+    if(state.quizCorrect<2) tips.push('Повтори: подушка безопасности, нужды/желания, сравнение цен.');
+
+    root.innerHTML = `
+      <div class="item">
+        <div class="emoji">${badge}</div>
+        <div class="meta">
+          <h3>Итог: ${grade}</h3>
+          <p>
+            Очки: <b>${state.score}</b><br/>
+            Викторина: <b>${state.quizCorrect}/${QUIZ.length}</b><br/>
+            Резерв: <b>${fmt(reserve)}</b> (цель ≥ ${fmt(goal)})
+          </p>
+          <div class="tags">
+            <span class="tag ${goalOk?'need':'risk'}">${goalOk?'Резерв соблюдён':'Резерв мал'}</span>
+            <span class="tag ${needsOk?'need':'risk'}">${needsOk?'Нужды куплены':'Нужд нет'}</span>
+            <span class="tag ${wantsTooMuch?'risk':'need'}">${wantsTooMuch?'Желаний многовато':'Баланс ок'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:12px">
+        <b>Советы на будущее:</b><br/>
+        ${tips.length? tips.map(t=>`• ${t}`).join('<br/>') : '• Отличный баланс! Продолжай в том же духе.'}
+      </div>
+
+      <div class="btnRow">
+        <button class="primary" id="btnAgain">Сыграть ещё раз</button>
+        <button class="good" id="btnTeacher">Показать задания учителю</button>
+      </div>
+
+      <div id="teacherBox" class="note" style="margin-top:12px; display:none">
+        <b>Идеи для обсуждения в классе:</b><br/>
+        • Какие покупки были «нужды», а какие «желания»? Почему?<br/>
+        • Что помогло сохранить резерв?<br/>
+        • Где можно применить сравнение цен в реальной жизни?<br/>
+        • Какой процент резерва вы считаете комфортным и почему?
+      </div>
+    `;
+
+    el('btnAgain').onclick = ()=>resetGame();
+    el('btnTeacher').onclick = ()=>{
+      const box = el('teacherBox');
+      box.style.display = box.style.display==='none' ? 'block' : 'none';
+    };
+    return;
+  }
+}
+
+function answerQuiz(idx){
+  const q = QUIZ[state.quizIndex];
+  if(!q) return;
+  if(idx===q.right){
+    state.quizCorrect++;
+    state.score += 10;
+    toast(`<span class="ok">+10</span> Верно! ${q.explain}`);
+  }else{
+    state.score = Math.max(0, state.score - 4);
+    toast(`<span class="warn">-4</span> Почти. ${q.explain}`);
+  }
+  state.quizIndex++;
+  updateHUD();
+  setTimeout(()=>renderStage(), 350);
+}
+
+/* ------------------ RESET & GLOBAL BUTTONS ------------------ */
+function resetGame(){
+  state.stage = 1;
+  state.name = 'Гость';
+  state.role = 'Ученик';
+  state.budget = 0;
+  state.startBudget = 0;
+  state.score = 0;
+  state.cart = {};
+  state.dealsDone = 0;
+  state.quizIndex = 0;
+  state.quizCorrect = 0;
+  state.shockDone = false;
+  renderCart();
+  updateHUD();
+  renderStage();
+}
+
+el('btnClear').onclick = ()=>{
+  // вернём деньги в бюджет и очистим корзину
+  for(const it of ITEMS){
+    const q = state.cart[it.id]||0;
+    if(q>0) state.budget += q*it.price;
+  }
+  state.cart = {};
+  toast(`<b>Корзина очищена.</b> Деньги возвращены в бюджет.`);
+  updateHUD(); renderCart();
+};
+
+el('btnRestart').onclick = ()=>resetGame();
+
+/* ------------------ INIT ------------------ */
+updateHUD();
+renderCart();
+renderStage();
+</script>
+</body>
+</html>
