@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Как не навредить себе при работе за компьютером</title>
+  <style>
+    :root{
+      --bg1:#667eea;
+      --bg2:#764ba2;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --accent:#4f46e5;
+      --accent-2:#7c3aed;
+      --ok:#16a34a;
+      --bad:#dc2626;
+      --shadow:0 20px 50px rgba(0,0,0,.18);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    .hero{
+      color:#fff;
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height:1.15;
+      text-shadow: 0 6px 18px rgba(0,0,0,.18);
+    }
+
+    .hero p{
+      margin:0 auto;
+      max-width:760px;
+      font-size: clamp(15px, 2vw, 18px);
+      opacity:.95;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .topbar{
+      padding:18px 22px 10px;
+      background: linear-gradient(90deg, rgba(79,70,229,.08), rgba(124,58,237,.08));
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+      font-weight:600;
+    }
+
+    .meta .pill{
+      background:#eef2ff;
+      color:#3730a3;
+      padding:9px 14px;
+      border-radius:999px;
+      font-size:14px;
+    }
+
+    .progress{
+      width:100%;
+      height:12px;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .35s ease;
+    }
+
+    .content{
+      padding: 26px 22px 24px;
+    }
+
+    .question-number{
+      color:var(--accent);
+      font-weight:700;
+      margin-bottom:10px;
+      font-size:15px;
+    }
+
+    .question-title{
+      font-size: clamp(22px, 3vw, 30px);
+      line-height:1.3;
+      margin:0 0 22px;
+      font-weight:700;
+    }
+
+    .answers{
+      display:grid;
+      gap:14px;
+    }
+
+    .answer{
+      border:2px solid #e5e7eb;
+      border-radius:18px;
+      padding:16px 18px;
+      cursor:pointer;
+      transition:.22s ease;
+      background:#fff;
+      font-size:18px;
+      font-weight:600;
+      text-align:left;
+    }
+
+    .answer:hover{
+      transform: translateY(-2px);
+      border-color:#c7d2fe;
+      box-shadow:0 10px 22px rgba(79,70,229,.10);
+    }
+
+    .answer.selected{
+      border-color:var(--accent);
+      background:#eef2ff;
+    }
+
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:24px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:none;
+      border-radius:16px;
+      padding:14px 22px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .btn-secondary{
+      background:#eef2ff;
+      color:#3730a3;
+    }
+
+    .btn-secondary:hover{ transform: translateY(-1px); }
+
+    .btn-primary{
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color:#fff;
+      box-shadow:0 12px 24px rgba(79,70,229,.25);
+    }
+
+    .btn-primary:hover{ transform: translateY(-1px); }
+
+    .btn-primary:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .result{
+      display:none;
+      text-align:center;
+      padding: 30px 22px 34px;
+    }
+
+    .result.show{ display:block; }
+
+    .score-ring{
+      width:180px;
+      height:180px;
+      margin:0 auto 18px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(closest-side, white 72%, transparent 73% 100%),
+        conic-gradient(var(--accent) 0deg, var(--accent-2) 0deg, #e5e7eb 0deg);
+      box-shadow: inset 0 0 0 8px rgba(79,70,229,.05), 0 20px 40px rgba(79,70,229,.15);
+    }
+
+    .score-value{
+      font-size:34px;
+      font-weight:800;
+      color:#312e81;
+      line-height:1;
+    }
+
+    .score-sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:15px;
+      font-weight:600;
+    }
+
+    .result h2{
+      font-size:34px;
+      margin:12px 0 10px;
+    }
+
+    .result p{
+      max-width:700px;
+      margin:10px auto;
+      color:#4b5563;
+      font-size:18px;
+      line-height:1.5;
+    }
+
+    .result-boxes{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+      gap:14px;
+      margin:26px 0;
+      text-align:left;
+    }
+
+    .mini-box{
+      padding:16px;
+      border-radius:18px;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+    }
+
+    .mini-box h3{
+      margin:0 0 8px;
+      font-size:14px;
+      color:#6b7280;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .mini-box strong{
+      font-size:28px;
+    }
+
+    .review{
+      margin-top:26px;
+      text-align:left;
+      background:#fafafa;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      padding:18px;
+    }
+
+    .review h3{
+      margin:0 0 14px;
+      font-size:22px;
+    }
+
+    .review-item{
+      padding:14px 0;
+      border-top:1px solid #e5e7eb;
+    }
+
+    .review-item:first-child{ border-top:none; }
+
+    .review-q{
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      margin-right:8px;
+      margin-top:6px;
+    }
+
+    .correct{ background:#dcfce7; color:#166534; }
+    .wrong{ background:#fee2e2; color:#991b1b; }
+
+    .footer-note{
+      color:#fff;
+      text-align:center;
+      margin-top:16px;
+      opacity:.9;
+      font-size:14px;
+    }
+
+    @media (max-width: 640px){
+      .content, .topbar, .result{ padding-left:16px; padding-right:16px; }
+      .answer{ font-size:16px; }
+      .controls{ flex-direction:column; }
+      .controls button{ width:100%; }
+      .score-ring{ width:150px; height:150px; }
+      .result h2{ font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Интерактивный тест</h1>
+      <p>Тема: <strong>«Как не навредить себе при работе за компьютером»</strong><br>Для учеников 5 класса</p>
+    </div>
+
+    <div class="card">
+      <div id="quizScreen">
+        <div class="topbar">
+          <div class="meta">
+            <div class="pill" id="counter">Вопрос 1 из 15</div>
+            <div class="pill" id="answered">Отвечено: 0/15</div>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="question-number" id="questionNumber">Вопрос 1</div>
+          <h2 class="question-title" id="questionTitle"></h2>
+          <div class="answers" id="answers"></div>
+
+          <div class="controls">
+            <button class="btn-secondary" id="prevBtn">← Назад</button>
+            <button class="btn-primary" id="nextBtn" disabled>Далее →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="result" id="resultScreen">
+        <div class="score-ring" id="scoreRing">
+          <div>
+            <div class="score-value" id="scoreValue">0/15</div>
+            <div class="score-sub" id="scorePercent">0%</div>
+          </div>
+        </div>
+
+        <h2 id="resultTitle">Результат</h2>
+        <p id="resultText"></p>
+
+        <div class="result-boxes">
+          <div class="mini-box">
+            <h3>Правильных</h3>
+            <strong id="correctCount">0</strong>
+          </div>
+          <div class="mini-box">
+            <h3>Ошибок</h3>
+            <strong id="wrongCount">0</strong>
+          </div>
+          <div class="mini-box">
+            <h3>Оценка знаний</h3>
+            <strong id="gradeText">-</strong>
+          </div>
+        </div>
+
+        <div class="controls" style="justify-content:center">
+          <button class="btn-primary" id="restartBtn">Пройти ещё раз</button>
+        </div>
+
+        <div class="review" id="reviewBlock">
+          <h3>Разбор ответов</h3>
+          <div id="reviewList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">Готово для загрузки на GitHub Pages: один HTML-файл без дополнительных библиотек.</div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Сколько времени подряд ученику 5 класса рекомендуется работать за компьютером?",
+        answers: ["10–15 минут", "20–25 минут", "1 час", "2 часа"],
+        correct: 1
+      },
+      {
+        question: "Что нужно делать после работы за компьютером?",
+        answers: ["Смотреть телевизор", "Сделать перерыв и размяться", "Сразу снова работать", "Лечь спать"],
+        correct: 1
+      },
+      {
+        question: "На каком расстоянии должны находиться глаза от монитора?",
+        answers: ["10–20 см", "30–40 см", "50–70 см", "Более 1 метра"],
+        correct: 2
+      },
+      {
+        question: "Как правильно сидеть за компьютером?",
+        answers: ["Сильно наклонившись к экрану", "С прямой спиной", "Лёжа на столе", "Стоя"],
+        correct: 1
+      },
+      {
+        question: "Что нужно делать для отдыха глаз?",
+        answers: ["Закрывать глаза на несколько секунд", "Смотреть только в экран", "Не моргать", "Не делать ничего"],
+        correct: 0
+      },
+      {
+        question: "Что нельзя делать за компьютером?",
+        answers: ["Работать аккуратно", "Пить воду", "Сидеть слишком близко к экрану", "Делать перерывы"],
+        correct: 2
+      },
+      {
+        question: "Каким должно быть освещение при работе за компьютером?",
+        answers: ["Очень ярким", "Полностью тёмным", "Умеренным и комфортным", "Только свет от монитора"],
+        correct: 2
+      },
+      {
+        question: "Почему важно делать гимнастику для глаз?",
+        answers: ["Чтобы глаза отдыхали", "Чтобы быстрее печатать", "Чтобы компьютер работал быстрее", "Чтобы экран стал ярче"],
+        correct: 0
+      },
+      {
+        question: "Что может произойти, если долго сидеть за компьютером без перерыва?",
+        answers: ["Устанут глаза и спина", "Станешь сильнее", "Компьютер выключится", "Ничего не случится"],
+        correct: 0
+      },
+      {
+        question: "Где должны находиться ноги при работе за компьютером?",
+        answers: ["На столе", "На полу", "На стуле", "В воздухе"],
+        correct: 1
+      },
+      {
+        question: "Можно ли есть и пить прямо над клавиатурой?",
+        answers: ["Можно всегда", "Можно иногда", "Нельзя", "Только если аккуратно"],
+        correct: 2
+      },
+      {
+        question: "Что нужно делать, если глаза устали?",
+        answers: ["Продолжать работать", "Сделать перерыв", "Смотреть в экран", "Сидеть ближе к монитору"],
+        correct: 1
+      },
+      {
+        question: "Как правильно держать спину при работе?",
+        answers: ["Сутулиться", "Держать прямо", "Лежать на столе", "Наклоняться к экрану"],
+        correct: 1
+      },
+      {
+        question: "Почему важно делать разминку?",
+        answers: ["Чтобы отдохнули мышцы", "Чтобы компьютер быстрее работал", "Чтобы экран стал ярче", "Чтобы быстрее закончить работу"],
+        correct: 0
+      },
+      {
+        question: "Что помогает сохранить здоровье при работе за компьютером?",
+        answers: ["Делать перерывы", "Правильно сидеть", "Делать упражнения для глаз", "Все перечисленное"],
+        correct: 3
+      }
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    const counterEl = document.getElementById("counter");
+    const answeredEl = document.getElementById("answered");
+    const progressBarEl = document.getElementById("progressBar");
+    const questionNumberEl = document.getElementById("questionNumber");
+    const questionTitleEl = document.getElementById("questionTitle");
+    const answersEl = document.getElementById("answers");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    function renderQuestion() {
+      const q = quizData[currentQuestion];
+      counterEl.textContent = `Вопрос ${currentQuestion + 1} из ${quizData.length}`;
+      questionNumberEl.textContent = `Вопрос ${currentQuestion + 1}`;
+      questionTitleEl.textContent = q.question;
+
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      answeredEl.textContent = `Отвечено: ${answeredCount}/${quizData.length}`;
+      progressBarEl.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+
+      answersEl.innerHTML = "";
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.className = "answer" + (userAnswers[currentQuestion] === index ? " selected" : "");
+        btn.textContent = `${String.fromCharCode(1040 + index)}) ${answer}`;
+        btn.addEventListener("click", () => {
+          userAnswers[currentQuestion] = index;
+          renderQuestion();
+        });
+        answersEl.appendChild(btn);
+      });
+
+      prevBtn.style.visibility = currentQuestion === 0 ? "hidden" : "visible";
+      nextBtn.disabled = userAnswers[currentQuestion] === null;
+      nextBtn.textContent = currentQuestion === quizData.length - 1 ? "Завершить тест ✓" : "Далее →";
+    }
+
+    function getResultMessage(score, total) {
+      const percent = Math.round((score / total) * 100);
+
+      if (percent === 100) {
+        return {
+          title: "Отлично!",
+          text: "Ты прекрасно знаешь правила безопасной работы за компьютером. Так держать!",
+          grade: "5"
+        };
+      }
+      if (percent >= 80) {
+        return {
+          title: "Очень хорошо!",
+          text: "У тебя хорошие знания по теме. Осталось совсем чуть-чуть до идеального результата.",
+          grade: "5"
+        };
+      }
+      if (percent >= 60) {
+        return {
+          title: "Хороший результат!",
+          text: "Ты знаешь основные правила, но некоторые моменты стоит ещё повторить.",
+          grade: "4"
+        };
+      }
+      if (percent >= 40) {
+        return {
+          title: "Неплохо!",
+          text: "Часть правил ты знаешь, но тему лучше повторить, чтобы работать за компьютером безопасно.",
+          grade: "3"
+        };
+      }
+      return {
+        title: "Нужно повторить тему",
+        text: "Попробуй ещё раз изучить правила безопасной работы за компьютером и пройти тест снова.",
+        grade: "2"
+      };
+    }
+
+    function showResults() {
+      let score = 0;
+      quizData.forEach((q, i) => {
+        if (userAnswers[i] === q.correct) score++;
+      });
+
+      const total = quizData.length;
+      const wrong = total - score;
+      const percent = Math.round((score / total) * 100);
+      const result = getResultMessage(score, total);
+
+      quizScreen.style.display = "none";
+      resultScreen.classList.add("show");
+
+      document.getElementById("scoreValue").textContent = `${score}/${total}`;
+      document.getElementById("scorePercent").textContent = `${percent}%`;
+      document.getElementById("resultTitle").textContent = result.title;
+      document.getElementById("resultText").textContent = result.text;
+      document.getElementById("correctCount").textContent = score;
+      document.getElementById("wrongCount").textContent = wrong;
+      document.getElementById("gradeText").textContent = result.grade;
+
+      const degrees = Math.round((percent / 100) * 360);
+      document.getElementById("scoreRing").style.background =
+        `radial-gradient(closest-side, white 72%, transparent 73% 100%),
+         conic-gradient(var(--accent) 0deg, var(--accent-2) ${degrees}deg, #e5e7eb ${degrees}deg)`;
+
+      const reviewList = document.getElementById("reviewList");
+      reviewList.innerHTML = "";
+      quizData.forEach((q, i) => {
+        const item = document.createElement("div");
+        item.className = "review-item";
+
+        const isCorrect = userAnswers[i] === q.correct;
+        const yourAnswer = userAnswers[i] !== null ? q.answers[userAnswers[i]] : "Нет ответа";
+        const correctAnswer = q.answers[q.correct];
+
+        item.innerHTML = `
+          <div class="review-q">${i + 1}. ${q.question}</div>
+          <div><span class="tag ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? 'Верно' : 'Ошибка'}</span></div>
+          <div style="margin-top:8px;"><strong>Твой ответ:</strong> ${yourAnswer}</div>
+          <div style="margin-top:6px;"><strong>Правильный ответ:</strong> ${correctAnswer}</div>
+        `;
+        reviewList.appendChild(item);
+      });
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (userAnswers[currentQuestion] === null) return;
+
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      currentQuestion = 0;
+      userAnswers = new Array(quizData.length).fill(null);
+      resultScreen.classList.remove("show");
+      quizScreen.style.display = "block";
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
