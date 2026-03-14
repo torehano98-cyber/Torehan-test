@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Цифровые носители информации</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #eff6ff, #e0f2fe);
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #475569;
+      font-size: 18px;
+    }
+
+    .question-card {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+
+    .question-card:hover {
+      border-color: #93c5fd;
+      transform: translateY(-2px);
+    }
+
+    .question-title {
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #1d4ed8;
+    }
+
+    .answers label {
+      display: block;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .answers label:hover {
+      background: #eff6ff;
+      border-color: #60a5fa;
+    }
+
+    .answers input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .check-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .check-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .reset-btn {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .reset-btn:hover {
+      background: #cbd5e1;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .excellent {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .good {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 2px solid #fde047;
+    }
+
+    .bad {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #fca5a5;
+    }
+
+    .correct {
+      border-color: #22c55e !important;
+      background: #dcfce7 !important;
+    }
+
+    .incorrect {
+      border-color: #ef4444 !important;
+      background: #fee2e2 !important;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 25px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 15px;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .question-title {
+        font-size: 17px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест: Цифровые носители информации</h1>
+    <div class="subtitle">15 вопросов для учеников по теме цифровых носителей информации</div>
+
+    <form id="quizForm"></form>
+
+    <div class="buttons">
+      <button class="check-btn" type="button" onclick="checkAnswers()">Проверить результат</button>
+      <button class="reset-btn" type="button" onclick="resetQuiz()">Сбросить</button>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <div class="footer-note">
+      Сохраните файл как <b>index.html</b> и загрузите на GitHub Pages
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. Что такое цифровой носитель информации?",
+        answers: [
+          "Устройство для хранения данных",
+          "Только программа на компьютере",
+          "Экран монитора",
+          "Компьютерная мышь"
+        ],
+        correct: 0
+      },
+      {
+        question: "2. Какой из вариантов является цифровым носителем?",
+        answers: [
+          "Клавиатура",
+          "Флешка",
+          "Колонка",
+          "Микрофон"
+        ],
+        correct: 1
+      },
+      {
+        question: "3. Для чего нужна флешка?",
+        answers: [
+          "Для вывода изображения",
+          "Для печати текста",
+          "Для хранения и переноса файлов",
+          "Для записи звука с микрофона"
+        ],
+        correct: 2
+      },
+      {
+        question: "4. Какой носитель обычно используется в телефонах и фотоаппаратах?",
+        answers: [
+          "Карта памяти",
+          "Дискета",
+          "DVD-диск",
+          "Кассета"
+        ],
+        correct: 0
+      },
+      {
+        question: "5. Какой носитель подходит для хранения большого количества данных в компьютере?",
+        answers: [
+          "Жесткий диск",
+          "Наушники",
+          "Веб-камера",
+          "Коврик для мыши"
+        ],
+        correct: 0
+      },
+      {
+        question: "6. Какой носитель информации считается устаревшим?",
+        answers: [
+          "SSD",
+          "Флешка",
+          "Дискета",
+          "Карта памяти"
+        ],
+        correct: 2
+      },
+      {
+        question: "7. Что можно хранить на цифровом носителе?",
+        answers: [
+          "Только картинки",
+          "Только музыку",
+          "Только видео",
+          "Документы, фото, видео, музыку и другие файлы"
+        ],
+        correct: 3
+      },
+      {
+        question: "8. Что нужно сделать перед извлечением флешки из компьютера?",
+        answers: [
+          "Сильно потянуть",
+          "Безопасно извлечь устройство",
+          "Выключить монитор",
+          "Нажать любую клавишу"
+        ],
+        correct: 1
+      },
+      {
+        question: "9. Какой носитель работает быстрее и современнее обычного жесткого диска?",
+        answers: [
+          "SSD",
+          "Дискета",
+          "CD-диск",
+          "Бумажная тетрадь"
+        ],
+        correct: 0
+      },
+      {
+        question: "10. Что означает, что у носителя большой объем памяти?",
+        answers: [
+          "Он тяжелый",
+          "Он красивый",
+          "На нем можно хранить много файлов",
+          "Он быстро ломается"
+        ],
+        correct: 2
+      },
+      {
+        question: "11. Какой носитель удобно использовать для переноса домашней работы в школу?",
+        answers: [
+          "Флешка",
+          "Монитор",
+          "Сканер",
+          "Принтер"
+        ],
+        correct: 0
+      },
+      {
+        question: "12. Что из перечисленного НЕ является цифровым носителем?",
+        answers: [
+          "Карта памяти",
+          "Флешка",
+          "Жесткий диск",
+          "Компьютерная мышь"
+        ],
+        correct: 3
+      },
+      {
+        question: "13. Какой носитель чаще всего используется для хранения фильмов, игр и больших файлов?",
+        answers: [
+          "Жесткий диск или SSD",
+          "Ластик",
+          "Тетрадь",
+          "Клавиатура"
+        ],
+        correct: 0
+      },
+      {
+        question: "14. Почему важно бережно обращаться с цифровыми носителями?",
+        answers: [
+          "Чтобы не потерять данные",
+          "Чтобы они стали ярче",
+          "Чтобы компьютер работал тише",
+          "Чтобы экран был больше"
+        ],
+        correct: 0
+      },
+      {
+        question: "15. Какой носитель можно назвать съемным?",
+        answers: [
+          "Флешка",
+          "Встроенный диск компьютера",
+          "Процессор",
+          "Материнская плата"
+        ],
+        correct: 0
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+
+    function renderQuiz() {
+      quizForm.innerHTML = "";
+
+      questions.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+
+        const title = document.createElement("div");
+        title.className = "question-title";
+        title.textContent = q.question;
+        card.appendChild(title);
+
+        const answersDiv = document.createElement("div");
+        answersDiv.className = "answers";
+
+        q.answers.forEach((answer, answerIndex) => {
+          const label = document.createElement("label");
+          label.innerHTML = `
+            <input type="radio" name="question${index}" value="${answerIndex}">
+            ${answer}
+          `;
+          answersDiv.appendChild(label);
+        });
+
+        card.appendChild(answersDiv);
+        quizForm.appendChild(card);
+      });
+    }
+
+    function checkAnswers() {
+      let score = 0;
+      const questionCards = document.querySelectorAll(".question-card");
+
+      questionCards.forEach((card, index) => {
+        const labels = card.querySelectorAll("label");
+        const selected = card.querySelector(`input[name="question${index}"]:checked`);
+
+        labels.forEach(label => {
+          label.classList.remove("correct", "incorrect");
+        });
+
+        if (selected) {
+          const selectedValue = Number(selected.value);
+          const correctValue = questions[index].correct;
+
+          if (selectedValue === correctValue) {
+            score++;
+            selected.parentElement.classList.add("correct");
+          } else {
+            selected.parentElement.classList.add("incorrect");
+            labels[correctValue].classList.add("correct");
+          }
+        } else {
+          labels[questions[index].correct].classList.add("correct");
+        }
+      });
+
+      const result = document.getElementById("result");
+      result.style.display = "block";
+
+      let message = `Ваш результат: ${score} из ${questions.length}`;
+
+      result.className = "result";
+      if (score >= 13) {
+        result.classList.add("excellent");
+        message += "<br>Отлично! Ты прекрасно знаешь цифровые носители информации!";
+      } else if (score >= 8) {
+        result.classList.add("good");
+        message += "<br>Хороший результат! Но можно еще немного повторить тему.";
+      } else {
+        result.classList.add("bad");
+        message += "<br>Нужно повторить тему и попробовать еще раз.";
+      }
+
+      result.innerHTML = message;
+      result.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+      const result = document.getElementById("result");
+      result.style.display = "none";
+      result.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
