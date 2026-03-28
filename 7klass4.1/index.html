@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Наруто-тест: Алгоритм ветвления в Python</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1e293b;
+      --orange:#ff7a18;
+      --orange-2:#ffb347;
+      --blue:#38bdf8;
+      --red:#ef4444;
+      --gold:#facc15;
+      --leaf:#22c55e;
+      --card:rgba(15,23,42,.76);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --shadow:0 20px 40px rgba(0,0,0,.35);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,122,24,.18), transparent 25%),
+        radial-gradient(circle at top right, rgba(56,189,248,.15), transparent 28%),
+        radial-gradient(circle at bottom center, rgba(250,204,21,.10), transparent 30%),
+        linear-gradient(135deg, var(--bg1), #111827 45%, var(--bg2));
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        linear-gradient(transparent 0 96%, rgba(255,255,255,.03) 96% 100%),
+        linear-gradient(90deg, transparent 0 96%, rgba(255,255,255,.03) 96% 100%);
+      background-size: 48px 48px;
+      pointer-events:none;
+      opacity:.25;
+    }
+
+    .scene{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .moon{
+      position:absolute;
+      top:60px;
+      right:100px;
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, #fff8dc, #ffd78f 55%, rgba(255,215,138,.35) 75%, transparent 76%);
+      filter:drop-shadow(0 0 25px rgba(255,214,123,.4));
+      opacity:.7;
+      animation:pulseMoon 5s ease-in-out infinite;
+    }
+
+    @keyframes pulseMoon {
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.05)}
+    }
+
+    .cloud{
+      position:absolute;
+      width:260px;
+      height:70px;
+      border-radius:50px;
+      background:rgba(255,255,255,.06);
+      filter:blur(2px);
+      animation:floatCloud linear infinite;
+    }
+    .cloud::before,.cloud::after{
+      content:"";
+      position:absolute;
+      background:inherit;
+      border-radius:50%;
+    }
+    .cloud::before{width:90px;height:90px;left:30px;top:-28px}
+    .cloud::after{width:110px;height:110px;right:25px;top:-35px}
+    @keyframes floatCloud {
+      from{transform:translateX(-320px)}
+      to{transform:translateX(calc(100vw + 320px))}
+    }
+
+    .chakra{
+      position:absolute;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:radial-gradient(circle, #fff, var(--blue), transparent 70%);
+      box-shadow:0 0 14px rgba(56,189,248,.9);
+      animation:rise 10s linear infinite;
+      opacity:.8;
+    }
+
+    @keyframes rise {
+      0%{transform:translateY(0) translateX(0) scale(.7); opacity:0}
+      10%{opacity:.9}
+      50%{transform:translateY(-45vh) translateX(20px) scale(1)}
+      100%{transform:translateY(-100vh) translateX(-10px) scale(.5); opacity:0}
+    }
+
+    .leaf{
+      position:absolute;
+      width:18px;
+      height:10px;
+      background:linear-gradient(90deg, #65d64f, #2f9e44);
+      border-radius:100% 0 100% 0;
+      transform:rotate(20deg);
+      box-shadow:0 0 10px rgba(34,197,94,.35);
+      animation:fall linear infinite;
+      opacity:.85;
+    }
+    .leaf::before{
+      content:"";
+      position:absolute;
+      left:8px;
+      top:-2px;
+      width:1px;
+      height:14px;
+      background:rgba(255,255,255,.5);
+      transform:rotate(25deg);
+    }
+    @keyframes fall{
+      0%{transform:translateY(-10vh) translateX(0) rotate(0deg)}
+      50%{transform:translateY(50vh) translateX(50px) rotate(180deg)}
+      100%{transform:translateY(110vh) translateX(-20px) rotate(360deg)}
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      max-width:980px;
+      margin:0 auto;
+      padding:32px 18px 50px;
+    }
+
+    .hero{
+      position:relative;
+      padding:28px 28px 24px;
+      border-radius:32px;
+      background:
+        linear-gradient(135deg, rgba(255,122,24,.18), rgba(239,68,68,.12) 45%, rgba(56,189,248,.12)),
+        rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      padding:1px;
+      background:linear-gradient(135deg, rgba(255,179,71,.9), rgba(56,189,248,.6), rgba(250,204,21,.8));
+      -webkit-mask:
+         linear-gradient(#000 0 0) content-box,
+         linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+              mask-composite:exclude;
+      pointer-events:none;
+      opacity:.5;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .symbol{
+      width:84px;
+      height:84px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:34px;
+      background:
+        radial-gradient(circle at 35% 35%, #ffd27d, var(--orange) 45%, #9a3412 90%);
+      box-shadow:
+        inset 0 0 18px rgba(255,255,255,.25),
+        0 0 25px rgba(255,122,24,.35);
+      position:relative;
+    }
+
+    .symbol::before{
+      content:"";
+      position:absolute;
+      width:48px;
+      height:48px;
+      border:3px solid rgba(255,255,255,.85);
+      border-radius:50%;
+      border-top-color:transparent;
+      border-left-color:transparent;
+      transform:rotate(20deg);
+      opacity:.85;
+    }
+
+    h1{
+      margin:0 0 6px;
+      font-size:clamp(28px, 5vw, 46px);
+      line-height:1.06;
+      letter-spacing:.4px;
+      text-shadow:0 4px 18px rgba(0,0,0,.25);
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:1.02rem;
+      line-height:1.55;
+      max-width:760px;
+    }
+
+    .chips{
+      margin-top:18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff6e5;
+      font-weight:700;
+      font-size:.95rem;
+      box-shadow:0 8px 20px rgba(0,0,0,.2);
+    }
+
+    .panel{
+      margin-top:22px;
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+
+    .topbar{
+      padding:18px 22px 8px;
+    }
+
+    .stats{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:700;
+      color:#fff;
+    }
+
+    .progress-wrap{
+      height:16px;
+      width:100%;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .progress{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--orange), var(--gold), var(--blue));
+      box-shadow:0 0 20px rgba(255,179,71,.4);
+      transition:width .35s ease;
+      position:relative;
+    }
+
+    .progress::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      animation:shine 1.6s linear infinite;
+    }
+
+    @keyframes shine{
+      from{transform:translateX(-100%)}
+      to{transform:translateX(100%)}
+    }
+
+    .question-box{
+      padding:8px 22px 22px;
+    }
+
+    .question-title{
+      font-size:1.45rem;
+      line-height:1.45;
+      margin:8px 0 16px;
+      font-weight:800;
+      color:#fffaf2;
+    }
+
+    .code{
+      margin:10px 0 18px;
+      padding:16px 18px;
+      background:rgba(2,6,23,.78);
+      border:1px solid rgba(148,163,184,.25);
+      border-left:4px solid var(--orange);
+      border-radius:18px;
+      overflow:auto;
+      font-family: Consolas, Monaco, monospace;
+      font-size:.98rem;
+      color:#e2e8f0;
+      line-height:1.5;
+      box-shadow: inset 0 0 24px rgba(0,0,0,.25);
+      white-space:pre-wrap;
+    }
+
+    .answers{
+      display:grid;
+      gap:14px;
+      margin-top:10px;
+    }
+
+    .answer{
+      position:relative;
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      padding:16px 18px 16px 56px;
+      border-radius:20px;
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+      user-select:none;
+      min-height:58px;
+      display:flex;
+      align-items:center;
+    }
+
+    .answer:hover{
+      transform:translateY(-2px) scale(1.01);
+      border-color:rgba(255,179,71,.55);
+      box-shadow:0 12px 24px rgba(0,0,0,.2);
+    }
+
+    .answer input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .answer .letter{
+      position:absolute;
+      left:16px;
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .answer.selected{
+      border-color:rgba(56,189,248,.7);
+      background:linear-gradient(135deg, rgba(56,189,248,.18), rgba(255,255,255,.06));
+      box-shadow:0 0 0 2px rgba(56,189,248,.15), 0 10px 24px rgba(0,0,0,.22);
+    }
+
+    .answer.correct{
+      border-color:rgba(34,197,94,.7);
+      background:linear-gradient(135deg, rgba(34,197,94,.18), rgba(255,255,255,.06));
+    }
+
+    .answer.wrong{
+      border-color:rgba(239,68,68,.75);
+      background:linear-gradient(135deg, rgba(239,68,68,.18), rgba(255,255,255,.06));
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      font-size:1rem;
+      font-weight:800;
+      padding:14px 22px;
+      border-radius:16px;
+      color:#fff;
+      transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
+      box-shadow:0 12px 24px rgba(0,0,0,.22);
+    }
+
+    button:hover{transform:translateY(-2px)}
+    button:active{transform:translateY(0)}
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      filter:grayscale(.15);
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, var(--orange), #f97316, #fb7185);
+    }
+
+    .btn-secondary{
+      background:linear-gradient(135deg, #334155, #475569);
+    }
+
+    .btn-ghost{
+      background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.14);
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:.98rem;
+      font-weight:600;
+    }
+
+    .feedback{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:#eff6ff;
+      line-height:1.5;
+      display:none;
+    }
+
+    .feedback.show{display:block}
+
+    .result{
+      display:none;
+      padding:26px 22px 28px;
+      text-align:center;
+    }
+
+    .result.show{display:block}
+
+    .result h2{
+      margin:0 0 10px;
+      font-size:2rem;
+    }
+
+    .score-ring{
+      width:min(280px, 74vw);
+      height:min(280px, 74vw);
+      margin:18px auto;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at center, rgba(15,23,42,.96) 0 54%, transparent 55%),
+        conic-gradient(var(--orange) 0 var(--deg), var(--blue) var(--deg), rgba(255,255,255,.08) 0);
+      display:grid;
+      place-items:center;
+      box-shadow:
+        0 0 0 14px rgba(255,255,255,.04),
+        0 24px 50px rgba(0,0,0,.35),
+        inset 0 0 30px rgba(255,255,255,.05);
+      position:relative;
+    }
+
+    .score-ring::before{
+      content:"";
+      position:absolute;
+      inset:18px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .score-text{
+      position:relative;
+      z-index:1;
+    }
+
+    .score-big{
+      font-size:3.4rem;
+      font-weight:900;
+      line-height:1;
+      background:linear-gradient(135deg, #fff, #fde68a, #93c5fd);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .score-small{
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .result-message{
+      max-width:720px;
+      margin:12px auto 0;
+      color:#e2e8f0;
+      line-height:1.7;
+      font-size:1.03rem;
+    }
+
+    .legend{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(170px,1fr));
+      gap:12px;
+      margin-top:22px;
+      text-align:left;
+    }
+
+    .legend-card{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:14px 16px;
+    }
+
+    .legend-card strong{
+      display:block;
+      margin-bottom:6px;
+      color:#fff7ed;
+    }
+
+    .hidden{display:none !important;}
+
+    footer{
+      text-align:center;
+      color:#94a3b8;
+      padding:18px 8px 10px;
+      font-size:.92rem;
+    }
+
+    @media (max-width:700px){
+      .hero{padding:22px 18px}
+      .question-box,.topbar,.result{padding-left:16px;padding-right:16px}
+      .answer{padding-left:50px}
+      .question-title{font-size:1.22rem}
+      .actions{justify-content:center}
+      .moon{right:24px; width:82px;height:82px}
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="moon"></div>
+  </div>
+
+  <div class="app">
+    <section class="hero">
+      <div class="brand">
+        <div class="symbol">忍</div>
+        <div>
+          <h1>Наруто-тест: Алгоритм ветвления в Python</h1>
+          <p class="subtitle">
+            Интерактивный тест для 7 класса. Здесь есть вопросы по <b>if</b>, <b>else</b>, <b>elif</b>, командам
+            <b>input()</b> и <b>print()</b>, а также задания с фрагментами программ.
+          </p>
+        </div>
+      </div>
+      <div class="chips">
+        <div class="chip">15 вопросов</div>
+        <div class="chip">Python</div>
+        <div class="chip">Сюжетный аниме-стиль</div>
+        <div class="chip">Подходит для GitHub Pages</div>
+      </div>
+    </section>
+
+    <section class="panel" id="quizPanel">
+      <div class="topbar">
+        <div class="stats">
+          <div class="badge" id="questionCounter">Вопрос 1 / 15</div>
+          <div class="badge" id="scoreBadge">Очки: 0</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="question-box" id="questionBox">
+        <div class="question-title" id="questionTitle"></div>
+        <div class="code hidden" id="codeBlock"></div>
+        <div class="answers" id="answersContainer"></div>
+        <div class="feedback" id="feedbackBox"></div>
+
+        <div class="actions">
+          <button class="btn-secondary" id="prevBtn">◀ Назад</button>
+          <div class="hint" id="hintText">Выберите один правильный ответ.</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn-ghost" id="checkBtn">Проверить</button>
+            <button class="btn-primary" id="nextBtn">Дальше ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="result" id="resultScreen">
+        <h2>Миссия завершена!</h2>
+        <div class="score-ring" id="scoreRing" style="--deg:0deg;">
+          <div class="score-text">
+            <div class="score-big" id="scoreBig">0/15</div>
+            <div class="score-small" id="scorePercent">0%</div>
+          </div>
+        </div>
+        <p class="result-message" id="resultMessage"></p>
+
+        <div class="legend">
+          <div class="legend-card">
+            <strong>Что проверяет тест</strong>
+            синтаксис ветвления, ввод и вывод данных, сравнения, понимание работы программ.
+          </div>
+          <div class="legend-card">
+            <strong>Совет ученику</strong>
+            обращай внимание на двоеточие, отступы и разницу между <b>=</b> и <b>==</b>.
+          </div>
+          <div class="legend-card">
+            <strong>Для учителя</strong>
+            тест можно запускать на уроке, дома, на интерактивной доске или через GitHub Pages.
+          </div>
+        </div>
+
+        <div class="actions" style="justify-content:center; margin-top:24px;">
+          <button class="btn-secondary" id="reviewBtn">Посмотреть ответы</button>
+          <button class="btn-primary" id="restartBtn">Пройти ещё раз</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Сделано как один HTML-файл: просто загрузите его в репозиторий GitHub и откройте через GitHub Pages.
+    </footer>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Какая команда используется для ветвления в Python?",
+        options: ["for", "if", "print", "input"],
+        answer: 1,
+        explanation: "Команда <b>if</b> используется для проверки условия и выбора действия."
+      },
+      {
+        question: "Какая команда используется, если нужно выполнить действие во всех остальных случаях?",
+        options: ["else", "while", "elif", "input"],
+        answer: 0,
+        explanation: "<b>else</b> выполняется тогда, когда условие в <b>if</b> ложно."
+      },
+      {
+        question: "Какая команда используется для проверки нескольких условий подряд?",
+        options: ["print", "for", "elif", "input"],
+        answer: 2,
+        explanation: "<b>elif</b> добавляют, когда после первого условия нужно проверить ещё одно."
+      },
+      {
+        question: "Что делает команда <b>input()</b>?",
+        options: [
+          "Выводит текст на экран",
+          "Считывает данные, введённые пользователем",
+          "Проверяет условие",
+          "Повторяет команды"
+        ],
+        answer: 1,
+        explanation: "<b>input()</b> получает данные с клавиатуры."
+      },
+      {
+        question: "Что делает команда <b>print()</b>?",
+        options: [
+          "Вводит число",
+          "Сравнивает значения",
+          "Выводит информацию на экран",
+          "Завершает программу"
+        ],
+        answer: 2,
+        explanation: "<b>print()</b> выводит текст, числа и результаты на экран."
+      },
+      {
+        question: "Какой знак используется для проверки равенства?",
+        options: ["=", "==", "!=", ">="],
+        answer: 1,
+        explanation: "<b>==</b> сравнивает значения. Один знак <b>=</b> присваивает значение переменной."
+      },
+      {
+        question: "Что означает знак <b>!=</b>?",
+        options: ["Больше", "Меньше", "Не равно", "Равно"],
+        answer: 2,
+        explanation: "<b>!=</b> означает «не равно»."
+      },
+      {
+        question: "Как правильно записать условие: «если x больше 10»?",
+        options: ["if x => 10:", "if x > 10:", "if x = 10:", "if x <> 10:"],
+        answer: 1,
+        explanation: "Правильная запись: <b>if x > 10:</b>"
+      },
+      {
+        question: "Что обязательно ставится в конце строки с <b>if</b>, <b>elif</b>, <b>else</b>?",
+        options: ["Точка", "Запятая", "Двоеточие", "Скобка"],
+        answer: 2,
+        explanation: "В Python после конструкции ветвления обязательно ставится <b>:</b>"
+      },
+      {
+        question: "Что будет выведено на экран?",
+        code: `a = 7
+if a > 5:
+    print("Да")
+else:
+    print("Нет")`,
+        options: ["Нет", "7", "Да", "Ничего"],
+        answer: 2,
+        explanation: "Число 7 больше 5, значит выполнится ветка <b>if</b> и выведется <b>Да</b>."
+      },
+      {
+        question: "Что будет выведено на экран?",
+        code: `x = 3
+if x == 5:
+    print("Пять")
+else:
+    print("Не пять")`,
+        options: ["Пять", "Не пять", "3", "Ошибка"],
+        answer: 1,
+        explanation: "3 не равно 5, поэтому программа выведет <b>Не пять</b>."
+      },
+      {
+        question: "Что делает эта программа?",
+        code: `age = int(input("Введите возраст: "))
+if age >= 18:
+    print("Вход разрешён")
+else:
+    print("Вход запрещён")`,
+        options: [
+          "Проверяет, умеет ли человек читать",
+          "Проверяет возраст пользователя",
+          "Считает сумму чисел",
+          "Выводит возраст на экран без проверки"
+        ],
+        answer: 1,
+        explanation: "Программа запрашивает возраст и проверяет, исполнилось ли пользователю 18 лет."
+      },
+      {
+        question: "Что нужно добавить, чтобы программа правильно сравнивала число, введённое с клавиатуры?",
+        code: `x = input("Введите число: ")
+if x > 0:
+    print("Положительное")`,
+        options: ["Ничего, программа уже правильная", "int()", "print()", "else"],
+        answer: 1,
+        explanation: "<b>input()</b> возвращает строку, поэтому для сравнения с числом нужно сделать преобразование: <b>int(input(...))</b>."
+      },
+      {
+        question: "Что будет выведено на экран?",
+        code: `n = 0
+if n > 0:
+    print("Положительное")
+elif n == 0:
+    print("Ноль")
+else:
+    print("Отрицательное")`,
+        options: ["Положительное", "Отрицательное", "Ноль", "Ошибка"],
+        answer: 2,
+        explanation: "Так как <b>n == 0</b>, выполнится ветка <b>elif</b> и выведется <b>Ноль</b>."
+      },
+      {
+        question: "Какой вариант записи верный?",
+        options: [
+          `if x > 5\nprint("Да")`,
+          `if x > 5:\n    print("Да")`,
+          `if (x > 5)\n    print("Да")`,
+          `if x > 5:\nprint("Да")`
+        ],
+        answer: 1,
+        explanation: "В Python нужны и <b>двоеточие</b>, и <b>отступ</b> внутри ветки."
+      }
+    ];
+
+    const state = {
+      current: 0,
+      selected: Array(questions.length).fill(null),
+      checked: Array(questions.length).fill(false),
+      score: 0
+    };
+
+    const questionCounter = document.getElementById("questionCounter");
+    const scoreBadge = document.getElementById("scoreBadge");
+    const progressBar = document.getElementById("progressBar");
+    const questionTitle = document.getElementById("questionTitle");
+    const codeBlock = document.getElementById("codeBlock");
+    const answersContainer = document.getElementById("answersContainer");
+    const feedbackBox = document.getElementById("feedbackBox");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const quizPanel = document.getElementById("quizPanel");
+    const questionBox = document.getElementById("questionBox");
+    const resultScreen = document.getElementById("resultScreen");
+    const scoreBig = document.getElementById("scoreBig");
+    const scorePercent = document.getElementById("scorePercent");
+    const scoreRing = document.getElementById("scoreRing");
+    const resultMessage = document.getElementById("resultMessage");
+    const restartBtn = document.getElementById("restartBtn");
+    const reviewBtn = document.getElementById("reviewBtn");
+
+    function renderQuestion() {
+      const q = questions[state.current];
+      questionCounter.textContent = `Вопрос ${state.current + 1} / ${questions.length}`;
+      scoreBadge.textContent = `Очки: ${state.score}`;
+      progressBar.style.width = `${(state.current / questions.length) * 100}%`;
+
+      questionTitle.innerHTML = q.question;
+
+      if (q.code) {
+        codeBlock.classList.remove("hidden");
+        codeBlock.textContent = q.code;
+      } else {
+        codeBlock.classList.add("hidden");
+        codeBlock.textContent = "";
+      }
+
+      answersContainer.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      q.options.forEach((option, index) => {
+        const label = document.createElement("label");
+        label.className = "answer";
+
+        const selected = state.selected[state.current] === index;
+        const checked = state.checked[state.current];
+
+        if (selected) label.classList.add("selected");
+
+        if (checked) {
+          if (index === q.answer) label.classList.add("correct");
+          if (selected && index !== q.answer) label.classList.add("wrong");
+        }
+
+        label.innerHTML = `
+          <input type="radio" name="answer" ${selected ? "checked" : ""}>
+          <span class="letter">${letters[index]}</span>
+          <span>${escapeHtml(option).replace(/\n/g, "<br>")}</span>
+        `;
+
+        label.addEventListener("click", () => {
+          if (state.checked[state.current]) return;
+          state.selected[state.current] = index;
+          renderQuestion();
+        });
+
+        answersContainer.appendChild(label);
+      });
+
+      if (state.checked[state.current]) {
+        const isCorrect = state.selected[state.current] === q.answer;
+        feedbackBox.classList.add("show");
+        feedbackBox.innerHTML = isCorrect
+          ? `✅ <b>Верно!</b> ${q.explanation}`
+          : `❌ <b>Неверно.</b> Правильный ответ: <b>${letters[q.answer]}) ${escapeHtml(q.options[q.answer])}</b><br>${q.explanation}`;
+      } else {
+        feedbackBox.classList.remove("show");
+        feedbackBox.innerHTML = "";
+      }
+
+      prevBtn.disabled = state.current === 0;
+      nextBtn.textContent = state.current === questions.length - 1 ? "Завершить 🏁" : "Дальше ▶";
+    }
+
+    function checkAnswer() {
+      const currentAnswer = state.selected[state.current];
+      if (currentAnswer === null) {
+        feedbackBox.classList.add("show");
+        feedbackBox.innerHTML = "⚠️ Сначала выбери ответ.";
+        return;
+      }
+
+      if (!state.checked[state.current]) {
+        state.checked[state.current] = true;
+        if (currentAnswer === questions[state.current].answer) {
+          state.score++;
+        }
+      }
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      if (state.current === questions.length - 1) {
+        finishQuiz();
+        return;
+      }
+      state.current++;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (state.current > 0) {
+        state.current--;
+        renderQuestion();
+      }
+    }
+
+    function finishQuiz() {
+      questionBox.classList.add("hidden");
+      document.querySelector(".topbar").classList.add("hidden");
+      resultScreen.classList.add("show");
+
+      const percent = Math.round((state.score / questions.length) * 100);
+      scoreBig.textContent = `${state.score}/${questions.length}`;
+      scorePercent.textContent = `${percent}%`;
+      scoreRing.style.setProperty("--deg", `${(percent / 100) * 360}deg`);
+
+      let message = "";
+      if (percent >= 87) {
+        message = "Ты настоящий шиноби ветвления! Отлично знаешь синтаксис Python, понимаешь работу условий и уверенно читаешь программы.";
+      } else if (percent >= 67) {
+        message = "Хороший результат! Основы ветвления ты уже понимаешь. Осталось немного потренировать сравнения, отступы и работу с input().";
+      } else if (percent >= 40) {
+        message = "Неплохо, но нужно ещё потренироваться. Повтори команды if, else, elif, а также разницу между = и ==.";
+      } else {
+        message = "Пока миссия была непростой. Но всё получится: начни с простых программ, повтори синтаксис ветвления и попробуй пройти тест ещё раз.";
+      }
+      resultMessage.textContent = message;
+      progressBar.style.width = `100%`;
+      scoreBadge.textContent = `Очки: ${state.score}`;
+    }
+
+    function restartQuiz() {
+      state.current = 0;
+      state.selected = Array(questions.length).fill(null);
+      state.checked = Array(questions.length).fill(false);
+      state.score = 0;
+
+      questionBox.classList.remove("hidden");
+      document.querySelector(".topbar").classList.remove("hidden");
+      resultScreen.classList.remove("show");
+      renderQuestion();
+    }
+
+    function reviewAnswers() {
+      state.current = 0;
+      questionBox.classList.remove("hidden");
+      document.querySelector(".topbar").classList.remove("hidden");
+      resultScreen.classList.remove("show");
+      renderQuestion();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    checkBtn.addEventListener("click", checkAnswer);
+    nextBtn.addEventListener("click", nextQuestion);
+    prevBtn.addEventListener("click", prevQuestion);
+    restartBtn.addEventListener("click", restartQuiz);
+    reviewBtn.addEventListener("click", reviewAnswers);
+
+    function buildScene() {
+      const scene = document.getElementById("scene");
+
+      for (let i = 0; i < 4; i++) {
+        const cloud = document.createElement("div");
+        cloud.className = "cloud";
+        cloud.style.top = `${40 + i * 90}px`;
+        cloud.style.left = `${-300 - i * 150}px`;
+        cloud.style.opacity = `${0.12 + Math.random() * 0.15}`;
+        cloud.style.animationDuration = `${22 + Math.random() * 22}s`;
+        cloud.style.animationDelay = `${-Math.random() * 20}s`;
+        cloud.style.transform = `scale(${0.7 + Math.random() * 0.7})`;
+        scene.appendChild(cloud);
+      }
+
+      for (let i = 0; i < 26; i++) {
+        const orb = document.createElement("div");
+        orb.className = "chakra";
+        orb.style.left = `${Math.random() * 100}vw`;
+        orb.style.bottom = `${-Math.random() * 20}px`;
+        orb.style.animationDuration = `${6 + Math.random() * 8}s`;
+        orb.style.animationDelay = `${-Math.random() * 12}s`;
+        orb.style.transform = `scale(${0.5 + Math.random() * 1.4})`;
+        scene.appendChild(orb);
+      }
+
+      for (let i = 0; i < 18; i++) {
+        const leaf = document.createElement("div");
+        leaf.className = "leaf";
+        leaf.style.left = `${Math.random() * 100}vw`;
+        leaf.style.animationDuration = `${8 + Math.random() * 8}s`;
+        leaf.style.animationDelay = `${-Math.random() * 12}s`;
+        leaf.style.opacity = `${0.5 + Math.random() * 0.5}`;
+        leaf.style.transform = `scale(${0.8 + Math.random() * 1.2}) rotate(${Math.random() * 120}deg)`;
+        scene.appendChild(leaf);
+      }
+    }
+
+    buildScene();
+    renderQuestion();
+  </script>
+</body>
+</html>
