@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Алгоритм ветвления</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #eff6ff, #e0f2fe);
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #1d4ed8;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #475569;
+      font-size: 18px;
+    }
+
+    .question {
+      margin-bottom: 28px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .question h3 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+
+    .code {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: Consolas, monospace;
+      white-space: pre-wrap;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    label {
+      display: block;
+      padding: 10px 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    label:hover {
+      background: #eff6ff;
+      border-color: #60a5fa;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: #2563eb;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    .result-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb, #60a5fa);
+      color: white;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .result-box {
+      background: rgba(255,255,255,0.12);
+      padding: 40px 30px;
+      border-radius: 24px;
+      max-width: 700px;
+      width: 100%;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .result-box h2 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    .score {
+      font-size: 34px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .grade {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .answers-review {
+      text-align: left;
+      margin-top: 25px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .answers-review p {
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .restart-btn {
+      margin-top: 25px;
+      padding: 14px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: white;
+      color: #1d4ed8;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .restart-btn:hover {
+      background: #dbeafe;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        margin: 15px;
+        padding: 18px;
+      }
+
+      .question h3 {
+        font-size: 18px;
+      }
+
+      .result-box h2 {
+        font-size: 32px;
+      }
+
+      .score {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест по теме «Алгоритм ветвления»</h1>
+    <div class="subtitle">
+      7 класс • 15 вопросов • Повторение синтаксиса, ввода, вывода и условий в Python
+    </div>
+
+    <form id="quizForm"></form>
+
+    <button class="btn" onclick="checkAnswers()">Проверить результат</button>
+  </div>
+
+  <div class="result-screen" id="resultScreen">
+    <div class="result-box">
+      <h2>Результат теста</h2>
+      <div class="score" id="scoreText"></div>
+      <div class="grade" id="gradeText"></div>
+      <div class="answers-review" id="answersReview"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Пройти ещё раз</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "1. Что такое алгоритм ветвления?",
+        options: [
+          "A) Алгоритм без условий",
+          "B) Алгоритм с повторением",
+          "C) Алгоритм, в котором есть выбор действия",
+          "D) Алгоритм только с числами"
+        ],
+        correct: 2
+      },
+      {
+        q: "2. Какая команда используется для ветвления в Python?",
+        options: [
+          "A) for",
+          "B) while",
+          "C) if",
+          "D) print"
+        ],
+        correct: 2
+      },
+      {
+        q: "3. Как правильно записывается условие в Python?",
+        options: [
+          "A) if (x > 5)",
+          "B) if x > 5:",
+          "C) if x > 5 then",
+          "D) if x > 5 {}"
+        ],
+        correct: 1
+      },
+      {
+        q: "4. Какая команда используется для ввода данных?",
+        options: [
+          "A) print()",
+          "B) input()",
+          "C) if",
+          "D) else"
+        ],
+        correct: 1
+      },
+      {
+        q: "5. Что делает команда print()?",
+        options: [
+          "A) Вводит данные",
+          "B) Проверяет условие",
+          "C) Выводит данные",
+          "D) Повторяет действия"
+        ],
+        correct: 2
+      },
+      {
+        q: "6. Что выведет программа?",
+        code: `x = 10
+if x > 5:
+    print("Да")`,
+        options: [
+          "A) Нет",
+          "B) Да",
+          "C) 10",
+          "D) Ошибка"
+        ],
+        correct: 1
+      },
+      {
+        q: "7. Что выведет программа?",
+        code: `x = 3
+if x > 5:
+    print("Да")
+else:
+    print("Нет")`,
+        options: [
+          "A) Да",
+          "B) Нет",
+          "C) 3",
+          "D) Ошибка"
+        ],
+        correct: 1
+      },
+      {
+        q: "8. Какая команда обозначает ветку «иначе»?",
+        options: [
+          "A) otherwise",
+          "B) else",
+          "C) elif",
+          "D) input"
+        ],
+        correct: 1
+      },
+      {
+        q: "9. Что выведет программа?",
+        code: `x = 0
+if x > 0:
+    print("+")
+elif x < 0:
+    print("-")
+else:
+    print("0")`,
+        options: [
+          "A) +",
+          "B) -",
+          "C) 0",
+          "D) Ошибка"
+        ],
+        correct: 2
+      },
+      {
+        q: "10. Какой знак используется для проверки равенства?",
+        options: [
+          "A) =",
+          "B) ==",
+          "C) !=",
+          "D) >="
+        ],
+        correct: 1
+      },
+      {
+        q: "11. Что выведет программа?",
+        code: `x = 7
+if x % 2 == 0:
+    print("Чётное")
+else:
+    print("Нечётное")`,
+        options: [
+          "A) Чётное",
+          "B) Нечётное",
+          "C) 7",
+          "D) Ошибка"
+        ],
+        correct: 1
+      },
+      {
+        q: "12. Что делает оператор % в Python?",
+        options: [
+          "A) Деление",
+          "B) Умножение",
+          "C) Находит остаток от деления",
+          "D) Сравнивает числа"
+        ],
+        correct: 2
+      },
+      {
+        q: "13. Что выведет программа, если ввести число 150?",
+        code: `x = int(input())
+if x > 100:
+    print("Большое")
+else:
+    print("Маленькое")`,
+        options: [
+          "A) Большое",
+          "B) Маленькое",
+          "C) 150",
+          "D) Ошибка"
+        ],
+        correct: 0
+      },
+      {
+        q: "14. Сколько веток может быть в алгоритме ветвления?",
+        options: [
+          "A) Только одна",
+          "B) Только две",
+          "C) Две или больше",
+          "D) Ни одной"
+        ],
+        correct: 2
+      },
+      {
+        q: "15. Что выведет программа?",
+        code: `x = 5
+if x >= 5:
+    print("OK")
+else:
+    print("NO")`,
+        options: [
+          "A) OK",
+          "B) NO",
+          "C) 5",
+          "D) Ошибка"
+        ],
+        correct: 0
+      }
+    ];
+
+    const form = document.getElementById("quizForm");
+
+    function renderQuestions() {
+      form.innerHTML = "";
+
+      questions.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+
+        let html = `<h3>${item.q}</h3>`;
+
+        if (item.code) {
+          html += `<div class="code">${item.code}</div>`;
+        }
+
+        item.options.forEach((option, optIndex) => {
+          html += `
+            <label>
+              <input type="radio" name="q${index}" value="${optIndex}">
+              ${option}
+            </label>
+          `;
+        });
+
+        div.innerHTML = html;
+        form.appendChild(div);
+      });
+    }
+
+    function getGrade(score) {
+      if (score === 15) return "Отлично! Оценка: 5";
+      if (score >= 12) return "Очень хорошо! Оценка: 5-";
+      if (score >= 9) return "Хорошо! Оценка: 4";
+      if (score >= 6) return "Неплохо, но нужно повторить. Оценка: 3";
+      return "Нужно повторить тему ещё раз. Оценка: 2";
+    }
+
+    function checkAnswers() {
+      let score = 0;
+      let reviewHTML = "";
+
+      questions.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const correctText = item.options[item.correct];
+        const userText = selected ? item.options[Number(selected.value)] : "Нет ответа";
+
+        if (selected && Number(selected.value) === item.correct) {
+          score++;
+          reviewHTML += `<p>✅ <strong>${item.q}</strong><br>Ваш ответ: ${userText}</p>`;
+        } else {
+          reviewHTML += `<p>❌ <strong>${item.q}</strong><br>Ваш ответ: ${userText}<br>Правильный ответ: ${correctText}</p>`;
+        }
+      });
+
+      document.getElementById("scoreText").textContent = `Ваш результат: ${score} из 15`;
+      document.getElementById("gradeText").textContent = getGrade(score);
+      document.getElementById("answersReview").innerHTML = reviewHTML;
+      document.getElementById("resultScreen").style.display = "flex";
+    }
+
+    function restartQuiz() {
+      document.getElementById("resultScreen").style.display = "none";
+      renderQuestions();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderQuestions();
+  </script>
+</body>
+</html>
