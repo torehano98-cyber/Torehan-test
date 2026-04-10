@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Разработка алгоритма</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef4ff, #f8fbff);
+      color: #1f2937;
+    }
+    .container {
+      max-width: 980px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 32px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #4b5563;
+      margin-bottom: 28px;
+      font-size: 18px;
+    }
+    .info-box {
+      background: #f3f7ff;
+      border-left: 6px solid #4f46e5;
+      padding: 16px 18px;
+      border-radius: 12px;
+      margin-bottom: 28px;
+    }
+    .question {
+      margin-bottom: 24px;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #fcfdff;
+    }
+    .question h3 {
+      margin: 0 0 14px 0;
+      font-size: 20px;
+      line-height: 1.4;
+    }
+    .options label {
+      display: block;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .options label:hover {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+    }
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+    pre {
+      background: #111827;
+      color: #f9fafb;
+      padding: 14px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 15px;
+      margin: 12px 0 0 0;
+    }
+    .buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s ease;
+    }
+    .check-btn {
+      background: #4f46e5;
+      color: white;
+    }
+    .check-btn:hover {
+      background: #4338ca;
+    }
+    .reset-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .reset-btn:hover {
+      background: #d1d5db;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 22px;
+      border-radius: 16px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      display: none;
+    }
+    .result h2 {
+      margin-top: 0;
+    }
+    .correct {
+      background: #ecfdf5 !important;
+      border-color: #86efac !important;
+    }
+    .incorrect {
+      background: #fef2f2 !important;
+      border-color: #fca5a5 !important;
+    }
+    .footer-note {
+      margin-top: 24px;
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+    }
+    @media (max-width: 700px) {
+      .container {
+        margin: 16px;
+        padding: 18px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+      .question h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест по информатике</h1>
+    <div class="subtitle">8 класс — тема: «Разработка алгоритма. Циклы и блок-схемы»</div>
+
+    <div class="info-box">
+      <strong>Инструкция:</strong> выбери один правильный ответ в каждом вопросе, затем нажми кнопку <strong>«Проверить тест»</strong>.
+    </div>
+
+    <form id="quizForm">
+
+      <div class="question" data-correct="b">
+        <h3>1. Что такое алгоритм?</h3>
+        <div class="options">
+          <label><input type="radio" name="q1" value="a"> Набор случайных действий</label>
+          <label><input type="radio" name="q1" value="b"> Чёткая последовательность действий для решения задачи</label>
+          <label><input type="radio" name="q1" value="c"> Только компьютерная программа</label>
+          <label><input type="radio" name="q1" value="d"> Таблица данных</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>2. Что такое циклический алгоритм?</h3>
+        <div class="options">
+          <label><input type="radio" name="q2" value="a"> Алгоритм, в котором нет команд</label>
+          <label><input type="radio" name="q2" value="b"> Алгоритм с одним действием</label>
+          <label><input type="radio" name="q2" value="c"> Алгоритм, в котором действия повторяются</label>
+          <label><input type="radio" name="q2" value="d"> Алгоритм только для рисования блок-схем</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>3. Какой цикл обычно используют, если известно количество повторений?</h3>
+        <div class="options">
+          <label><input type="radio" name="q3" value="a"> while</label>
+          <label><input type="radio" name="q3" value="b"> for</label>
+          <label><input type="radio" name="q3" value="c"> if</label>
+          <label><input type="radio" name="q3" value="d"> input</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>4. Какой цикл выполняется, пока условие истинно?</h3>
+        <div class="options">
+          <label><input type="radio" name="q4" value="a"> while</label>
+          <label><input type="radio" name="q4" value="b"> for</label>
+          <label><input type="radio" name="q4" value="c"> print</label>
+          <label><input type="radio" name="q4" value="d"> range</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="d">
+        <h3>5. Какая запись цикла <code>for</code> в Python верная?</h3>
+        <div class="options">
+          <label><input type="radio" name="q5" value="a"> for i to 5</label>
+          <label><input type="radio" name="q5" value="b"> for i = 1 to 5</label>
+          <label><input type="radio" name="q5" value="c"> for(i&lt;5)</label>
+          <label><input type="radio" name="q5" value="d"> for i in range(5):</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>6. Что делает функция <code>range(5)</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q6" value="a"> Создаёт числа от 1 до 5</label>
+          <label><input type="radio" name="q6" value="b"> Создаёт только число 5</label>
+          <label><input type="radio" name="q6" value="c"> Создаёт числа от 0 до 4</label>
+          <label><input type="radio" name="q6" value="d"> Создаёт числа от 0 до 5</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>7. Что такое блок-схема?</h3>
+        <div class="options">
+          <label><input type="radio" name="q7" value="a"> Список команд на Python</label>
+          <label><input type="radio" name="q7" value="b"> Графическое изображение алгоритма</label>
+          <label><input type="radio" name="q7" value="c"> Таблица с числами</label>
+          <label><input type="radio" name="q7" value="d"> Вид цикла</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>8. Какая фигура в блок-схеме обозначает начало и конец?</h3>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a"> Овал</label>
+          <label><input type="radio" name="q8" value="b"> Ромб</label>
+          <label><input type="radio" name="q8" value="c"> Прямоугольник</label>
+          <label><input type="radio" name="q8" value="d"> Стрелка</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>9. Какая фигура в блок-схеме обозначает действие или процесс?</h3>
+        <div class="options">
+          <label><input type="radio" name="q9" value="a"> Овал</label>
+          <label><input type="radio" name="q9" value="b"> Ромб</label>
+          <label><input type="radio" name="q9" value="c"> Прямоугольник</label>
+          <label><input type="radio" name="q9" value="d"> Треугольник</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>10. Какая фигура в блок-схеме обозначает условие?</h3>
+        <div class="options">
+          <label><input type="radio" name="q10" value="a"> Прямоугольник</label>
+          <label><input type="radio" name="q10" value="b"> Ромб</label>
+          <label><input type="radio" name="q10" value="c"> Овал</label>
+          <label><input type="radio" name="q10" value="d"> Линия</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="d">
+        <h3>11. Что обозначает стрелка в блок-схеме?</h3>
+        <div class="options">
+          <label><input type="radio" name="q11" value="a"> Название программы</label>
+          <label><input type="radio" name="q11" value="b"> Проверку ошибки</label>
+          <label><input type="radio" name="q11" value="c"> Фигуру условия</label>
+          <label><input type="radio" name="q11" value="d"> Направление выполнения алгоритма</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>12. Сколько раз выполнится цикл?</h3>
+        <pre>for i in range(3):
+    print(i)</pre>
+        <div class="options">
+          <label><input type="radio" name="q12" value="a"> 2 раза</label>
+          <label><input type="radio" name="q12" value="b"> 3 раза</label>
+          <label><input type="radio" name="q12" value="c"> 4 раза</label>
+          <label><input type="radio" name="q12" value="d"> Бесконечно</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>13. Что выведет программа?</h3>
+        <pre>i = 1
+while i &lt; 4:
+    print(i)
+    i = i + 1</pre>
+        <div class="options">
+          <label><input type="radio" name="q13" value="a"> 1 2 3</label>
+          <label><input type="radio" name="q13" value="b"> 1 2 3 4</label>
+          <label><input type="radio" name="q13" value="c"> 0 1 2 3</label>
+          <label><input type="radio" name="q13" value="d"> Ничего не выведет</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>14. Что будет результатом выполнения программы?</h3>
+        <pre>s = 0
+for i in range(1, 4):
+    s = s + i
+print(s)</pre>
+        <div class="options">
+          <label><input type="radio" name="q14" value="a"> 3</label>
+          <label><input type="radio" name="q14" value="b"> 4</label>
+          <label><input type="radio" name="q14" value="c"> 6</label>
+          <label><input type="radio" name="q14" value="d"> 10</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>15. Какой алгоритм лучше всего подойдёт для вывода чисел от 1 до 10?</h3>
+        <div class="options">
+          <label><input type="radio" name="q15" value="a"> Циклический алгоритм</label>
+          <label><input type="radio" name="q15" value="b"> Линейный алгоритм без повторений</label>
+          <label><input type="radio" name="q15" value="c"> Только алгоритм с ветвлением</label>
+          <label><input type="radio" name="q15" value="d"> Алгоритм без команд</label>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button type="button" class="check-btn" onclick="checkQuiz()">Проверить тест</button>
+        <button type="reset" class="reset-btn" onclick="resetQuiz()">Сбросить</button>
+      </div>
+    </form>
+
+    <div class="result" id="resultBox">
+      <h2 id="scoreText"></h2>
+      <p id="gradeText"></p>
+    </div>
+
+    <div class="footer-note">
+      Готовый HTML-файл можно загрузить на GitHub Pages или открыть в браузере локально.
+    </div>
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const questions = document.querySelectorAll('.question');
+      let score = 0;
+      let answered = 0;
+
+      questions.forEach((question, index) => {
+        const correct = question.dataset.correct;
+        const selected = question.querySelector(`input[name="q${index + 1}"]:checked`);
+        const labels = question.querySelectorAll('label');
+
+        labels.forEach(label => {
+          label.classList.remove('correct', 'incorrect');
+        });
+
+        if (selected) {
+          answered++;
+          const parentLabel = selected.parentElement;
+          if (selected.value === correct) {
+            score++;
+            parentLabel.classList.add('correct');
+          } else {
+            parentLabel.classList.add('incorrect');
+            const correctInput = question.querySelector(`input[value="${correct}"]`);
+            if (correctInput) {
+              correctInput.parentElement.classList.add('correct');
+            }
+          }
+        }
+      });
+
+      const resultBox = document.getElementById('resultBox');
+      const scoreText = document.getElementById('scoreText');
+      const gradeText = document.getElementById('gradeText');
+
+      let gradeMessage = '';
+      if (score >= 13) {
+        gradeMessage = 'Отличный результат! Ты хорошо понял тему.';
+      } else if (score >= 10) {
+        gradeMessage = 'Хороший результат! Но есть ещё что повторить.';
+      } else if (score >= 7) {
+        gradeMessage = 'Неплохо, но тему стоит закрепить.';
+      } else {
+        gradeMessage = 'Нужно ещё потренироваться по теме циклов и блок-схем.';
+      }
+
+      resultBox.style.display = 'block';
+      scoreText.textContent = `Твой результат: ${score} из ${questions.length}`;
+      gradeText.textContent = answered < questions.length
+        ? `${gradeMessage} Также обрати внимание: не на все вопросы был дан ответ.`
+        : gradeMessage;
+
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('label').forEach(label => {
+        label.classList.remove('correct', 'incorrect');
+      });
+      document.getElementById('resultBox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
