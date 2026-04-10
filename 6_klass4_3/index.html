@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Гиперссылки</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef6ff, #f9fbff);
+      color: #1f2937;
+    }
+    .container {
+      max-width: 950px;
+      margin: 36px auto;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 34px;
+    }
+    .subtitle {
+      text-align: center;
+      margin-top: 10px;
+      color: #4b5563;
+      font-size: 18px;
+    }
+    .note {
+      margin: 24px 0 28px;
+      padding: 16px 18px;
+      background: #eff6ff;
+      border-left: 6px solid #2563eb;
+      border-radius: 12px;
+      line-height: 1.5;
+    }
+    .question {
+      margin-bottom: 22px;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #fcfdff;
+    }
+    .question h3 {
+      margin: 0 0 14px 0;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+    .options label {
+      display: block;
+      margin: 10px 0;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .options label:hover {
+      background: #eef4ff;
+      border-color: #bfdbfe;
+    }
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.08);
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+    button {
+      border: none;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .check-btn {
+      background: #2563eb;
+      color: white;
+    }
+    .check-btn:hover {
+      background: #1d4ed8;
+    }
+    .reset-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .reset-btn:hover {
+      background: #d1d5db;
+    }
+    .result {
+      display: none;
+      margin-top: 28px;
+      padding: 22px;
+      border-radius: 16px;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+    }
+    .result h2 {
+      margin-top: 0;
+    }
+    .correct {
+      background: #ecfdf5 !important;
+      border-color: #86efac !important;
+    }
+    .incorrect {
+      background: #fef2f2 !important;
+      border-color: #fca5a5 !important;
+    }
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) {
+      .container {
+        margin: 14px;
+        padding: 18px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      .question h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест по теме «Гиперссылка»</h1>
+    <div class="subtitle">MS Word • 10 вопросов</div>
+
+    <div class="note">
+      <strong>Инструкция:</strong> выбери один правильный ответ в каждом вопросе и нажми <strong>«Проверить тест»</strong>.
+    </div>
+
+    <form id="quizForm">
+
+      <div class="question" data-correct="b">
+        <h3>1. Что такое гиперссылка?</h3>
+        <div class="options">
+          <label><input type="radio" name="q1" value="a"> Обычный текст без действий</label>
+          <label><input type="radio" name="q1" value="b"> Элемент документа, при нажатии на который происходит переход</label>
+          <label><input type="radio" name="q1" value="c"> Только изображение в документе</label>
+          <label><input type="radio" name="q1" value="d"> Название файла</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>2. Куда может вести гиперссылка?</h3>
+        <div class="options">
+          <label><input type="radio" name="q2" value="a"> Только на сайт</label>
+          <label><input type="radio" name="q2" value="b"> Только на файл</label>
+          <label><input type="radio" name="q2" value="c"> На сайт, файл или другое место в документе</label>
+          <label><input type="radio" name="q2" value="d"> Только на рисунок</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>3. Какой вид гиперссылки открывает страницу в интернете?</h3>
+        <div class="options">
+          <label><input type="radio" name="q3" value="a"> Ссылка на сайт</label>
+          <label><input type="radio" name="q3" value="b"> Ссылка на таблицу</label>
+          <label><input type="radio" name="q3" value="c"> Ссылка на рисунок</label>
+          <label><input type="radio" name="q3" value="d"> Ссылка на абзац</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="d">
+        <h3>4. Как выглядит гиперссылка в документе чаще всего?</h3>
+        <div class="options">
+          <label><input type="radio" name="q4" value="a"> Красный жирный текст</label>
+          <label><input type="radio" name="q4" value="b"> Зелёный курсив</label>
+          <label><input type="radio" name="q4" value="c"> Чёрный текст без изменений</label>
+          <label><input type="radio" name="q4" value="d"> Синий подчёркнутый текст</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>5. Как можно создать гиперссылку первым способом в MS Word?</h3>
+        <div class="options">
+          <label><input type="radio" name="q5" value="a"> Выделить текст → удалить его</label>
+          <label><input type="radio" name="q5" value="b"> Выделить текст → ПКМ → «Гиперссылка» → вставить ссылку → ОК</label>
+          <label><input type="radio" name="q5" value="c"> Нажать Esc → Enter</label>
+          <label><input type="radio" name="q5" value="d"> Просто напечатать слово «ссылка»</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>6. Какой второй способ добавления гиперссылки указан в презентации?</h3>
+        <div class="options">
+          <label><input type="radio" name="q6" value="a"> Вкладка «Вставка» → «Ссылка» / «Гиперссылка»</label>
+          <label><input type="radio" name="q6" value="b"> Вкладка «Главная» → «Шрифт»</label>
+          <label><input type="radio" name="q6" value="c"> Вкладка «Файл» → «Печать»</label>
+          <label><input type="radio" name="q6" value="d"> Вкладка «Вид» → «Масштаб»</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="c">
+        <h3>7. Для чего нужна ссылка на файл?</h3>
+        <div class="options">
+          <label><input type="radio" name="q7" value="a"> Чтобы изменить цвет текста</label>
+          <label><input type="radio" name="q7" value="b"> Чтобы вставить картинку</label>
+          <label><input type="radio" name="q7" value="c"> Чтобы открыть другой документ</label>
+          <label><input type="radio" name="q7" value="d"> Чтобы удалить страницу</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="b">
+        <h3>8. Что делает ссылка внутри документа?</h3>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a"> Закрывает программу</label>
+          <label><input type="radio" name="q8" value="b"> Переводит к нужному месту в документе</label>
+          <label><input type="radio" name="q8" value="c"> Меняет шрифт текста</label>
+          <label><input type="radio" name="q8" value="d"> Печатает документ</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="d">
+        <h3>9. Что нужно сделать после вставки адреса или пути, чтобы завершить создание гиперссылки?</h3>
+        <div class="options">
+          <label><input type="radio" name="q9" value="a"> Нажать Delete</label>
+          <label><input type="radio" name="q9" value="b"> Закрыть Word</label>
+          <label><input type="radio" name="q9" value="c"> Нажать Backspace</label>
+          <label><input type="radio" name="q9" value="d"> Нажать ОК</label>
+        </div>
+      </div>
+
+      <div class="question" data-correct="a">
+        <h3>10. Как понять, что к тексту или объекту добавилась гиперссылка?</h3>
+        <div class="options">
+          <label><input type="radio" name="q10" value="a"> Текст становится синим и подчёркнутым</label>
+          <label><input type="radio" name="q10" value="b"> Текст исчезает</label>
+          <label><input type="radio" name="q10" value="c"> Страница становится пустой</label>
+          <label><input type="radio" name="q10" value="d"> Документ автоматически печатается</label>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button type="button" class="check-btn" onclick="checkQuiz()">Проверить тест</button>
+        <button type="reset" class="reset-btn" onclick="resetQuiz()">Сбросить</button>
+      </div>
+    </form>
+
+    <div class="result" id="resultBox">
+      <h2 id="scoreText"></h2>
+      <p id="gradeText"></p>
+    </div>
+
+    <div class="footer">
+      HTML-файл можно загрузить на GitHub Pages или открыть в любом браузере.
+    </div>
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const questions = document.querySelectorAll('.question');
+      let score = 0;
+      let answered = 0;
+
+      questions.forEach((question, index) => {
+        const correct = question.dataset.correct;
+        const selected = question.querySelector(`input[name="q${index + 1}"]:checked`);
+        const labels = question.querySelectorAll('label');
+
+        labels.forEach(label => {
+          label.classList.remove('correct', 'incorrect');
+        });
+
+        if (selected) {
+          answered++;
+          if (selected.value === correct) {
+            score++;
+            selected.parentElement.classList.add('correct');
+          } else {
+            selected.parentElement.classList.add('incorrect');
+            const correctInput = question.querySelector(`input[value="${correct}"]`);
+            if (correctInput) {
+              correctInput.parentElement.classList.add('correct');
+            }
+          }
+        }
+      });
+
+      const resultBox = document.getElementById('resultBox');
+      const scoreText = document.getElementById('scoreText');
+      const gradeText = document.getElementById('gradeText');
+
+      let message = '';
+      if (score === 10) {
+        message = 'Отлично! Все ответы верные.';
+      } else if (score >= 8) {
+        message = 'Очень хороший результат!';
+      } else if (score >= 6) {
+        message = 'Хорошо, но можно ещё повторить тему.';
+      } else {
+        message = 'Тему стоит ещё раз повторить.';
+      }
+
+      if (answered < questions.length) {
+        message += ' Обрати внимание: ты ответил не на все вопросы.';
+      }
+
+      scoreText.textContent = `Твой результат: ${score} из ${questions.length}`;
+      gradeText.textContent = message;
+      resultBox.style.display = 'block';
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('label').forEach(label => {
+        label.classList.remove('correct', 'incorrect');
+      });
+      document.getElementById('resultBox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
