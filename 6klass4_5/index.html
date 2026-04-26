@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Авторское право и плагиат</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #222;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1f4e79;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    .student-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .student-info input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cfd8e3;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .question {
+      background: #f9fbff;
+      border: 1px solid #dbe7f3;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .question h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #163a5f;
+    }
+
+    .option {
+      display: block;
+      margin: 8px 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      background: #eef5ff;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .check-btn {
+      background: #1f7a1f;
+      color: white;
+    }
+
+    .reset-btn {
+      background: #c0392b;
+      color: white;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 14px;
+      background: #eef8ee;
+      border: 1px solid #cfe8cf;
+      display: none;
+    }
+
+    .result h2 {
+      margin-top: 0;
+      color: #1b5e20;
+    }
+
+    .details {
+      margin-top: 12px;
+      padding-left: 20px;
+    }
+
+    .correct {
+      color: #1b5e20;
+      font-weight: bold;
+    }
+
+    .incorrect {
+      color: #b71c1c;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px;
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .question h3 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест: «Авторское право и плагиат»</h1>
+    <p class="subtitle">Для учеников 6 класса</p>
+
+    <div class="student-info">
+      <input type="text" id="studentName" placeholder="Ф.И. ученика" />
+      <input type="text" id="studentClass" placeholder="Класс" />
+      <input type="date" id="testDate" />
+    </div>
+
+    <form id="quizForm">
+      <div class="question">
+        <h3>1. Что такое авторское право?</h3>
+        <label class="option"><input type="radio" name="q1" value="A"> A) Право на покупку книг</label>
+        <label class="option"><input type="radio" name="q1" value="B"> B) Право автора на своё произведение</label>
+        <label class="option"><input type="radio" name="q1" value="C"> C) Право на использование интернета</label>
+        <label class="option"><input type="radio" name="q1" value="D"> D) Право на скачивание файлов</label>
+      </div>
+
+      <div class="question">
+        <h3>2. Кто считается автором?</h3>
+        <label class="option"><input type="radio" name="q2" value="A"> A) Тот, кто купил произведение</label>
+        <label class="option"><input type="radio" name="q2" value="B"> B) Тот, кто его придумал и создал</label>
+        <label class="option"><input type="radio" name="q2" value="C"> C) Тот, кто его переписал</label>
+        <label class="option"><input type="radio" name="q2" value="D"> D) Любой человек</label>
+      </div>
+
+      <div class="question">
+        <h3>3. Что такое плагиат?</h3>
+        <label class="option"><input type="radio" name="q3" value="A"> A) Помощь другу</label>
+        <label class="option"><input type="radio" name="q3" value="B"> B) Копирование чужой работы без указания автора</label>
+        <label class="option"><input type="radio" name="q3" value="C"> C) Работа в группе</label>
+        <label class="option"><input type="radio" name="q3" value="D"> D) Создание собственного проекта</label>
+      </div>
+
+      <div class="question">
+        <h3>4. Можно ли копировать текст из интернета и выдавать за свой?</h3>
+        <label class="option"><input type="radio" name="q4" value="A"> A) Да</label>
+        <label class="option"><input type="radio" name="q4" value="B"> B) Иногда</label>
+        <label class="option"><input type="radio" name="q4" value="C"> C) Нет</label>
+        <label class="option"><input type="radio" name="q4" value="D"> D) Только в школе</label>
+      </div>
+
+      <div class="question">
+        <h3>5. Что нужно сделать, если используешь чужую информацию?</h3>
+        <label class="option"><input type="radio" name="q5" value="A"> A) Ничего</label>
+        <label class="option"><input type="radio" name="q5" value="B"> B) Указать источник</label>
+        <label class="option"><input type="radio" name="q5" value="C"> C) Стереть имя автора</label>
+        <label class="option"><input type="radio" name="q5" value="D"> D) Сказать устно</label>
+      </div>
+
+      <div class="question">
+        <h3>6. Что защищает авторское право?</h3>
+        <label class="option"><input type="radio" name="q6" value="A"> A) Только книги</label>
+        <label class="option"><input type="radio" name="q6" value="B"> B) Только музыку</label>
+        <label class="option"><input type="radio" name="q6" value="C"> C) Книги, музыку, фильмы, рисунки</label>
+        <label class="option"><input type="radio" name="q6" value="D"> D) Только интернет</label>
+      </div>
+
+      <div class="question">
+        <h3>7. Можно ли использовать чужую картинку без разрешения?</h3>
+        <label class="option"><input type="radio" name="q7" value="A"> A) Да</label>
+        <label class="option"><input type="radio" name="q7" value="B"> B) Нет</label>
+        <label class="option"><input type="radio" name="q7" value="C"> C) Только ночью</label>
+        <label class="option"><input type="radio" name="q7" value="D"> D) Только в школе</label>
+      </div>
+
+      <div class="question">
+        <h3>8. Что является примером плагиата?</h3>
+        <label class="option"><input type="radio" name="q8" value="A"> A) Сам написал сочинение</label>
+        <label class="option"><input type="radio" name="q8" value="B"> B) Скопировал текст и не указал автора</label>
+        <label class="option"><input type="radio" name="q8" value="C"> C) Сделал проект с другом</label>
+        <label class="option"><input type="radio" name="q8" value="D"> D) Нарисовал рисунок</label>
+      </div>
+
+      <div class="question">
+        <h3>9. Если ты указал автора, это уже не плагиат?</h3>
+        <label class="option"><input type="radio" name="q9" value="A"> A) Да</label>
+        <label class="option"><input type="radio" name="q9" value="B"> B) Нет</label>
+        <label class="option"><input type="radio" name="q9" value="C"> C) Иногда</label>
+        <label class="option"><input type="radio" name="q9" value="D"> D) Не знаю</label>
+      </div>
+
+      <div class="question">
+        <h3>10. Можно ли скачать музыку бесплатно без разрешения автора?</h3>
+        <label class="option"><input type="radio" name="q10" value="A"> A) Да</label>
+        <label class="option"><input type="radio" name="q10" value="B"> B) Нет</label>
+        <label class="option"><input type="radio" name="q10" value="C"> C) Иногда можно</label>
+        <label class="option"><input type="radio" name="q10" value="D"> D) Только детям</label>
+      </div>
+
+      <div class="question">
+        <h3>11. Что такое источник информации?</h3>
+        <label class="option"><input type="radio" name="q11" value="A"> A) Телефон</label>
+        <label class="option"><input type="radio" name="q11" value="B"> B) Место, откуда взята информация</label>
+        <label class="option"><input type="radio" name="q11" value="C"> C) Учитель</label>
+        <label class="option"><input type="radio" name="q11" value="D"> D) Интернет</label>
+      </div>
+
+      <div class="question">
+        <h3>12. Нужно ли указывать источник при использовании информации?</h3>
+        <label class="option"><input type="radio" name="q12" value="A"> A) Да</label>
+        <label class="option"><input type="radio" name="q12" value="B"> B) Нет</label>
+        <label class="option"><input type="radio" name="q12" value="C"> C) Только иногда</label>
+        <label class="option"><input type="radio" name="q12" value="D"> D) Только взрослым</label>
+      </div>
+
+      <div class="question">
+        <h3>13. Что произойдёт, если нарушать авторское право?</h3>
+        <label class="option"><input type="radio" name="q13" value="A"> A) Ничего</label>
+        <label class="option"><input type="radio" name="q13" value="B"> B) Можно получить наказание</label>
+        <label class="option"><input type="radio" name="q13" value="C"> C) Будет весело</label>
+        <label class="option"><input type="radio" name="q13" value="D"> D) Получишь подарок</label>
+      </div>
+
+      <div class="question">
+        <h3>14. Что из этого является правильным?</h3>
+        <label class="option"><input type="radio" name="q14" value="A"> A) Копировать всё подряд</label>
+        <label class="option"><input type="radio" name="q14" value="B"> B) Использовать чужие работы без разрешения</label>
+        <label class="option"><input type="radio" name="q14" value="C"> C) Создавать своё или указывать автора</label>
+        <label class="option"><input type="radio" name="q14" value="D"> D) Списывать у друзей</label>
+      </div>
+
+      <div class="question">
+        <h3>15. Как избежать плагиата?</h3>
+        <label class="option"><input type="radio" name="q15" value="A"> A) Копировать быстрее</label>
+        <label class="option"><input type="radio" name="q15" value="B"> B) Делать всё самому или указывать источник</label>
+        <label class="option"><input type="radio" name="q15" value="C"> C) Списывать</label>
+        <label class="option"><input type="radio" name="q15" value="D"> D) Игнорировать правила</label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="check-btn" onclick="checkQuiz()">Проверить результат</button>
+        <button type="reset" class="reset-btn" onclick="resetResult()">Сбросить</button>
+      </div>
+    </form>
+
+    <div class="result" id="resultBox">
+      <h2 id="scoreText"></h2>
+      <div id="gradeText"></div>
+      <ol class="details" id="detailsList"></ol>
+    </div>
+
+    <div class="footer-note">
+      HTML-тест готов для загрузки на GitHub Pages
+    </div>
+  </div>
+
+  <script>
+    const answers = {
+      q1: "B",
+      q2: "B",
+      q3: "B",
+      q4: "C",
+      q5: "B",
+      q6: "C",
+      q7: "B",
+      q8: "B",
+      q9: "A",
+      q10: "B",
+      q11: "B",
+      q12: "A",
+      q13: "B",
+      q14: "C",
+      q15: "B"
+    };
+
+    function checkQuiz() {
+      let score = 0;
+      const detailsList = document.getElementById("detailsList");
+      const resultBox = document.getElementById("resultBox");
+      const scoreText = document.getElementById("scoreText");
+      const gradeText = document.getElementById("gradeText");
+
+      detailsList.innerHTML = "";
+
+      for (let key in answers) {
+        const selected = document.querySelector(`input[name="${key}"]:checked`);
+        const item = document.createElement("li");
+
+        if (selected) {
+          if (selected.value === answers[key]) {
+            score++;
+            item.innerHTML = `Вопрос ${key.substring(1)} — <span class="correct">верно</span>`;
+          } else {
+            item.innerHTML = `Вопрос ${key.substring(1)} — <span class="incorrect">неверно</span> (правильный ответ: ${answers[key]})`;
+          }
+        } else {
+          item.innerHTML = `Вопрос ${key.substring(1)} — <span class="incorrect">нет ответа</span> (правильный ответ: ${answers[key]})`;
+        }
+
+        detailsList.appendChild(item);
+      }
+
+      let grade = "";
+      if (score === 15) {
+        grade = "Отличный результат!";
+      } else if (score >= 12) {
+        grade = "Очень хорошо!";
+      } else if (score >= 9) {
+        grade = "Хороший результат!";
+      } else if (score >= 6) {
+        grade = "Нужно ещё немного повторить тему.";
+      } else {
+        grade = "Стоит повторить тему ещё раз.";
+      }
+
+      scoreText.textContent = `Ваш результат: ${score} из 15`;
+      gradeText.textContent = grade;
+      resultBox.style.display = "block";
+      resultBox.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function resetResult() {
+      document.getElementById("resultBox").style.display = "none";
+      document.getElementById("detailsList").innerHTML = "";
+      document.getElementById("scoreText").textContent = "";
+      document.getElementById("gradeText").textContent = "";
+    }
+
+    document.getElementById("testDate").valueAsDate = new Date();
+  </script>
+</body>
+</html>
