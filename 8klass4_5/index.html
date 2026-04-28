@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Повторение циклов for и while</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Trebuchet MS', Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,180,.45), transparent 22%),
+        radial-gradient(circle at 90% 20%, rgba(190,255,120,.35), transparent 18%),
+        linear-gradient(135deg, #183d18, #5f8f28 45%, #244d21);
+      color: #18330f;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .swamp-bubbles span {
+      position: fixed;
+      bottom: -80px;
+      width: 28px;
+      height: 28px;
+      background: rgba(207, 255, 118, .25);
+      border: 2px solid rgba(255,255,255,.25);
+      border-radius: 50%;
+      animation: bubble 11s linear infinite;
+      z-index: 0;
+    }
+    .swamp-bubbles span:nth-child(1){left: 8%; animation-delay: 0s; width: 18px; height: 18px;}
+    .swamp-bubbles span:nth-child(2){left: 22%; animation-delay: 2s;}
+    .swamp-bubbles span:nth-child(3){left: 40%; animation-delay: 4s; width: 42px; height: 42px;}
+    .swamp-bubbles span:nth-child(4){left: 63%; animation-delay: 1s; width: 20px; height: 20px;}
+    .swamp-bubbles span:nth-child(5){left: 84%; animation-delay: 3s; width: 34px; height: 34px;}
+    @keyframes bubble {
+      0% { transform: translateY(0) scale(1); opacity: .4; }
+      70% { opacity: .7; }
+      100% { transform: translateY(-115vh) scale(1.6); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #f9e8a6, #cce76d);
+      border: 6px solid #3d611a;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 18px 0 rgba(39, 60, 18, .55), 0 22px 35px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -70px;
+      top: -80px;
+      background: rgba(78, 128, 31, .25);
+      border-radius: 50%;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 52px);
+      color: #2c4b13;
+      text-shadow: 2px 2px 0 #fff7b1;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      margin: 12px 0 0;
+      max-width: 750px;
+    }
+
+    .characters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 26px 0;
+    }
+
+    .character {
+      background: rgba(255, 247, 177, .92);
+      border: 4px solid #385c19;
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 8px 0 rgba(37, 63, 17, .55);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .face {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #8dc63f;
+      border: 4px solid #2f5414;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .face::before, .face::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #8dc63f;
+      border: 4px solid #2f5414;
+      border-radius: 50% 50% 0 50%;
+      top: -10px;
+    }
+    .face::before { left: -12px; transform: rotate(-25deg); }
+    .face::after { right: -12px; transform: rotate(115deg); }
+    .eyes {
+      position: absolute;
+      top: 24px;
+      left: 15px;
+      letter-spacing: 8px;
+      font-size: 18px;
+    }
+    .smile {
+      position: absolute;
+      top: 43px;
+      left: 23px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .donkey, .dragon {
+      font-size: 58px;
+      filter: drop-shadow(2px 4px 0 rgba(0,0,0,.2));
+    }
+
+    .info-box {
+      background: rgba(231, 255, 155, .92);
+      border-left: 10px solid #314f17;
+      padding: 16px 20px;
+      border-radius: 18px;
+      margin-bottom: 22px;
+      font-size: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.2);
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .question {
+      background: rgba(255, 250, 211, .96);
+      border: 4px solid #3b601b;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 10px 0 rgba(37, 63, 17, .55);
+      position: relative;
+    }
+
+    .question::after {
+      content: "🌿";
+      position: absolute;
+      right: 18px;
+      top: 12px;
+      font-size: 28px;
+    }
+
+    .question h3 {
+      margin: 0 34px 14px 0;
+      font-size: 21px;
+      color: #243f10;
+    }
+
+    pre {
+      background: #162914;
+      color: #d7ff85;
+      padding: 14px;
+      border-radius: 14px;
+      overflow-x: auto;
+      border: 3px solid #4e7a22;
+      font-size: 16px;
+    }
+
+    label {
+      display: block;
+      background: #f7f0b9;
+      border: 2px solid #b5c65d;
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin: 9px 0;
+      cursor: pointer;
+      transition: .2s;
+    }
+    label:hover {
+      transform: translateX(5px);
+      background: #e2f49b;
+      border-color: #557b22;
+    }
+    input[type="radio"] { transform: scale(1.15); margin-right: 8px; }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 26px 0;
+    }
+
+    button {
+      border: none;
+      border-radius: 18px;
+      padding: 15px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #17310b;
+      background: linear-gradient(135deg, #f7df6e, #9dd13c);
+      border: 4px solid #314f17;
+      box-shadow: 0 7px 0 #243f10;
+      transition: .15s;
+    }
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(5px); box-shadow: 0 2px 0 #243f10; }
+
+    #result {
+      display: none;
+      background: #fff6bd;
+      border: 6px solid #314f17;
+      border-radius: 26px;
+      padding: 24px;
+      font-size: 22px;
+      text-align: center;
+      box-shadow: 0 12px 0 rgba(37, 63, 17, .55);
+    }
+
+    .correct { background: #d8ffac !important; border-color: #2e891b !important; }
+    .wrong { background: #ffd0c8 !important; border-color: #c63b2b !important; }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #fff7bd;
+      font-size: 16px;
+      text-shadow: 1px 2px 2px #000;
+    }
+
+    @media (max-width: 760px) {
+      .characters { grid-template-columns: 1fr; }
+      header { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="swamp-bubbles"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="container">
+    <header>
+      <h1>🧅 Болотный тест по циклам</h1>
+      <p class="subtitle">Тема: <b>«Повторение циклов for и while»</b>. Помоги сказочным героям выбраться из болота программирования!</p>
+    </header>
+
+    <section class="characters">
+      <div class="character">
+        <div class="face"><div class="eyes">• •</div><div class="smile">⌣</div></div>
+        <div><b>Огр-программист</b><br>Следит за синтаксисом циклов.</div>
+      </div>
+      <div class="character">
+        <div class="donkey">🫏</div>
+        <div><b>Весёлый ослик</b><br>Проверяет результаты программ.</div>
+      </div>
+      <div class="character">
+        <div class="dragon">🐉</div>
+        <div><b>Дракон-хранитель</b><br>Охраняет правильные ответы.</div>
+      </div>
+    </section>
+
+    <div class="info-box">Выбери один правильный ответ в каждом вопросе. В конце нажми кнопку <b>«Проверить тест»</b>.</div>
+
+    <form id="quizForm">
+      <div class="question"><h3>1. Какой цикл используется, если заранее известно количество повторений?</h3>
+        <label><input type="radio" name="q1" value="A">A) while</label>
+        <label><input type="radio" name="q1" value="B">B) for</label>
+        <label><input type="radio" name="q1" value="C">C) if</label>
+        <label><input type="radio" name="q1" value="D">D) input</label>
+      </div>
+
+      <div class="question"><h3>2. Как правильно записать цикл for в Python?</h3>
+        <label><input type="radio" name="q2" value="A">A) for i = 1 to 10</label>
+        <label><input type="radio" name="q2" value="B">B) for i in range(10):</label>
+        <label><input type="radio" name="q2" value="C">C) for (i &lt; 10)</label>
+        <label><input type="radio" name="q2" value="D">D) for i from 1 to 10</label>
+      </div>
+
+      <div class="question"><h3>3. Что делает функция range(5)?</h3>
+        <label><input type="radio" name="q3" value="A">A) Генерирует числа от 1 до 5</label>
+        <label><input type="radio" name="q3" value="B">B) Генерирует числа от 0 до 5</label>
+        <label><input type="radio" name="q3" value="C">C) Генерирует числа от 0 до 4</label>
+        <label><input type="radio" name="q3" value="D">D) Генерирует числа от 1 до 4</label>
+      </div>
+
+      <div class="question"><h3>4. Какой цикл выполняется, пока условие истинно?</h3>
+        <label><input type="radio" name="q4" value="A">A) for</label>
+        <label><input type="radio" name="q4" value="B">B) while</label>
+        <label><input type="radio" name="q4" value="C">C) if</label>
+        <label><input type="radio" name="q4" value="D">D) print</label>
+      </div>
+
+      <div class="question"><h3>5. Что произойдет, если в цикле while условие всегда истинно?</h3>
+        <label><input type="radio" name="q5" value="A">A) Ошибка синтаксиса</label>
+        <label><input type="radio" name="q5" value="B">B) Цикл выполнится один раз</label>
+        <label><input type="radio" name="q5" value="C">C) Бесконечный цикл</label>
+        <label><input type="radio" name="q5" value="D">D) Программа сама исправит ошибку</label>
+      </div>
+
+      <div class="question"><h3>6. Что выведет программа?</h3><pre>for i in range(3):
+    print(i)</pre>
+        <label><input type="radio" name="q6" value="A">A) 1 2 3</label>
+        <label><input type="radio" name="q6" value="B">B) 0 1 2</label>
+        <label><input type="radio" name="q6" value="C">C) 0 1 2 3</label>
+        <label><input type="radio" name="q6" value="D">D) 1 2</label>
+      </div>
+
+      <div class="question"><h3>7. Что выведет программа?</h3><pre>i = 1
+while i &lt;= 3:
+    print(i)
+    i += 1</pre>
+        <label><input type="radio" name="q7" value="A">A) 1 2 3</label>
+        <label><input type="radio" name="q7" value="B">B) 0 1 2</label>
+        <label><input type="radio" name="q7" value="C">C) 1 2 3 4</label>
+        <label><input type="radio" name="q7" value="D">D) Бесконечный цикл</label>
+      </div>
+
+      <div class="question"><h3>8. Что выведет программа?</h3><pre>for i in range(1, 5):
+    print(i)</pre>
+        <label><input type="radio" name="q8" value="A">A) 1 2 3 4</label>
+        <label><input type="radio" name="q8" value="B">B) 1 2 3 4 5</label>
+        <label><input type="radio" name="q8" value="C">C) 0 1 2 3 4</label>
+        <label><input type="radio" name="q8" value="D">D) 2 3 4</label>
+      </div>
+
+      <div class="question"><h3>9. Что выведет программа?</h3><pre>i = 0
+while i &lt; 3:
+    print(i)
+    i += 2</pre>
+        <label><input type="radio" name="q9" value="A">A) 0 1 2</label>
+        <label><input type="radio" name="q9" value="B">B) 0 2</label>
+        <label><input type="radio" name="q9" value="C">C) 1 3</label>
+        <label><input type="radio" name="q9" value="D">D) 0 2 4</label>
+      </div>
+
+      <div class="question"><h3>10. Что выведет программа?</h3><pre>for i in range(2, 8, 2):
+    print(i)</pre>
+        <label><input type="radio" name="q10" value="A">A) 2 4 6</label>
+        <label><input type="radio" name="q10" value="B">B) 2 4 6 8</label>
+        <label><input type="radio" name="q10" value="C">C) 2 3 4 5 6 7</label>
+        <label><input type="radio" name="q10" value="D">D) 4 6 8</label>
+      </div>
+
+      <div class="question"><h3>11. Заполни пропуск, чтобы вывести числа от 0 до 4:</h3><pre>for i in ______:
+    print(i)</pre>
+        <label><input type="radio" name="q11" value="A">A) range(5)</label>
+        <label><input type="radio" name="q11" value="B">B) range(1, 5)</label>
+        <label><input type="radio" name="q11" value="C">C) range(0, 6)</label>
+        <label><input type="radio" name="q11" value="D">D) range(1, 6)</label>
+      </div>
+
+      <div class="question"><h3>12. Заполни пропуск:</h3><pre>i = 1
+while i &lt;= 5:
+    print(i)
+    ______</pre>
+        <label><input type="radio" name="q12" value="A">A) i = i</label>
+        <label><input type="radio" name="q12" value="B">B) i + 1</label>
+        <label><input type="radio" name="q12" value="C">C) i += 1</label>
+        <label><input type="radio" name="q12" value="D">D) i == 1</label>
+      </div>
+
+      <div class="question"><h3>13. Заполни пропуск, чтобы остановить цикл при i = 5:</h3><pre>for i in range(10):
+    if i == 5:
+        ______
+    print(i)</pre>
+        <label><input type="radio" name="q13" value="A">A) stop</label>
+        <label><input type="radio" name="q13" value="B">B) break</label>
+        <label><input type="radio" name="q13" value="C">C) exit</label>
+        <label><input type="radio" name="q13" value="D">D) continue</label>
+      </div>
+
+      <div class="question"><h3>14. Заполни пропуск, чтобы вывести числа от 0 до 4:</h3><pre>i = 0
+while ______:
+    print(i)
+    i += 1</pre>
+        <label><input type="radio" name="q14" value="A">A) i &gt; 5</label>
+        <label><input type="radio" name="q14" value="B">B) i &lt; 5</label>
+        <label><input type="radio" name="q14" value="C">C) i == 5</label>
+        <label><input type="radio" name="q14" value="D">D) i != 0</label>
+      </div>
+
+      <div class="question"><h3>15. Заполни пропуск, чтобы вывести значение i:</h3><pre>for i in range(3):
+    ______</pre>
+        <label><input type="radio" name="q15" value="A">A) input(i)</label>
+        <label><input type="radio" name="q15" value="B">B) print(i)</label>
+        <label><input type="radio" name="q15" value="C">C) i += 1</label>
+        <label><input type="radio" name="q15" value="D">D) return i</label>
+      </div>
+    </form>
+
+    <div class="buttons">
+      <button type="button" onclick="checkQuiz()">🧅 Проверить тест</button>
+      <button type="button" onclick="resetQuiz()">🔄 Пройти заново</button>
+    </div>
+
+    <div id="result"></div>
+
+    <footer>Болотная академия Python • 8 класс • Циклы for и while</footer>
+  </div>
+
+  <script>
+    const answers = {
+      q1: 'B', q2: 'B', q3: 'C', q4: 'B', q5: 'C',
+      q6: 'B', q7: 'A', q8: 'A', q9: 'B', q10: 'A',
+      q11: 'A', q12: 'C', q13: 'B', q14: 'B', q15: 'B'
+    };
+
+    function checkQuiz() {
+      let score = 0;
+      let total = Object.keys(answers).length;
+
+      for (let key in answers) {
+        const selected = document.querySelector(`input[name="${key}"]:checked`);
+        const labels = document.querySelectorAll(`input[name="${key}"]`);
+
+        labels.forEach(input => {
+          input.parentElement.classList.remove('correct', 'wrong');
+          if (input.value === answers[key]) {
+            input.parentElement.classList.add('correct');
+          }
+        });
+
+        if (selected) {
+          if (selected.value === answers[key]) {
+            score++;
+          } else {
+            selected.parentElement.classList.add('wrong');
+          }
+        }
+      }
+
+      let mark = '';
+      let phrase = '';
+      if (score >= 13) {
+        mark = '5';
+        phrase = 'Отлично! Огр-программист гордится тобой! 🧅';
+      } else if (score >= 10) {
+        mark = '4';
+        phrase = 'Хорошо! Осталось чуть-чуть потренироваться. 🌿';
+      } else if (score >= 7) {
+        mark = '3';
+        phrase = 'Неплохо, но циклы нужно повторить ещё раз. 🫏';
+      } else {
+        mark = '2';
+        phrase = 'Болото циклов пока не пройдено. Попробуй снова! 🐉';
+      }
+
+      const result = document.getElementById('result');
+      result.style.display = 'block';
+      result.innerHTML = `
+        <h2>Результат: ${score} из ${total}</h2>
+        <p><b>Оценка:</b> ${mark}</p>
+        <p>${phrase}</p>
+      `;
+      result.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetQuiz() {
+      document.getElementById('quizForm').reset();
+      document.querySelectorAll('label').forEach(label => label.classList.remove('correct', 'wrong'));
+      document.getElementById('result').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
