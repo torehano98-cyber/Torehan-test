@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест: Реферат</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #fef3c7, #fce7f3);
+      color: #1f2937;
+      min-height: 100vh;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 25px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+    }
+
+    header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 18px;
+      opacity: 0.95;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 6px solid #2563eb;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 20px;
+      transition: 0.2s;
+    }
+
+    .question-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #111827;
+    }
+
+    label {
+      display: block;
+      background: #f9fafb;
+      margin: 10px 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    label:hover {
+      background: #eef2ff;
+      border-color: #6366f1;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .check-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    .reset-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    button:hover {
+      transform: scale(1.04);
+      opacity: 0.9;
+    }
+
+    #result {
+      margin-top: 30px;
+      padding: 25px;
+      border-radius: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .excellent {
+      background: #dcfce7;
+      color: #166534;
+      border: 3px solid #22c55e;
+    }
+
+    .good {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 3px solid #eab308;
+    }
+
+    .bad {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 3px solid #ef4444;
+    }
+
+    .correct-answer {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+    }
+
+    .wrong-answer {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 35px;
+      color: #6b7280;
+      font-size: 15px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 28px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .question-title {
+        font-size: 18px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📝 Тест: «Реферат»</h1>
+      <p>Проверь свои знания о структуре, оформлении и правилах написания реферата</p>
+    </header>
+
+    <div class="info-box">
+      <strong>Инструкция:</strong> выбери один правильный ответ в каждом вопросе. После выполнения нажми кнопку <strong>«Проверить ответы»</strong>.
+    </div>
+
+    <form id="quizForm">
+      <div class="question-card">
+        <div class="question-title">1. Что такое реферат?</div>
+        <label><input type="radio" name="q1" value="A">A) Переписанный текст из интернета</label>
+        <label><input type="radio" name="q1" value="B">B) Краткое изложение информации по теме</label>
+        <label><input type="radio" name="q1" value="C">C) Сочинение без правил</label>
+        <label><input type="radio" name="q1" value="D">D) Только устный рассказ</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">2. Какая часть НЕ входит в структуру реферата?</div>
+        <label><input type="radio" name="q2" value="A">A) Введение</label>
+        <label><input type="radio" name="q2" value="B">B) Основная часть</label>
+        <label><input type="radio" name="q2" value="C">C) Диалог</label>
+        <label><input type="radio" name="q2" value="D">D) Заключение</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">3. Что пишется во введении?</div>
+        <label><input type="radio" name="q3" value="A">A) Выводы</label>
+        <label><input type="radio" name="q3" value="B">B) Актуальность темы</label>
+        <label><input type="radio" name="q3" value="C">C) Список литературы</label>
+        <label><input type="radio" name="q3" value="D">D) Только картинки</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">4. Что должно быть в основной части?</div>
+        <label><input type="radio" name="q4" value="A">A) Только картинки</label>
+        <label><input type="radio" name="q4" value="B">B) Личное мнение, факты и выводы</label>
+        <label><input type="radio" name="q4" value="C">C) Только название темы</label>
+        <label><input type="radio" name="q4" value="D">D) Только список литературы</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">5. Что пишется в заключении?</div>
+        <label><input type="radio" name="q5" value="A">A) Новая тема</label>
+        <label><input type="radio" name="q5" value="B">B) Список источников</label>
+        <label><input type="radio" name="q5" value="C">C) Краткие выводы по работе</label>
+        <label><input type="radio" name="q5" value="D">D) Название школы</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">6. Где указывается тема реферата?</div>
+        <label><input type="radio" name="q6" value="A">A) Только в списке литературы</label>
+        <label><input type="radio" name="q6" value="B">B) На титульном листе</label>
+        <label><input type="radio" name="q6" value="C">C) Только в заключении</label>
+        <label><input type="radio" name="q6" value="D">D) В названии файла</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">7. Какой формат листа используется для реферата?</div>
+        <label><input type="radio" name="q7" value="A">A) А3</label>
+        <label><input type="radio" name="q7" value="B">B) А5</label>
+        <label><input type="radio" name="q7" value="C">C) А4</label>
+        <label><input type="radio" name="q7" value="D">D) Любой, без разницы</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">8. Какой шрифт рекомендуется использовать?</div>
+        <label><input type="radio" name="q8" value="A">A) Comic Sans</label>
+        <label><input type="radio" name="q8" value="B">B) Times New Roman</label>
+        <label><input type="radio" name="q8" value="C">C) Impact</label>
+        <label><input type="radio" name="q8" value="D">D) Только рукописный</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">9. Что содержит оглавление?</div>
+        <label><input type="radio" name="q9" value="A">A) Полный текст реферата</label>
+        <label><input type="radio" name="q9" value="B">B) Названия разделов и номера страниц</label>
+        <label><input type="radio" name="q9" value="C">C) Только картинки</label>
+        <label><input type="radio" name="q9" value="D">D) Только фамилию ученика</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">10. Каким должен быть объем реферата?</div>
+        <label><input type="radio" name="q10" value="A">A) 1 страница</label>
+        <label><input type="radio" name="q10" value="B">B) 2–3 страницы</label>
+        <label><input type="radio" name="q10" value="C">C) Не менее 8–10 страниц</label>
+        <label><input type="radio" name="q10" value="D">D) Только половина страницы</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">11. Где обычно размещается список использованной литературы?</div>
+        <label><input type="radio" name="q11" value="A">A) В начале работы</label>
+        <label><input type="radio" name="q11" value="B">B) В середине титульного листа</label>
+        <label><input type="radio" name="q11" value="C">C) В конце реферата</label>
+        <label><input type="radio" name="q11" value="D">D) Он не нужен</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">12. Что НЕ является критерием оценивания реферата?</div>
+        <label><input type="radio" name="q12" value="A">A) Актуальность темы</label>
+        <label><input type="radio" name="q12" value="B">B) Полнота раскрытия темы</label>
+        <label><input type="radio" name="q12" value="C">C) Цвет тетради ученика</label>
+        <label><input type="radio" name="q12" value="D">D) Достоверность материала</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">13. Что нельзя делать при написании реферата?</div>
+        <label><input type="radio" name="q13" value="A">A) Делать выводы</label>
+        <label><input type="radio" name="q13" value="B">B) Использовать источники</label>
+        <label><input type="radio" name="q13" value="C">C) Просто копировать текст без переработки</label>
+        <label><input type="radio" name="q13" value="D">D) Писать введение</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">14. С чего должна начинаться каждая глава основной части?</div>
+        <label><input type="radio" name="q14" value="A">A) С середины страницы</label>
+        <label><input type="radio" name="q14" value="B">B) С новой строки</label>
+        <label><input type="radio" name="q14" value="C">C) С новой страницы</label>
+        <label><input type="radio" name="q14" value="D">D) С любого места</label>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">15. Что должно быть указано на титульном листе?</div>
+        <label><input type="radio" name="q15" value="A">A) Только тема</label>
+        <label><input type="radio" name="q15" value="B">B) Только имя ученика</label>
+        <label><input type="radio" name="q15" value="C">C) Школа, тема, ученик, учитель, населенный пункт и год</label>
+        <label><input type="radio" name="q15" value="D">D) Только список литературы</label>
+      </div>
+    </form>
+
+    <div class="buttons">
+      <button class="check-btn" onclick="checkAnswers()">✅ Проверить ответы</button>
+      <button class="reset-btn" onclick="resetQuiz()">🔄 Пройти заново</button>
+    </div>
+
+    <div id="result"></div>
+
+    <footer>
+      Тест по теме «Реферат» | Информатика | 6 класс
+    </footer>
+  </div>
+
+  <script>
+    const correctAnswers = {
+      q1: "B",
+      q2: "C",
+      q3: "B",
+      q4: "B",
+      q5: "C",
+      q6: "B",
+      q7: "C",
+      q8: "B",
+      q9: "B",
+      q10: "C",
+      q11: "C",
+      q12: "C",
+      q13: "C",
+      q14: "C",
+      q15: "C"
+    };
+
+    function checkAnswers() {
+      let score = 0;
+      const total = Object.keys(correctAnswers).length;
+
+      for (let question in correctAnswers) {
+        const selected = document.querySelector(`input[name="${question}"]:checked`);
+        const labels = document.querySelectorAll(`input[name="${question}"]`);
+
+        labels.forEach(input => {
+          input.parentElement.classList.remove("correct-answer", "wrong-answer");
+
+          if (input.value === correctAnswers[question]) {
+            input.parentElement.classList.add("correct-answer");
+          }
+        });
+
+        if (selected) {
+          if (selected.value === correctAnswers[question]) {
+            score++;
+          } else {
+            selected.parentElement.classList.add("wrong-answer");
+          }
+        }
+      }
+
+      const result = document.getElementById("result");
+      result.style.display = "block";
+      result.className = "";
+
+      let message = "";
+
+      if (score >= 13) {
+        result.classList.add("excellent");
+        message = `🎉 Отлично! Ты набрал(а) ${score} из ${total} баллов.`;
+      } else if (score >= 9) {
+        result.classList.add("good");
+        message = `👍 Хорошо! Ты набрал(а) ${score} из ${total} баллов.`;
+      } else {
+        result.classList.add("bad");
+        message = `📚 Нужно повторить тему. Ты набрал(а) ${score} из ${total} баллов.`;
+      }
+
+      result.textContent = message;
+      result.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function resetQuiz() {
+      document.getElementById("quizForm").reset();
+      document.getElementById("result").style.display = "none";
+
+      document.querySelectorAll("label").forEach(label => {
+        label.classList.remove("correct-answer", "wrong-answer");
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
