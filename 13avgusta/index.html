@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050a2b">
+  <title>Энергия нашего класса</title>
+  <style>
+    :root {
+      --bg: #03061d;
+      --panel: rgba(5, 13, 53, 0.78);
+      --panel-strong: rgba(3, 9, 39, 0.94);
+      --text: #f8f9ff;
+      --muted: #bcc8ff;
+      --cyan: #37e8ff;
+      --blue: #3184ff;
+      --violet: #956bff;
+      --pink: #ff61d8;
+      --green: #57f1bd;
+      --shadow: 0 0 14px rgba(55, 232, 255, .55), 0 0 34px rgba(49, 132, 255, .2);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: "Segoe UI", Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(25, 166, 255, .25), transparent 24%),
+        radial-gradient(circle at 88% 14%, rgba(131, 42, 255, .28), transparent 28%),
+        radial-gradient(circle at 52% 110%, rgba(41, 80, 217, .26), transparent 40%),
+        linear-gradient(145deg, #02051a 0%, #08104a 50%, #09032b 100%);
+      isolation: isolate;
+    }
+
+    button, input { font: inherit; }
+
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .space,
+    .space::before,
+    .space::after {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+    }
+
+    .space {
+      opacity: .9;
+      background-image:
+        radial-gradient(circle at 8% 12%, #fff 0 1px, transparent 1.8px),
+        radial-gradient(circle at 18% 72%, #75eaff 0 1px, transparent 1.8px),
+        radial-gradient(circle at 31% 26%, #fff 0 1.3px, transparent 2px),
+        radial-gradient(circle at 43% 83%, #bb88ff 0 1px, transparent 1.8px),
+        radial-gradient(circle at 57% 15%, #fff 0 1px, transparent 1.8px),
+        radial-gradient(circle at 66% 67%, #6fdfff 0 1.2px, transparent 2px),
+        radial-gradient(circle at 78% 34%, #ff82e5 0 1px, transparent 1.9px),
+        radial-gradient(circle at 91% 77%, #fff 0 1.3px, transparent 2px);
+      background-size: 230px 190px, 310px 270px, 390px 330px, 270px 310px, 350px 230px, 290px 390px, 430px 290px, 330px 350px;
+      animation: drift 28s linear infinite alternate;
+    }
+
+    .space::before {
+      content: "";
+      opacity: .7;
+      background:
+        radial-gradient(ellipse at 0% 62%, transparent 0 23%, rgba(33, 202, 255, .16) 25%, transparent 31%),
+        radial-gradient(ellipse at 103% 44%, transparent 0 23%, rgba(226, 65, 255, .17) 25%, transparent 31%);
+      filter: blur(5px);
+    }
+
+    .space::after {
+      content: "";
+      opacity: .5;
+      background: linear-gradient(110deg, transparent 5%, rgba(48, 176, 255, .08) 20%, transparent 34%, transparent 70%, rgba(173, 58, 255, .08) 84%, transparent 96%);
+    }
+
+    .app {
+      width: min(1500px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(18px, 2vw, 32px) clamp(16px, 3.2vw, 52px) 28px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: clamp(16px, 2vh, 24px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 18px;
+    }
+
+    .title-wrap { text-align: center; padding-left: 146px; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 4.8vw, 78px);
+      line-height: .98;
+      letter-spacing: -.035em;
+      text-shadow: 0 4px 0 rgba(117, 88, 212, .35), 0 0 28px rgba(139, 183, 255, .28);
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: #e4e9ff;
+      font-size: clamp(17px, 1.7vw, 28px);
+      font-weight: 700;
+    }
+
+    .tools {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .icon-button {
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(136, 205, 255, .36);
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background: rgba(5, 12, 48, .68);
+      box-shadow: inset 0 0 16px rgba(52, 154, 255, .08);
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      background: rgba(13, 38, 91, .88);
+      outline: none;
+    }
+
+    .battery-zone {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(18px, 3vw, 40px);
+    }
+
+    .battery-shell {
+      position: relative;
+      height: clamp(112px, 14vh, 164px);
+      padding: 12px;
+      border: 4px solid #a8f6ff;
+      border-radius: 34px;
+      background: rgba(1, 7, 35, .86);
+      box-shadow: var(--shadow), inset 0 0 24px rgba(32, 153, 255, .18);
+    }
+
+    .battery-shell::after {
+      content: "";
+      position: absolute;
+      top: 30%;
+      right: -28px;
+      width: 24px;
+      height: 40%;
+      border: 4px solid #a8f6ff;
+      border-left: 0;
+      border-radius: 0 12px 12px 0;
+      background: rgba(6, 17, 68, .92);
+      box-shadow: 8px 0 20px rgba(55, 232, 255, .44);
+    }
+
+    .battery-track {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #02071d, #07123c);
+    }
+
+    .battery-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      border-radius: inherit;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.18), transparent 18%),
+        linear-gradient(90deg, #19d8ff 0%, #397dff 52%, #b04fff 100%);
+      box-shadow: inset -8px 0 20px rgba(255,255,255,.42), 0 0 40px rgba(66, 176, 255, .72);
+      transition: width .75s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .battery-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.24) 45%, transparent 65%);
+      transform: translateX(-100%);
+      animation: shine 2.8s ease-in-out infinite;
+    }
+
+    .percent {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: clamp(48px, 6.2vw, 92px);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.05em;
+      text-shadow: 0 4px 5px rgba(0,0,0,.65), 0 0 16px rgba(255,255,255,.22);
+    }
+
+    .counter-card {
+      width: 188px;
+      padding: 16px;
+      border: 1px solid rgba(148, 177, 255, .34);
+      border-radius: 20px;
+      text-align: center;
+      background: rgba(4, 11, 46, .76);
+      box-shadow: inset 0 0 20px rgba(72, 101, 255, .12);
+    }
+
+    .counter-label { color: var(--muted); font-size: 14px; font-weight: 700; }
+
+    .counter-value {
+      margin: 4px 0 10px;
+      font-size: 25px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stepper { display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 8px; }
+
+    .stepper button {
+      width: 42px;
+      height: 38px;
+      border: 1px solid rgba(71, 219, 255, .48);
+      border-radius: 11px;
+      color: white;
+      background: rgba(21, 70, 125, .55);
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .stepper button:hover,
+    .stepper button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+    .target-number { color: var(--cyan); font-size: 19px; font-weight: 900; }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(12px, 1.5vw, 22px);
+      align-content: center;
+    }
+
+    .choice {
+      --accent: var(--cyan);
+      position: relative;
+      min-height: clamp(150px, 19vh, 218px);
+      overflow: hidden;
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: linear-gradient(145deg, rgba(8, 18, 67, .88), rgba(3, 8, 36, .93));
+      box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 52%, transparent), inset 0 0 26px rgba(56, 83, 184, .12);
+      display: grid;
+      grid-template-rows: 1fr auto;
+      place-items: center;
+      gap: 8px;
+      padding: 20px 18px 22px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .choice:nth-child(2), .choice:nth-child(6) { --accent: var(--violet); }
+    .choice:nth-child(3), .choice:nth-child(4) { --accent: var(--pink); }
+
+    .choice::before {
+      content: "";
+      position: absolute;
+      inset: -60% -30%;
+      opacity: 0;
+      background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,.16), transparent 60%);
+      transform: translateX(-35%);
+      transition: opacity .2s ease, transform .45s ease;
+    }
+
+    .choice:hover,
+    .choice:focus-visible {
+      transform: translateY(-5px) scale(1.012);
+      background: linear-gradient(145deg, rgba(15, 39, 103, .96), rgba(8, 11, 49, .96));
+      box-shadow: 0 0 16px var(--accent), 0 12px 30px rgba(0,0,0,.32), inset 0 0 34px rgba(84, 107, 230, .17);
+      outline: none;
+    }
+
+    .choice:hover::before,
+    .choice:focus-visible::before { opacity: 1; transform: translateX(35%); }
+
+    .choice.selected { animation: selectPulse .62s ease; }
+
+    .choice-icon {
+      width: clamp(74px, 7vw, 104px);
+      height: clamp(74px, 7vw, 104px);
+      border: 2px solid color-mix(in srgb, var(--accent) 70%, white);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: clamp(38px, 4vw, 62px);
+      background: color-mix(in srgb, var(--accent) 10%, rgba(4, 9, 39, .82));
+      filter: drop-shadow(0 0 10px var(--accent));
+    }
+
+    .choice-label {
+      position: relative;
+      z-index: 1;
+      max-width: 95%;
+      font-size: clamp(18px, 1.55vw, 27px);
+      line-height: 1.12;
+      font-weight: 850;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .footer-note {
+      color: rgba(220, 228, 255, .72);
+      text-align: center;
+      font-size: clamp(13px, 1vw, 16px);
+      font-weight: 600;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 20;
+      width: min(600px, calc(100% - 32px));
+      padding: 16px 22px;
+      border: 1px solid rgba(119, 239, 255, .7);
+      border-radius: 18px;
+      text-align: center;
+      font-size: clamp(17px, 1.6vw, 23px);
+      font-weight: 800;
+      background: rgba(4, 12, 49, .95);
+      box-shadow: 0 0 24px rgba(55, 232, 255, .38), 0 14px 40px rgba(0,0,0,.45);
+      opacity: 0;
+      transform: translate(-50%, 18px) scale(.97);
+      pointer-events: none;
+      transition: opacity .24s ease, transform .24s ease;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      padding: 22px;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 38%, rgba(37, 75, 177, .45), rgba(1, 3, 18, .93) 68%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .45s ease, visibility .45s ease;
+    }
+
+    .overlay.open { opacity: 1; visibility: visible; }
+
+    .final-card {
+      position: relative;
+      width: min(840px, 100%);
+      overflow: hidden;
+      padding: clamp(30px, 5vw, 62px);
+      border: 2px solid var(--cyan);
+      border-radius: 36px;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(7, 20, 73, .97), rgba(12, 3, 45, .98));
+      box-shadow: 0 0 22px rgba(53, 230, 255, .58), 0 0 80px rgba(139, 70, 255, .3);
+    }
+
+    .final-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      z-index: -1;
+      background: conic-gradient(from 0deg, transparent, rgba(50, 214, 255, .13), transparent, rgba(255, 70, 220, .13), transparent);
+      animation: rotate 10s linear infinite;
+    }
+
+    .final-emoji { font-size: clamp(64px, 9vw, 112px); filter: drop-shadow(0 0 18px rgba(70, 218, 255, .65)); }
+
+    .final-card h2 {
+      margin: 12px 0 10px;
+      font-size: clamp(38px, 5.8vw, 76px);
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    .final-card p {
+      max-width: 680px;
+      margin: 14px auto;
+      color: #dce5ff;
+      font-size: clamp(18px, 2vw, 27px);
+      line-height: 1.35;
+      font-weight: 650;
+      text-wrap: balance;
+    }
+
+    .class-agreement {
+      margin: 24px auto !important;
+      color: white !important;
+      font-weight: 850 !important;
+    }
+
+    .high-five {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0 24px;
+      padding: 11px 18px;
+      border: 1px solid rgba(255, 100, 218, .65);
+      border-radius: 999px;
+      color: #ffd9f7;
+      background: rgba(255, 67, 214, .09);
+      font-size: clamp(16px, 1.5vw, 21px);
+      font-weight: 800;
+    }
+
+    .primary-button {
+      min-width: min(340px, 100%);
+      min-height: 62px;
+      border: 0;
+      border-radius: 19px;
+      color: #050821;
+      background: linear-gradient(90deg, var(--cyan), #8af7ff 45%, #e2b5ff);
+      box-shadow: 0 0 24px rgba(55, 232, 255, .42);
+      cursor: pointer;
+      font-size: clamp(19px, 1.7vw, 25px);
+      font-weight: 900;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .primary-button:hover,
+    .primary-button:focus-visible {
+      transform: translateY(-3px) scale(1.015);
+      box-shadow: 0 0 34px rgba(55, 232, 255, .7);
+      outline: 3px solid white;
+      outline-offset: 4px;
+    }
+
+    .confetti {
+      position: fixed;
+      top: -30px;
+      z-index: 31;
+      width: 9px;
+      height: 22px;
+      border-radius: 5px;
+      animation: fall var(--speed) linear forwards;
+      transform: translate3d(0,0,0) rotate(0deg);
+      pointer-events: none;
+    }
+
+    .energy-orb {
+      position: fixed;
+      z-index: 25;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 9px white, 0 0 22px var(--orb-color, var(--cyan));
+      pointer-events: none;
+      animation: flyToBattery .65s cubic-bezier(.3,.8,.35,1) forwards;
+    }
+
+    body.lesson-started .app { filter: blur(8px); transform: scale(1.02); transition: .45s ease; }
+
+    .lesson-message {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      text-align: center;
+      background: radial-gradient(circle, rgba(27, 79, 179, .48), rgba(2, 5, 25, .93));
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+
+    body.lesson-started .lesson-message { opacity: 1; visibility: visible; }
+
+    .lesson-message strong {
+      display: block;
+      font-size: clamp(54px, 9vw, 128px);
+      line-height: .95;
+      text-shadow: 0 0 28px rgba(55, 232, 255, .6);
+    }
+
+    .lesson-message span {
+      display: block;
+      margin-top: 18px;
+      color: #d9e5ff;
+      font-size: clamp(22px, 3vw, 42px);
+      font-weight: 750;
+    }
+
+    @keyframes shine { 0%, 35% { transform: translateX(-100%); } 70%, 100% { transform: translateX(100%); } }
+    @keyframes selectPulse { 0% { transform: scale(1); } 35% { transform: scale(.97); } 70% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    @keyframes drift { to { transform: translate3d(-18px, 12px, 0); } }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    @keyframes fall { to { transform: translate3d(var(--drift), 110vh, 0) rotate(760deg); } }
+    @keyframes flyToBattery {
+      0% { left: var(--from-x); top: var(--from-y); transform: scale(.7); opacity: 1; }
+      55% { transform: scale(1.35); opacity: 1; }
+      100% { left: var(--to-x); top: var(--to-y); transform: scale(.35); opacity: 0; }
+    }
+
+    @media (max-width: 920px) {
+      .app { grid-template-rows: auto auto auto auto; }
+      .title-wrap { padding-left: 0; }
+      .topbar { grid-template-columns: 1fr; }
+      .tools { position: absolute; top: 12px; right: 12px; }
+      .title-wrap { padding-top: 44px; }
+      .battery-zone { grid-template-columns: 1fr; }
+      .counter-card { width: 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; text-align: left; }
+      .counter-value { margin: 2px 0 0; }
+      .stepper { width: 170px; }
+      .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .app { padding-inline: 12px; }
+      .tools { position: static; justify-content: center; order: -1; }
+      .title-wrap { padding-top: 0; }
+      .choices { grid-template-columns: 1fr; }
+      .choice { min-height: 150px; grid-template-columns: 90px 1fr; grid-template-rows: 1fr; text-align: left; }
+      .choice-label { text-align: left; max-width: 100%; }
+      .battery-shell { height: 105px; }
+      .battery-shell::after { right: -16px; width: 13px; }
+      .counter-card { grid-template-columns: 1fr; text-align: center; }
+      .stepper { margin: 8px auto 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="space" aria-hidden="true"></div>
+
+  <main class="app" id="app">
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1>Энергия нашего класса</h1>
+        <p class="subtitle">Что ты сегодня добавишь в нашу команду?</p>
+      </div>
+      <div class="tools" aria-label="Настройки">
+        <button class="icon-button" id="soundButton" type="button" title="Выключить звук" aria-label="Выключить звук">🔊</button>
+        <button class="icon-button" id="fullscreenButton" type="button" title="На весь экран" aria-label="Открыть на весь экран">⛶</button>
+        <button class="icon-button" id="resetButton" type="button" title="Начать заново" aria-label="Сбросить результаты">↻</button>
+      </div>
+    </header>
+
+    <section class="battery-zone" aria-label="Общая энергия класса">
+      <div class="battery-shell">
+        <div class="battery-track">
+          <div class="battery-fill" id="batteryFill"></div>
+          <div class="percent" id="percent" aria-live="polite">0%</div>
+        </div>
+      </div>
+      <div class="counter-card">
+        <div>
+          <div class="counter-label">УЧАСТНИКИ</div>
+          <div class="counter-value"><span id="currentCount">0</span> из <span id="targetCountText">20</span></div>
+        </div>
+        <div class="stepper" aria-label="Количество учеников">
+          <button id="minusButton" type="button" aria-label="Уменьшить количество учеников">−</button>
+          <span class="target-number" id="targetNumber">20</span>
+          <button id="plusButton" type="button" aria-label="Увеличить количество учеников">+</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="choices" aria-label="Выберите свой вклад в команду">
+      <button class="choice" type="button" data-message="Твои идеи сегодня пригодятся!" data-color="#37e8ff">
+        <span class="choice-icon" aria-hidden="true">💡</span>
+        <span class="choice-label">Я добавлю идею</span>
+      </button>
+      <button class="choice" type="button" data-message="Твоя помощь делает команду сильнее!" data-color="#956bff">
+        <span class="choice-icon" aria-hidden="true">🤝</span>
+        <span class="choice-label">Я помогу другим</span>
+      </button>
+      <button class="choice" type="button" data-message="Внимание к другим — важная суперсила!" data-color="#ff61d8">
+        <span class="choice-icon" aria-hidden="true">👂</span>
+        <span class="choice-label">Я буду внимательно слушать</span>
+      </button>
+      <button class="choice" type="button" data-message="Отличная энергия для нашей команды!" data-color="#ff61d8">
+        <span class="choice-icon" aria-hidden="true">😊</span>
+        <span class="choice-label">Я добавлю хорошее настроение</span>
+      </button>
+      <button class="choice" type="button" data-message="Смелость помогает нам расти!" data-color="#37e8ff">
+        <span class="choice-icon" aria-hidden="true">💪</span>
+        <span class="choice-label">Я не побоюсь трудностей</span>
+      </button>
+      <button class="choice" type="button" data-message="Твоя поддержка очень важна!" data-color="#956bff">
+        <span class="choice-icon" aria-hidden="true">❤️</span>
+        <span class="choice-label">Я поддержу команду</span>
+      </button>
+    </section>
+
+    <div class="footer-note">Каждый ученик подходит к доске и выбирает один вариант</div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <section class="overlay" id="finalOverlay" aria-hidden="true" aria-labelledby="finalTitle">
+    <div class="final-card">
+      <div class="final-emoji" aria-hidden="true">🚀</div>
+      <h2 id="finalTitle">Энергия класса — 100%!</h2>
+      <p>Каждый добавил частичку своей силы в нашу общую команду.</p>
+      <p class="class-agreement">Сегодня мы слушаем, помогаем и работаем вместе.</p>
+      <div class="high-five">🖐️ Дайте пять соседу — мы готовы!</div><br>
+      <button class="primary-button" id="startLessonButton" type="button">Начать урок 🚀</button>
+    </div>
+  </section>
+
+  <section class="lesson-message" id="lessonMessage" aria-hidden="true">
+    <div>
+      <strong>Поехали! 🚀</strong>
+      <span>Пусть урок будет интересным и дружным!</span>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const state = { current: 0, target: 20, sound: true, complete: false };
+      const batteryFill = document.getElementById('batteryFill');
+      const percent = document.getElementById('percent');
+      const currentCount = document.getElementById('currentCount');
+      const targetCountText = document.getElementById('targetCountText');
+      const targetNumber = document.getElementById('targetNumber');
+      const toast = document.getElementById('toast');
+      const overlay = document.getElementById('finalOverlay');
+      const lessonMessage = document.getElementById('lessonMessage');
+      const soundButton = document.getElementById('soundButton');
+      let toastTimer;
+      let audioContext;
+
+      function getPercent() {
+        return Math.min(100, Math.round((state.current / state.target) * 100));
+      }
+
+      function render() {
+        const value = getPercent();
+        batteryFill.style.width = value + '%';
+        percent.textContent = value + '%';
+        currentCount.textContent = state.current;
+        targetCountText.textContent = state.target;
+        targetNumber.textContent = state.target;
+      }
+
+      function playTone(frequency = 540, duration = .12) {
+        if (!state.sound) return;
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+          gain.gain.setValueAtTime(.0001, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.12, audioContext.currentTime + .015);
+          gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + duration);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + duration + .02);
+        } catch (_) { /* Звук необязателен. */ }
+      }
+
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
+
+      function launchOrb(button, color) {
+        const from = button.getBoundingClientRect();
+        const to = document.querySelector('.battery-shell').getBoundingClientRect();
+        const orb = document.createElement('span');
+        orb.className = 'energy-orb';
+        orb.style.setProperty('--from-x', (from.left + from.width / 2 - 13) + 'px');
+        orb.style.setProperty('--from-y', (from.top + from.height / 2 - 13) + 'px');
+        orb.style.setProperty('--to-x', (to.left + to.width * .55) + 'px');
+        orb.style.setProperty('--to-y', (to.top + to.height / 2) + 'px');
+        orb.style.setProperty('--orb-color', color);
+        document.body.appendChild(orb);
+        orb.addEventListener('animationend', () => orb.remove(), { once: true });
+      }
+
+      function makeConfetti() {
+        const colors = ['#37e8ff', '#956bff', '#ff61d8', '#ffffff', '#57f1bd'];
+        for (let i = 0; i < 70; i++) {
+          const bit = document.createElement('span');
+          bit.className = 'confetti';
+          bit.style.left = Math.random() * 100 + 'vw';
+          bit.style.background = colors[i % colors.length];
+          bit.style.setProperty('--speed', (2.7 + Math.random() * 2.4) + 's');
+          bit.style.setProperty('--drift', (-80 + Math.random() * 160) + 'px');
+          bit.style.animationDelay = (Math.random() * .7) + 's';
+          document.body.appendChild(bit);
+          setTimeout(() => bit.remove(), 6000);
+        }
+      }
+
+      function finish() {
+        if (state.complete) return;
+        state.complete = true;
+        playTone(760, .25);
+        setTimeout(() => {
+          overlay.classList.add('open');
+          overlay.setAttribute('aria-hidden', 'false');
+          document.getElementById('startLessonButton').focus();
+          makeConfetti();
+        }, 650);
+      }
+
+      document.querySelectorAll('.choice').forEach((button, index) => {
+        button.addEventListener('click', () => {
+          if (state.complete || state.current >= state.target) return;
+          state.current += 1;
+          button.classList.remove('selected');
+          void button.offsetWidth;
+          button.classList.add('selected');
+          launchOrb(button, button.dataset.color || '#37e8ff');
+          playTone(480 + index * 42);
+          showToast(button.dataset.message);
+          render();
+          if (state.current >= state.target) finish();
+        });
+      });
+
+      document.getElementById('minusButton').addEventListener('click', () => {
+        state.target = Math.max(Math.max(1, state.current), state.target - 1);
+        render();
+        if (state.current >= state.target) finish();
+      });
+
+      document.getElementById('plusButton').addEventListener('click', () => {
+        state.target = Math.min(40, state.target + 1);
+        render();
+      });
+
+      soundButton.addEventListener('click', () => {
+        state.sound = !state.sound;
+        soundButton.textContent = state.sound ? '🔊' : '🔇';
+        soundButton.title = state.sound ? 'Выключить звук' : 'Включить звук';
+        soundButton.setAttribute('aria-label', soundButton.title);
+        if (state.sound) playTone(560);
+      });
+
+      document.getElementById('fullscreenButton').addEventListener('click', async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) { showToast('Полноэкранный режим недоступен в этом браузере'); }
+      });
+
+      document.getElementById('resetButton').addEventListener('click', () => {
+        if (state.current > 0 && !window.confirm('Начать упражнение заново?')) return;
+        state.current = 0;
+        state.complete = false;
+        document.body.classList.remove('lesson-started');
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        lessonMessage.setAttribute('aria-hidden', 'true');
+        render();
+        showToast('Батарея готова к новому заряду!');
+      });
+
+      document.getElementById('startLessonButton').addEventListener('click', () => {
+        playTone(880, .28);
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        lessonMessage.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lesson-started');
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.body.classList.contains('lesson-started')) {
+          document.body.classList.remove('lesson-started');
+          lessonMessage.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
