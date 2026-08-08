@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Распределительная Шляпа — Выбери загадочную карточку</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --dark-gold: #c5a059;
+            --bg-dark: #0a0812;
+            --panel-bg: rgba(20, 15, 35, 0.85);
+            --gryffindor: #740001;
+            --slytherin: #1a472a;
+            --ravenclaw: #0e1a40;
+            --hufflepuff: #ecb939;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Philosopher', serif;
+            background-color: var(--bg-dark);
+            color: #f0e6d2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(120, 80, 200, 0.15), transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1), transparent 50%);
+        }
+
+        /* Звездный фон на Canvas */
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin: 20px 0;
+            z-index: 2;
+        }
+
+        h1 {
+            font-family: 'Cinzel Decorative', cursive;
+            color: var(--gold);
+            font-size: 2.2rem;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 0 25px rgba(255, 215, 0, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--dark-gold);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Экран настроек */
+        .setup-card {
+            background: var(--panel-bg);
+            border: 2px solid var(--dark-gold);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+            z-index: 2;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-size: 1.1rem;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(10, 8, 18, 0.8);
+            border: 1px solid var(--dark-gold);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Philosopher', serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .groups-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a0000, #8b0000);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-family: 'Cinzel Decorative', cursive;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #8b0000, #a80000);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Главная арена распределения */
+        .game-container {
+            display: none;
+            width: 95%;
+            max-width: 1300px;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            z-index: 2;
+        }
+
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: var(--panel-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--dark-gold);
+        }
+
+        .btn-reset {
+            width: auto;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #111, #333);
+        }
+
+        /* Карточки */
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            perspective: 1000px;
+            min-height: 220px;
+        }
+
+        .card-wrapper {
+            width: 110px;
+            height: 160px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            border-radius: 10px;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--dark-gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Рубашка карточки */
+        .card-back {
+            background: linear-gradient(135deg, #1a1228, #0d0814);
+            background-image: radial-gradient(circle at center, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+        }
+
+        .card-back::before {
+            content: "⚡";
+            font-size: 2.5rem;
+            color: var(--gold);
+            filter: drop-shadow(0 0 8px var(--gold));
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Лицевая сторона */
+        .card-front {
+            background: linear-gradient(135deg, #2b2238, #181222);
+            transform: rotateY(180deg);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .card-front .icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 5px var(--gold));
+        }
+
+        .card-front .group-name {
+            font-size: 0.95rem;
+            color: var(--gold);
+            font-weight: bold;
+            word-break: break-word;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Анимация улетающей карточки */
+        .card-wrapper.flying {
+            pointer-events: none;
+            animation: flyToGroup 1s forwards ease-in-out;
+            z-index: 100;
+        }
+
+        @keyframes flyToGroup {
+            0% {
+                transform: scale(1) translate(0, 0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) translate(var(--tx, 0px), -100px) rotate(15deg);
+                opacity: 0.9;
+                filter: drop-shadow(0 0 20px var(--gold));
+            }
+            100% {
+                transform: scale(0) translate(var(--tx, 0px), var(--ty, 300px));
+                opacity: 0;
+            }
+        }
+
+        /* Контейнеры факультетов / групп */
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .group-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--dark-gold);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .group-box.glow {
+            animation: boxGlow 0.8s ease-out;
+        }
+
+        @keyframes boxGlow {
+            0% { box-shadow: 0 0 0px var(--gold); }
+            50% { box-shadow: 0 0 30px var(--gold); border-color: #fff; }
+            100% { box-shadow: 0 0 0px var(--gold); }
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .group-title {
+            font-size: 1.2rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-count {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #fff;
+            border: 1px solid var(--dark-gold);
+        }
+
+        .group-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
+            flex-grow: 1;
+        }
+
+        .member-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--dark-gold);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Эффект магических искр на клике */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--gold);
+            animation: sparkleFade 0.8s linear forwards;
+        }
+
+        @keyframes sparkleFade {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="stars-canvas"></canvas>
+
+    <header>
+        <h1>Распределительная Шляпа</h1>
+        <div class="subtitle">Метод «Загадочная карточка»</div>
+    </header>
+
+    <!-- Экран первичной настройки -->
+    <div class="setup-card" id="setup-screen">
+        <div class="form-group">
+            <label for="student-count">Количество учеников:</label>
+            <input type="number" id="student-count" min="2" max="100" value="20">
+        </div>
+
+        <div class="form-group">
+            <label for="group-count">Количество групп:</label>
+            <input type="number" id="group-count" min="2" max="10" value="4">
+        </div>
+
+        <div class="form-group">
+            <label>Названия групп (факультетов):</label>
+            <div class="groups-inputs" id="groups-inputs-container"></div>
+        </div>
+
+        <button class="btn" onclick="startGame()">Начать Распределение</button>
+    </div>
+
+    <!-- Главная игровая арена -->
+    <div class="game-container" id="game-screen">
+        <div class="controls-bar">
+            <div id="status-text" style="color: var(--gold); font-size: 1.1rem;">
+                Выберите карточку, чтобы узнать свой факультет!
+            </div>
+            <button class="btn btn-reset" onclick="resetGame()">Заново</button>
+        </div>
+
+        <!-- Сетка карточек -->
+        <div class="cards-grid" id="cards-grid"></div>
+
+        <!-- Контейнеры для сформированных групп -->
+        <div class="groups-container" id="groups-container"></div>
+    </div>
+
+    <script>
+        // Предустановленные маговские символы и факультеты
+        const HOGWARTS_DEFAULTS = [
+            { name: "Гриффиндор", icon: "🦁" },
+            { name: "Слизерин", icon: "🐍" },
+            { name: "Когтевран", icon: "🦅" },
+            { name: "Пуффендуй", icon: "🦡" },
+            { name: "Орден Феникса", icon: "🔥" },
+            { name: "Отряд Дамблдора", icon: "🪄" },
+            { name: "Маги Времени", icon: "⏳" },
+            { name: "Зельевары", icon: "🧪" }
+        ];
+
+        let groupsData = [];
+        let cardAssignments = [];
+        let studentCounter = 1;
+
+        // Создание элементов ввода названий групп
+        const groupCountInput = document.getElementById('group-count');
+        const groupsInputsContainer = document.getElementById('groups-inputs-container');
+
+        function updateGroupInputs() {
+            const count = parseInt(groupCountInput.value) || 2;
+            groupsInputsContainer.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const defaultGroup = HOGWARTS_DEFAULTS[i] || { name: `Группа ${i + 1}`, icon: "✨" };
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="text" class="group-name-input" data-icon="${defaultGroup.icon}" value="${defaultGroup.name}" placeholder="Название группы ${i+1}">
+                `;
+                groupsInputsContainer.appendChild(div);
+            }
+        }
+
+        groupCountInput.addEventListener('input', updateGroupInputs);
+        updateGroupInputs(); // Инициализация
+
+        // Звуковые эффекты через Web Audio API (не требует сторонних файлов!)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playMagicSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.5);
+            
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playWhooshSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.4);
+            
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        // Запуск игры
+        function startGame() {
+            const studentCount = parseInt(document.getElementById('student-count').value);
+            const inputElements = document.querySelectorAll('.group-name-input');
+            
+            if (studentCount < inputElements.length) {
+                alert("Количество учеников не может быть меньше количества групп!");
+                return;
+            }
+
+            groupsData = [];
+            inputElements.forEach((inp, idx) => {
+                groupsData.push({
+                    id: idx,
+                    name: inp.value.trim() || `Группа ${idx + 1}`,
+                    icon: inp.dataset.icon || "✨",
+                    count: 0
+                });
+            });
+
+            // Расчет равномерного распределения
+            cardAssignments = [];
+            const numGroups = groupsData.length;
+            const baseSize = Math.floor(studentCount / numGroups);
+            let remainder = studentCount % numGroups;
+
+            // Формируем список подгрупп
+            for (let g = 0; g < numGroups; g++) {
+                let size = baseSize + (remainder > 0 ? 1 : 0);
+                if (remainder > 0) remainder--;
+                for (let i = 0; i < size; i++) {
+                    cardAssignments.push(g);
+                }
+            }
+
+            // Перемешиваем карточки случайным образом (Алгоритм Фишера-Йейтса)
+            for (let i = cardAssignments.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardAssignments[i], cardAssignments[j]] = [cardAssignments[j], cardAssignments[i]];
+            }
+
+            studentCounter = 1;
+            renderGameBoard(studentCount);
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+        }
+
+        // Отрисовка игрового поля
+        function renderGameBoard(totalStudents) {
+            const cardsGrid = document.getElementById('cards-grid');
+            const groupsContainer = document.getElementById('groups-container');
+            
+            cardsGrid.innerHTML = '';
+            groupsContainer.innerHTML = '';
+
+            // Генерация карточек
+            for (let i = 0; i < totalStudents; i++) {
+                const groupIdx = cardAssignments[i];
+                const group = groupsData[groupIdx];
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'card-wrapper';
+                wrapper.dataset.groupIdx = groupIdx;
+                
+                wrapper.innerHTML = `
+                    <div class="card">
+                        <div class="card-face card-back"></div>
+                        <div class="card-face card-front">
+                            <div class="icon">${group.icon}</div>
+                            <div class="group-name">${group.name}</div>
+                        </div>
+                    </div>
+                `;
+
+                wrapper.addEventListener('click', (e) => revealCard(wrapper, group, e));
+                cardsGrid.appendChild(wrapper);
+            }
+
+            // Генерация контейнеров групп
+            groupsData.forEach((group, idx) => {
+                const box = document.createElement('div');
+                box.className = 'group-box';
+                box.id = `group-box-${idx}`;
+                box.innerHTML = `
+                    <div class="group-header">
+                        <div class="group-title"><span>${group.icon}</span> ${group.name}</div>
+                        <div class="group-count" id="count-${idx}">0</div>
+                    </div>
+                    <div class="group-members" id="members-${idx}"></div>
+                `;
+                groupsContainer.appendChild(box);
+            });
+        }
+
+        // Обработка выбора карточки
+        function revealCard(wrapper, group, event) {
+            if (wrapper.classList.contains('clicked')) return;
+            wrapper.classList.add('clicked');
+
+            const card = wrapper.querySelector('.card');
+            
+            // Эффекты
+            playMagicSound();
+            createSparkles(event.clientX, event.clientY);
+
+            // Переворот
+            card.classList.add('flipped');
+
+            setTimeout(() => {
+                // Анимация полета в нужную группу
+                const groupBox = document.getElementById(`group-box-${group.id}`);
+                const cardRect = wrapper.getBoundingClientRect();
+                const boxRect = groupBox.getBoundingClientRect();
+
+                const tx = boxRect.left + boxRect.width / 2 - (cardRect.left + cardRect.width / 2);
+                const ty = boxRect.top + boxRect.height / 2 - (cardRect.top + cardRect.height / 2);
+
+                wrapper.style.setProperty('--tx', `${tx}px`);
+                wrapper.style.setProperty('--ty', `${ty}px`);
+                
+                playWhooshSound();
+                wrapper.classList.add('flying');
+
+                setTimeout(() => {
+                    // Добавление в список группы
+                    addGroupMember(group.id);
+                    wrapper.style.visibility = 'hidden';
+                }, 900);
+
+            }, 700);
+        }
+
+        // Добавление ученика в блок факультета
+        function addGroupMember(groupIdx) {
+            const group = groupsData[groupIdx];
+            group.count++;
+
+            document.getElementById(`count-${groupIdx}`).innerText = group.count;
+            
+            const membersDiv = document.getElementById(`members-${groupIdx}`);
+            const badge = document.createElement('div');
+            badge.className = 'member-badge';
+            badge.innerHTML = `<span>Ученик ${studentCounter++}</span>`;
+            membersDiv.appendChild(badge);
+
+            // Вспышка на блоке группы
+            const box = document.getElementById(`group-box-${groupIdx}`);
+            box.classList.remove('glow');
+            void box.offsetWidth; // Триггер reflow для перезапуска анимации
+            box.classList.add('glow');
+        }
+
+        // Создание искр
+        function createSparkles(x, y) {
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = `${x}px`;
+                sparkle.style.top = `${y}px`;
+                
+                const sx = (Math.random() - 0.5) * 120 + 'px';
+                const sy = (Math.random() - 0.5) * 120 + 'px';
+                sparkle.style.setProperty('--sx', sx);
+                sparkle.style.setProperty('--sy', sy);
+
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 800);
+            }
+        }
+
+        // Перезапуск
+        function resetGame() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'block';
+        }
+
+        // Фон со звездами на Canvas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const stars = Array.from({ length: 100 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            alpha: Math.random(),
+            speed: Math.random() * 0.02 + 0.005
+        }));
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.alpha += star.speed;
+                if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
+
+                ctx.fillStyle = `rgba(255, 215, 0, ${Math.abs(star.alpha)})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(drawStars);
+        }
+        drawStars();
+    </script>
+</body>
+</html>
