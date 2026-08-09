@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Паучье распределение — Мультивселенная класса</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            spider: {
+              red: '#FF2A42',
+              darkRed: '#C9001B',
+              blue: '#00E5FF',
+              darkBlue: '#0042D0',
+              night: '#0B0E14',
+              card: '#131A29',
+              gwen: '#FF2A85',
+              yellow: '#FFD600',
+              noir: '#1F2937'
+            }
+          },
+          fontFamily: {
+            comic: ['Impact', 'Trebuchet MS', 'Arial Black', 'sans-serif'],
+            body: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Background halftone comic dots pattern */
+    .bg-halftone {
+      background-color: #0b0e14;
+      background-image: 
+        radial-gradient(rgba(0, 229, 255, 0.12) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(255, 42, 66, 0.12) 1.5px, #0b0e14 1.5px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+
+    /* Hard comic shadows */
+    .comic-box {
+      border: 3.5px solid #000000;
+      box-shadow: 6px 6px 0px #000000;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .comic-box-sm {
+      border: 2.5px solid #000000;
+      box-shadow: 4px 4px 0px #000000;
+    }
+
+    .comic-box-lg {
+      border: 4px solid #000000;
+      box-shadow: 8px 8px 0px #000000;
+    }
+
+    .comic-shadow-red {
+      box-shadow: 6px 6px 0px #FF2A42;
+    }
+
+    .comic-shadow-blue {
+      box-shadow: 6px 6px 0px #00E5FF;
+    }
+
+    .comic-shadow-yellow {
+      box-shadow: 6px 6px 0px #FFD600;
+    }
+
+    /* Button interactions */
+    .comic-btn {
+      position: relative;
+      border: 3.5px solid #000;
+      box-shadow: 5px 5px 0px #000;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+      user-select: none;
+    }
+
+    .comic-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px #000;
+    }
+
+    .comic-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    /* Text Outline & Comic Effect */
+    .comic-text-stroke {
+      -webkit-text-stroke: 1.5px #000;
+      text-shadow: 3px 3px 0px #000;
+    }
+
+    .comic-text-stroke-lg {
+      -webkit-text-stroke: 2.5px #000;
+      text-shadow: 4px 4px 0px #000;
+    }
+
+    /* Custom Web Matrix Lines overlay */
+    .spider-web-bg {
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Animations */
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 42, 66, 0.8)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.9)); transform: scale(1.05); }
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes rotateWeb {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spin-slow {
+      animation: rotateWeb 12s linear infinite;
+    }
+
+    @keyframes flyIn {
+      0% { opacity: 0; transform: translateY(30px) scale(0.9) rotate(-2deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+
+    .card-fly-in {
+      animation: flyIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0E14;
+      border-left: 2px solid #000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #FF2A42;
+      border: 2px solid #000;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00E5FF;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .spin-slow, .pulse-glow, .card-fly-in {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-halftone spider-web-bg text-white font-body min-h-screen flex flex-col justify-between selection:bg-spider-red selection:text-white pb-8">
+
+  <!-- Top Navigation Header -->
+  <header class="w-full bg-slate-950/90 border-b-4 border-black px-4 py-3 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 bg-spider-red rounded-xl comic-box-sm flex items-center justify-center shrink-0">
+          <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <!-- Spider Icon SVG -->
+            <path d="M12 2C11.45 2 11 2.45 11 3V5H9C8.45 5 8 5.45 8 6C8 6.55 8.45 7 9 7H11V9.17C9.83 9.58 9 10.69 9 12C9 12.35 9.06 12.69 9.17 13H7C6.45 13 6 13.45 6 14C6 14.55 6.45 15 7 15H9.17C9.58 16.17 10.69 17 12 17C13.31 17 14.42 16.17 14.83 15H17C17.55 15 18 14.55 18 14C18 13.45 17.55 13 17 13H14.83C14.94 12.69 15 12.35 15 12C15 10.69 14.17 9.58 13 9.17V7H15C15.55 7 16 6.55 16 6C16 5.45 15.55 5 15 5H13V3C13 2.45 12.55 2 12 2Z"/>
+            <path d="M4 4C3.45 4 3 4.45 3 5V9C3 11.21 4.79 13 7 13H8V11H7C5.9 11 5 10.1 5 9V6H7C7.55 6 8 5.55 8 5C8 4.45 7.55 4 7 4H4Z"/>
+            <path d="M20 4H17C16.45 4 16 4.45 16 5C16 5.55 16.45 6 17 6H19V9C19 10.1 18.1 11 17 11H16V13H17C19.21 13 21 11.21 21 9V5C21 4.45 20.55 4 20 4Z"/>
+            <path d="M3 15C3 14.45 3.45 14 4 14H5V16H4C3.45 16 3 15.55 3 15Z"/>
+            <path d="M20 14C19.45 14 19 14.45 19 15C19 15.55 19.45 16 20 16H21C21.55 16 22 15.55 22 15C22 14.45 21.55 14 20 14Z"/>
+            <path d="M7 17C4.79 17 3 18.79 3 21C3 21.55 3.45 22 4 22C4.55 22 5 21.55 5 21C5 19.9 5.9 19 7 19H8V17H7Z"/>
+            <path d="M17 17H16V19H17C18.1 19 19 19.9 19 21C19 21.55 19.45 22 20 22C20.55 22 21 21.55 21 21C21 18.79 19.21 17 17 17Z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="inline-block bg-spider-yellow text-black font-comic uppercase tracking-wider text-xs md:text-sm px-2 py-0.5 rounded font-bold -rotate-1 border border-black">
+            Мультивселенная класса
+          </span>
+          <h1 class="font-comic text-xl md:text-2xl text-white tracking-wide comic-text-stroke leading-none mt-0.5">
+            ПАУЧЬЕ РАСПРЕДЕЛЕНИЕ
+          </h1>
+        </div>
+      </div>
+
+      <!-- Controls Right -->
+      <div class="flex items-center gap-2">
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" onclick="toggleSound()" aria-label="Переключить звук" class="comic-btn bg-slate-800 hover:bg-slate-700 text-white p-2 md:px-3 md:py-2 rounded-xl flex items-center gap-2 font-bold text-sm">
+          <span id="soundIcon" class="text-xl">🔊</span>
+          <span id="soundText" class="hidden sm:inline">Звук: Вкл</span>
+        </button>
+
+        <!-- Fullscreen Toggle -->
+        <button onclick="toggleFullscreen()" aria-label="Полноэкранный режим" class="comic-btn bg-spider-blue hover:bg-cyan-400 text-black p-2 md:px-3 md:py-2 rounded-xl flex items-center gap-2 font-bold text-sm">
+          <span class="text-xl">⛶</span>
+          <span class="hidden md:inline">На весь экран</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header Section -->
+  <main class="max-w-7xl mx-auto px-4 pt-6 pb-4 w-full flex-1">
+    
+    <div class="text-center mb-6 max-w-3xl mx-auto">
+      <div class="inline-block bg-spider-red text-white font-comic text-2xl md:text-4xl lg:text-5xl px-6 py-2 rounded-2xl comic-box-lg -rotate-1 mb-3 tracking-wider comic-text-stroke-lg uppercase">
+        ⚡ Паучье распределение ⚡
+      </div>
+      <p class="text-slate-300 text-sm md:text-base lg:text-lg bg-slate-900/80 border-2 border-slate-700 p-3 md:p-4 rounded-2xl comic-box-sm">
+        Добавьте имена, выберите количество команд и запустите паучий портал. Система распределит всех случайно и максимально равномерно.
+      </p>
+    </div>
+
+    <!-- INPUT SETUP VIEW (Visible when not showing results) -->
+    <div id="setupSection" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Panel 1: Students Input -->
+      <div class="lg:col-span-7 bg-spider-card p-5 md:p-6 rounded-2xl comic-box border-4 border-black relative">
+        <div class="flex items-center justify-between mb-3 border-b-2 border-slate-700 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-spider-blue text-black font-comic text-xl flex items-center justify-center font-bold comic-box-sm">1</span>
+            <h2 class="font-comic text-2xl text-spider-blue tracking-wide uppercase comic-text-stroke">
+              Ученики
+            </h2>
+          </div>
+          <button onclick="clearStudentsList()" class="comic-btn bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs md:text-sm px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
+            <span>🗑️</span> Очистить
+          </button>
+        </div>
+
+        <label for="studentInput" class="block text-xs md:text-sm text-slate-400 mb-2">
+          Введите имена учеников (каждое с новой строки или через запятую):
+        </label>
+
+        <textarea 
+          id="studentInput" 
+          rows="10" 
+          aria-label="Список имен учеников"
+          placeholder="Алихан&#10;Аружан&#10;Данияр&#10;София..."
+          class="w-full bg-slate-950 text-white font-mono text-base md:text-lg p-4 rounded-xl border-2 border-slate-700 focus:border-spider-blue focus:outline-none focus:ring-2 focus:ring-spider-blue/50 transition-all resize-y"
+          oninput="updateStudentMetrics()"
+        ></textarea>
+
+        <!-- Student Count Footer -->
+        <div class="mt-3 flex items-center justify-between bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-800">
+          <span class="text-xs md:text-sm text-slate-400">Всего участников:</span>
+          <span id="studentCountBadge" class="font-comic text-lg text-spider-yellow bg-black px-3 py-0.5 rounded-md border border-slate-700">
+            0 учеников
+          </span>
+        </div>
+      </div>
+
+      <!-- Panel 2: Group Settings & Launch Portal -->
+      <div class="lg:col-span-5 bg-spider-card p-5 md:p-6 rounded-2xl comic-box border-4 border-black flex flex-col justify-between gap-6">
+        
+        <div>
+          <div class="flex items-center gap-2 mb-4 border-b-2 border-slate-700 pb-3">
+            <span class="w-8 h-8 rounded-lg bg-spider-red text-white font-comic text-xl flex items-center justify-center font-bold comic-box-sm">2</span>
+            <h2 class="font-comic text-2xl text-spider-red tracking-wide uppercase comic-text-stroke">
+              Команды
+            </h2>
+          </div>
+
+          <label class="block text-sm text-slate-300 font-bold mb-3">
+            Выберите количество групп:
+          </label>
+
+          <!-- Group Buttons 2, 3, 4, 5, 6 -->
+          <div class="grid grid-cols-5 gap-2 md:gap-3 mb-6" id="teamButtonsGroup" role="group" aria-label="Выбор количества команд">
+            <button onclick="selectTeamCount(2)" id="teamBtn-2" class="comic-btn bg-slate-800 hover:bg-slate-700 text-white font-comic text-2xl py-3 rounded-xl">2</button>
+            <button onclick="selectTeamCount(3)" id="teamBtn-3" class="comic-btn bg-slate-800 hover:bg-slate-700 text-white font-comic text-2xl py-3 rounded-xl">3</button>
+            <button onclick="selectTeamCount(4)" id="teamBtn-4" class="comic-btn bg-spider-red text-white font-comic text-2xl py-3 rounded-xl comic-shadow-red scale-105">4</button>
+            <button onclick="selectTeamCount(5)" id="teamBtn-5" class="comic-btn bg-slate-800 hover:bg-slate-700 text-white font-comic text-2xl py-3 rounded-xl">5</button>
+            <button onclick="selectTeamCount(6)" id="teamBtn-6" class="comic-btn bg-slate-800 hover:bg-slate-700 text-white font-comic text-2xl py-3 rounded-xl">6</button>
+          </div>
+
+          <!-- Dynamic Distribution Metrics -->
+          <div class="space-y-2 bg-slate-900/90 p-4 rounded-xl border-2 border-slate-800 text-sm">
+            <div class="flex justify-between items-center text-slate-300">
+              <span>👥 Введено учеников:</span>
+              <strong id="metricStudents" class="text-white font-bold text-base">0</strong>
+            </div>
+            <div class="flex justify-between items-center text-slate-300">
+              <span>🕷️ Выбрано команд:</span>
+              <strong id="metricTeams" class="text-spider-blue font-bold text-base">4</strong>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-slate-200">
+              <span>⚖️ В каждой команде:</span>
+              <strong id="metricPerTeam" class="text-spider-yellow font-bold text-base">0 учеников</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giant Portal Launch Button -->
+        <div>
+          <button 
+            id="launchPortalBtn" 
+            onclick="startSpiderPortal()" 
+            class="comic-btn w-full bg-gradient-to-r from-spider-red to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-comic text-2xl md:text-3xl py-4 px-6 rounded-2xl comic-shadow-red flex items-center justify-center gap-3 uppercase tracking-wider comic-text-stroke pulse-glow"
+          >
+            <span class="text-3xl">🌀</span>
+            <span>Запустить паучий портал</span>
+          </button>
+
+          <div class="text-center mt-2 text-xs text-slate-400">
+            Подсказка: нажмите <kbd class="px-2 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700 font-mono">Ctrl + Enter</kbd> для быстрого запуска
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RESULTS VIEW (Hidden by default, shown after Portal animation) -->
+    <div id="resultsSection" class="hidden space-y-6">
+      
+      <!-- Top Actions Bar -->
+      <div class="bg-spider-card p-4 rounded-2xl comic-box border-4 border-black flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚡</span>
+          <h2 class="font-comic text-2xl text-spider-yellow tracking-wide uppercase comic-text-stroke">
+            Результаты распределения
+          </h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 md:gap-3 w-full sm:w-auto">
+          <button onclick="reshuffleWithPortal()" class="comic-btn bg-spider-red hover:bg-red-500 text-white font-bold text-sm md:text-base px-4 py-2.5 rounded-xl flex-1 sm:flex-none flex items-center justify-center gap-2">
+            <span>🔄</span> Перемешать ещё раз
+          </button>
+          <button onclick="copyTeamsToClipboard()" class="comic-btn bg-spider-blue hover:bg-cyan-400 text-black font-bold text-sm md:text-base px-4 py-2.5 rounded-xl flex-1 sm:flex-none flex items-center justify-center gap-2">
+            <span>📋</span> Копировать команды
+          </button>
+          <button onclick="editList()" class="comic-btn bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm md:text-base px-4 py-2.5 rounded-xl flex-1 sm:flex-none flex items-center justify-center gap-2">
+            <span>✏️</span> Изменить список
+          </button>
+          <button onclick="resetAll()" class="comic-btn bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-sm md:text-base px-3 py-2.5 rounded-xl flex-1 sm:flex-none flex items-center justify-center gap-2">
+            <span>🧹</span> Начать заново
+          </button>
+        </div>
+      </div>
+
+      <!-- Teams Dynamic Grid -->
+      <div id="teamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <!-- Generated Team Cards populate here dynamically -->
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- SPIDER PORTAL FULLSCREEN MODAL ANIMATION -->
+  <div id="portalOverlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 hidden">
+    
+    <!-- Swirling Web Canvas Animation -->
+    <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center mb-6">
+      
+      <!-- Canvas Spiral Ring -->
+      <canvas id="portalCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+      <!-- Center Glowing Spider Emblem -->
+      <div class="w-28 h-28 md:w-36 md:h-36 bg-spider-red rounded-full comic-box flex items-center justify-center pulse-glow z-10">
+        <svg class="w-20 h-20 text-white spin-slow" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C11.45 2 11 2.45 11 3V5H9C8.45 5 8 5.45 8 6C8 6.55 8.45 7 9 7H11V9.17C9.83 9.58 9 10.69 9 12C9 12.35 9.06 12.69 9.17 13H7C6.45 13 6 13.45 6 14C6 14.55 6.45 15 7 15H9.17C9.58 16.17 10.69 17 12 17C13.31 17 14.42 16.17 14.83 15H17C17.55 15 18 14.55 18 14C18 13.45 17.55 13 17 13H14.83C14.94 12.69 15 12.35 15 12C15 10.69 14.17 9.58 13 9.17V7H15C15.55 7 16 6.55 16 6C16 5.45 15.55 5 15 5H13V3C13 2.45 12.55 2 12 2Z"/>
+          <path d="M4 4C3.45 4 3 4.45 3 5V9C3 11.21 4.79 13 7 13H8V11H7C5.9 11 5 10.1 5 9V6H7C7.55 6 8 5.55 8 5C8 4.45 7.55 4 7 4H4Z"/>
+          <path d="M20 4H17C16.45 4 16 4.45 16 5C16 5.55 16.45 6 17 6H19V9C19 10.1 18.1 11 17 11H16V13H17C19.21 13 21 11.21 21 9V5C21 4.45 20.55 4 20 4Z"/>
+          <path d="M3 15C3 14.45 3.45 14 4 14H5V16H4C3.45 16 3 15.55 3 15Z"/>
+          <path d="M20 14C19.45 14 19 14.45 19 15C19 15.55 19.45 16 20 16H21C21.55 16 22 15.55 22 15C22 14.45 21.55 14 20 14Z"/>
+          <path d="M7 17C4.79 17 3 18.79 3 21C3 21.55 3.45 22 4 22C4.55 22 5 21.55 5 21C5 19.9 5.9 19 7 19H8V17H7Z"/>
+          <path d="M17 17H16V19H17C18.1 19 19 19.9 19 21C19 21.55 20 22 20 22C20.55 22 21 21.55 21 21C21 18.79 19.21 17 17 17Z"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- Portal Status Text -->
+    <div class="text-center max-w-lg px-4">
+      <div class="inline-block bg-spider-yellow text-black font-comic text-xl md:text-2xl px-4 py-1 rounded-lg comic-box-sm -rotate-1 mb-2 font-bold uppercase tracking-wider">
+        Паучье чувство работает…
+      </div>
+      <p id="portalStatusMsg" class="font-comic text-2xl md:text-3xl lg:text-4xl text-spider-blue comic-text-stroke tracking-wider min-h-[48px]">
+        Сканируем мультивселенную класса
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification Alert -->
+  <div id="toastAlert" class="fixed bottom-6 right-6 z-50 transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none">
+    <div class="bg-spider-yellow text-black font-comic text-lg md:text-xl px-5 py-3 rounded-xl comic-box border-2 border-black flex items-center gap-3">
+      <span id="toastIcon" class="text-2xl">✅</span>
+      <span id="toastMessage">Сообщение</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs text-slate-400 mt-6 px-4">
+    <p>Паучье распределение учеников • Вселенная класса • Работает полностью автономно</p>
+  </footer>
+
+  <script>
+    /* =========================================================================
+       1. STATE MANAGEMENT & TEAMS DEFINITION
+       ========================================================================= */
+
+    // Default Demo Students List
+    const DEMO_STUDENTS = [
+      "Алихан", "Аружан", "Данияр", "София", "Максим", "Айлин",
+      "Тимур", "Диана", "Нурислам", "Виктория", "Арсен", "Мадина"
+    ];
+
+    // Teams definitions (Up to 6)
+    const TEAMS_DATA = [
+      {
+        id: "scarlet",
+        name: "Алые пауки",
+        bgColor: "bg-red-950/80",
+        borderColor: "border-spider-red",
+        badgeBg: "bg-spider-red",
+        textColor: "text-red-400",
+        shadowClass: "comic-shadow-red",
+        iconSvg: `<svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C11.45 2 11 2.45 11 3V5H9C8.45 5 8 5.45 8 6C8 6.55 8.45 7 9 7H11V9.17C9.83 9.58 9 10.69 9 12C9 12.35 9.06 12.69 9.17 13H7C6.45 13 6 13.45 6 14C6 14.55 6.45 15 7 15H9.17C9.58 16.17 10.69 17 12 17C13.31 17 14.42 16.17 14.83 15H17C17.55 15 18 14.55 18 14C18 13.45 17.55 13 17 13H14.83C14.94 12.69 15 12.35 15 12C15 10.69 14.17 9.58 13 9.17V7H15C15.55 7 16 6.55 16 6C16 5.45 15.55 5 15 5H13V3C13 2.45 12.55 2 12 2Z"/></svg>`
+      },
+      {
+        id: "miles",
+        name: "Отряд Майлза",
+        bgColor: "bg-zinc-950/90",
+        borderColor: "border-spider-red",
+        badgeBg: "bg-zinc-900 border-2 border-spider-red",
+        textColor: "text-spider-red",
+        shadowClass: "comic-shadow-red",
+        iconSvg: `<svg class="w-7 h-7 text-spider-yellow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`
+      },
+      {
+        id: "gwen",
+        name: "Команда Гвен",
+        bgColor: "bg-slate-900/90",
+        borderColor: "border-spider-gwen",
+        badgeBg: "bg-spider-gwen",
+        textColor: "text-pink-300",
+        shadowClass: "comic-shadow",
+        iconSvg: `<svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg>`
+      },
+      {
+        id: "spidey2099",
+        name: "Пауки 2099",
+        bgColor: "bg-cyan-950/80",
+        borderColor: "border-spider-blue",
+        badgeBg: "bg-spider-blue",
+        textColor: "text-spider-blue",
+        shadowClass: "comic-shadow-blue",
+        iconSvg: `<svg class="w-7 h-7 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19.2 8.5 12 12.2 4.8 8.5 12 4.8zM4 10.3l7 3.6v6.8l-7-3.5v-6.9zm16 6.9l-7 3.5v-6.8l7-3.6v6.9z"/></svg>`
+      },
+      {
+        id: "iron",
+        name: "Железные пауки",
+        bgColor: "bg-amber-950/80",
+        borderColor: "border-spider-yellow",
+        badgeBg: "bg-spider-yellow",
+        textColor: "text-amber-300",
+        shadowClass: "comic-shadow-yellow",
+        iconSvg: `<svg class="w-7 h-7 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg>`
+      },
+      {
+        id: "noir",
+        name: "Пауки Нуар",
+        bgColor: "bg-gray-950/90",
+        borderColor: "border-slate-500",
+        badgeBg: "bg-slate-700",
+        textColor: "text-slate-300",
+        shadowClass: "comic-shadow",
+        iconSvg: `<svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12l10 10 10-10L12 2zm0 3.8L18.2 12 12 18.2 5.8 12 12 5.8z"/></svg>`
+      }
+    ];
+
+    // Current app state
+    let state = {
+      selectedTeamCount: 4,
+      studentList: [],
+      currentDistribution: [],
+      isSoundMuted: false
+    };
+
+    /* =========================================================================
+       2. SOUND EFFECTS (WEB AUDIO API)
+       ========================================================================= */
+
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            this.ctx = new AudioContextClass();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        if (state.isSoundMuted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(150, now + 0.06);
+
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } catch (e) { console.error(e); }
+      }
+
+      playPortalSweep() {
+        if (state.isSoundMuted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        try {
+          const now = this.ctx.currentTime;
+          
+          // Oscillator 1 - Sawtooth Synth Sweep
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(100, now);
+          osc.frequency.exponentialRampToValueAtTime(520, now + 1.2);
+          osc.frequency.exponentialRampToValueAtTime(180, now + 1.5);
+
+          // Filter
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(250, now);
+          filter.frequency.linearRampToValueAtTime(2000, now + 1.0);
+          filter.frequency.linearRampToValueAtTime(300, now + 1.5);
+
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.2, now + 0.3);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+          osc.connect(filter);
+          filter.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 1.5);
+        } catch (e) { console.error(e); }
+      }
+
+      playFanfare() {
+        if (state.isSoundMuted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        try {
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const now = this.ctx.currentTime + idx * 0.08;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.3);
+          });
+        } catch (e) { console.error(e); }
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    function toggleSound() {
+      state.isSoundMuted = !state.isSoundMuted;
+      localStorage.setItem("spider_sound_muted", state.isSoundMuted);
+      
+      const icon = document.getElementById("soundIcon");
+      const text = document.getElementById("soundText");
+
+      if (state.isSoundMuted) {
+        icon.textContent = "🔇";
+        text.textContent = "Звук: Выкл";
+      } else {
+        icon.textContent = "🔊";
+        text.textContent = "Звук: Вкл";
+        sound.playClick();
+      }
+    }
+
+    /* =========================================================================
+       3. UTILITIES & PLURALIZATION
+       ========================================================================= */
+
+    // Proper Russian plural forms for "ученик"
+    function getStudentPluralForm(count) {
+      const mod10 = count % 10;
+      const mod100 = count % 100;
+
+      if (mod100 >= 11 && mod100 <= 19) {
+        return `${count} учеников`;
+      }
+      if (mod10 === 1) {
+        return `${count} ученик`;
+      }
+      if (mod10 >= 2 && mod10 <= 4) {
+        return `${count} ученика`;
+      }
+      return `${count} учеников`;
+    }
+
+    function toggleFullscreen() {
+      sound.playClick();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          showToast("Полноэкранный режим недоступен", "⚠️");
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function showToast(message, icon = "✅") {
+      const toast = document.getElementById("toastAlert");
+      const msgEl = document.getElementById("toastMessage");
+      const iconEl = document.getElementById("toastIcon");
+
+      msgEl.textContent = message;
+      iconEl.textContent = icon;
+
+      toast.classList.remove("translate-y-24", "opacity-0", "pointer-events-none");
+      toast.classList.add("translate-y-0", "opacity-100");
+
+      setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-24", "opacity-0", "pointer-events-none");
+      }, 2800);
+    }
+
+    /* =========================================================================
+       4. INPUT & METRICS LOGIC
+       ========================================================================= */
+
+    function parseStudentsFromTextarea() {
+      const text = document.getElementById("studentInput").value;
+      if (!text) return [];
+
+      // Split by newline OR comma
+      const rawNames = text.split(/[\n,]+/);
+      
+      // Clean names, ignore empty lines, preserve duplicates
+      const cleaned = rawNames
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
+
+      return cleaned;
+    }
+
+    function updateStudentMetrics() {
+      const students = parseStudentsFromTextarea();
+      state.studentList = students;
+      const count = students.length;
+
+      // Update badge
+      document.getElementById("studentCountBadge").textContent = getStudentPluralForm(count);
+      document.getElementById("metricStudents").textContent = count;
+      document.getElementById("metricTeams").textContent = state.selectedTeamCount;
+
+      // Calculate approximate per team
+      const perTeamEl = document.getElementById("metricPerTeam");
+      if (count === 0) {
+        perTeamEl.textContent = "0 учеников";
+      } else {
+        const minCount = Math.floor(count / state.selectedTeamCount);
+        const maxCount = Math.ceil(count / state.selectedTeamCount);
+
+        if (minCount === maxCount) {
+          perTeamEl.textContent = `по ${getStudentPluralForm(minCount)}`;
+        } else {
+          perTeamEl.textContent = `от ${minCount} до ${maxCount} учеников`;
+        }
+      }
+
+      // Save to LocalStorage
+      localStorage.setItem("spider_students_text", document.getElementById("studentInput").value);
+    }
+
+    function selectTeamCount(count) {
+      sound.playClick();
+      state.selectedTeamCount = count;
+      localStorage.setItem("spider_team_count", count);
+
+      // Update active button state styling
+      [2, 3, 4, 5, 6].forEach(num => {
+        const btn = document.getElementById(`teamBtn-${num}`);
+        if (!btn) return;
+        if (num === count) {
+          btn.className = "comic-btn bg-spider-red text-white font-comic text-2xl py-3 rounded-xl comic-shadow-red scale-105";
+        } else {
+          btn.className = "comic-btn bg-slate-800 hover:bg-slate-700 text-white font-comic text-2xl py-3 rounded-xl";
+        }
+      });
+
+      updateStudentMetrics();
+    }
+
+    function clearStudentsList() {
+      sound.playClick();
+      document.getElementById("studentInput").value = "";
+      updateStudentMetrics();
+      showToast("Список учеников очищен", "🗑️");
+    }
+
+    /* =========================================================================
+       5. FISHER-YATES RANDOMIZATION ENGINE
+       ========================================================================= */
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function distributeStudentsEvenly(students, teamCount) {
+      // 1. Fully randomize using Fisher-Yates
+      const shuffled = shuffleArray(students);
+
+      // 2. Initialize team arrays
+      const teams = Array.from({ length: teamCount }, () => []);
+
+      // 3. Round-robin assignment for absolute max difference of 1 student
+      shuffled.forEach((student, idx) => {
+        const teamIdx = idx % teamCount;
+        teams[teamIdx].push(student);
+      });
+
+      return teams;
+    }
+
+    /* =========================================================================
+       6. PORTAL ANIMATION & EXECUTION
+       ========================================================================= */
+
+    let portalAnimationId = null;
+
+    function renderPortalCanvas() {
+      const canvas = document.getElementById("portalCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      
+      const width = canvas.offsetWidth || 300;
+      const height = canvas.offsetHeight || 300;
+      canvas.width = width;
+      canvas.height = height;
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+      let angle = 0;
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw Swirling Portal Rays
+        const numRays = 12;
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+
+        for (let i = 0; i < numRays; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          const rayAngle = (i * 2 * Math.PI) / numRays;
+          const endX = Math.cos(rayAngle) * width;
+          const endY = Math.sin(rayAngle) * height;
+          ctx.lineTo(endX, endY);
+          ctx.strokeStyle = i % 2 === 0 ? "rgba(255, 42, 66, 0.4)" : "rgba(0, 229, 255, 0.4)";
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        }
+
+        // Concentric Web Rings
+        for (let r = 20; r < width / 1.5; r += 25) {
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+
+        angle += 0.05;
+        portalAnimationId = requestAnimationFrame(draw);
+      }
+
+      if (portalAnimationId) cancelAnimationFrame(portalAnimationId);
+      draw();
+    }
+
+    function startSpiderPortal() {
+      sound.playClick();
+      const students = parseStudentsFromTextarea();
+      const teamCount = state.selectedTeamCount;
+
+      // Validation 1: Empty list
+      if (students.length === 0) {
+        showToast("Добавьте имена учеников", "⚠️");
+        return;
+      }
+
+      // Validation 2: Fewer students than teams
+      if (students.length < teamCount) {
+        showToast(`Для создания ${teamCount} команд необходимо добавить минимум ${teamCount} учеников`, "⚠️");
+        return;
+      }
+
+      // Show Portal Overlay Modal
+      const overlay = document.getElementById("portalOverlay");
+      overlay.classList.remove("hidden");
+      renderPortalCanvas();
+
+      // Play audio sweep sound
+      sound.playPortalSweep();
+
+      // Dynamic text message sequence
+      const messages = [
+        "Сканируем мультивселенную класса…",
+        "Находим идеальный баланс…",
+        "Собираем команды героев…"
+      ];
+
+      const statusEl = document.getElementById("portalStatusMsg");
+      statusEl.textContent = messages[0];
+
+      setTimeout(() => { statusEl.textContent = messages[1]; }, 500);
+      setTimeout(() => { statusEl.textContent = messages[2]; }, 1000);
+
+      // Perform shuffle computation
+      const teamsDistribution = distributeStudentsEvenly(students, teamCount);
+      state.currentDistribution = teamsDistribution;
+
+      // Complete portal after ~1.5s
+      setTimeout(() => {
+        if (portalAnimationId) cancelAnimationFrame(portalAnimationId);
+        overlay.classList.add("hidden");
+
+        // Sound fanfare
+        sound.playFanfare();
+
+        // Display results
+        renderDistributionResults();
+      }, 1500);
+    }
+
+    /* =========================================================================
+       7. RESULTS RENDER ENGINE & GRID ADAPTATION
+       ========================================================================= */
+
+    function renderDistributionResults() {
+      // Hide setup panel, show results panel
+      document.getElementById("setupSection").classList.add("hidden");
+      const resultsSection = document.getElementById("resultsSection");
+      resultsSection.classList.remove("hidden");
+
+      const grid = document.getElementById("teamsGrid");
+      grid.innerHTML = "";
+
+      const teamCount = state.selectedTeamCount;
+
+      // Responsive Grid Setup based on team count
+      if (teamCount === 2) {
+        grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+      } else if (teamCount === 3 || teamCount === 4) {
+        grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+      } else { // 5 or 6 teams
+        grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+      }
+
+      // Build each team card
+      state.currentDistribution.forEach((memberList, idx) => {
+        const teamInfo = TEAMS_DATA[idx];
+
+        const card = document.createElement("div");
+        card.className = `bg-spider-card p-5 rounded-2xl comic-box border-4 ${teamInfo.borderColor} ${teamInfo.shadowClass} card-fly-in`;
+        card.style.animationDelay = `${idx * 0.1}s`;
+
+        // Card Content
+        card.innerHTML = `
+          <!-- Card Header -->
+          <div class="flex items-center justify-between border-b-2 border-slate-700/80 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl ${teamInfo.badgeBg} flex items-center justify-center comic-box-sm shrink-0">
+                ${teamInfo.iconSvg}
+              </div>
+              <div>
+                <h3 class="font-comic text-2xl ${teamInfo.textColor} tracking-wide uppercase comic-text-stroke">
+                  ${teamInfo.name}
+                </h3>
+              </div>
+            </div>
+
+            <!-- Member Count Badge -->
+            <span class="font-comic text-sm bg-black px-3 py-1 rounded-lg border border-slate-700 text-spider-yellow">
+              ${memberList.length} уч.
+            </span>
+          </div>
+
+          <!-- Members Numbered List -->
+          <ol class="space-y-2">
+            ${memberList.map((student, sIdx) => `
+              <li class="flex items-center gap-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl font-bold text-base md:text-lg hover:border-slate-600 transition-colors">
+                <span class="w-7 h-7 rounded-lg ${teamInfo.badgeBg} text-white font-comic text-sm flex items-center justify-center shrink-0 border border-black">
+                  ${sIdx + 1}
+                </span>
+                <span class="text-white truncate">${escapeHtml(student)}</span>
+              </li>
+            `).join('')}
+          </ol>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // Scroll smoothly to results top
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    function reshuffleWithPortal() {
+      startSpiderPortal();
+    }
+
+    function editList() {
+      sound.playClick();
+      document.getElementById("resultsSection").classList.add("hidden");
+      document.getElementById("setupSection").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetAll() {
+      sound.playClick();
+      if (confirm("Вы уверены, что хотите начать заново? Результаты будут сброшены.")) {
+        document.getElementById("resultsSection").classList.add("hidden");
+        document.getElementById("setupSection").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Сброшено!", "🧹");
+      }
+    }
+
+    /* =========================================================================
+       8. COPY TO CLIPBOARD
+       ========================================================================= */
+
+    function copyTeamsToClipboard() {
+      sound.playClick();
+      if (!state.currentDistribution || state.currentDistribution.length === 0) return;
+
+      let formattedText = "";
+
+      state.currentDistribution.forEach((memberList, idx) => {
+        const teamInfo = TEAMS_DATA[idx];
+        formattedText += `${teamInfo.name}\n\n`;
+        memberList.forEach(student => {
+          formattedText += `${student}\n`;
+        });
+        formattedText += `\n`;
+      });
+
+      formattedText = formattedText.trim();
+
+      // Native Clipboard or Fallback execCommand
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(formattedText)
+          .then(() => showToast("Команды скопированы", "📋"))
+          .catch(() => fallbackCopyText(formattedText));
+      } else {
+        fallbackCopyText(formattedText);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Команды скопированы", "📋");
+      } catch (err) {
+        showToast("Не удалось скопировать", "❌");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    /* =========================================================================
+       9. INITIALIZATION & LOCALSTORAGE PERSISTENCE
+       ========================================================================= */
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // 1. Load saved sound preference
+      const savedMute = localStorage.getItem("spider_sound_muted");
+      if (savedMute !== null) {
+        state.isSoundMuted = savedMute === "true";
+        const icon = document.getElementById("soundIcon");
+        const text = document.getElementById("soundText");
+        if (state.isSoundMuted) {
+          icon.textContent = "🔇";
+          text.textContent = "Звук: Выкл";
+        }
+      }
+
+      // 2. Load saved student list or use default
+      const savedStudentsText = localStorage.getItem("spider_students_text");
+      const textarea = document.getElementById("studentInput");
+      if (savedStudentsText !== null && savedStudentsText.trim().length > 0) {
+        textarea.value = savedStudentsText;
+      } else {
+        textarea.value = DEMO_STUDENTS.join("\n");
+      }
+
+      // 3. Load saved team count
+      const savedCount = localStorage.getItem("spider_team_count");
+      if (savedCount) {
+        selectTeamCount(parseInt(savedCount, 10));
+      } else {
+        selectTeamCount(4);
+      }
+
+      updateStudentMetrics();
+
+      // Keyboard Shortcut: Ctrl + Enter to launch
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          e.preventDefault();
+          startSpiderPortal();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
