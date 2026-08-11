@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#050816">
+  <title>Инфо-Пакман — основы программирования Python</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: rgba(12, 18, 46, .92);
+      --line: rgba(112, 140, 255, .22);
+      --blue: #315bff;
+      --cyan: #42e8ff;
+      --yellow: #ffd93d;
+      --text: #f5f7ff;
+      --muted: #9aa7d1;
+      --green: #5cf2a3;
+      --red: #ff5a75;
+      --orange: #ffab45;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      background:
+        radial-gradient(circle at 16% 10%, rgba(49, 91, 255, .17), transparent 33%),
+        radial-gradient(circle at 84% 90%, rgba(140, 65, 255, .13), transparent 34%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-rounded, "Segoe UI", Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 84%);
+    }
+
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px 20px 28px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      position: relative;
+      width: 48px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 28px rgba(255, 217, 61, .35);
+    }
+    .logo::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: 13px;
+      width: 26px;
+      height: 24px;
+      background: var(--bg);
+      clip-path: polygon(100% 50%, 0 0, 0 100%);
+    }
+
+    h1 { margin: 0; font-size: clamp(21px, 3vw, 34px); line-height: 1; letter-spacing: -.04em; }
+    .subtitle { margin-top: 5px; color: var(--muted); font-size: 13px; }
+
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .help-button, .action-button {
+      min-width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 13px;
+      background: rgba(255,255,255,.06);
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+      transition: .2s ease;
+    }
+    .action-button { padding: 0 13px; font-size: 12px; }
+    .action-button.active { color: var(--yellow); border-color: rgba(255,217,61,.38); background: rgba(255,217,61,.1); }
+    .help-button:hover, .action-button:hover { background: rgba(255,255,255,.11); transform: translateY(-1px); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 294px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .game-card, .side-card {
+      background: var(--panel);
+      border: 1px solid rgba(120, 145, 255, .18);
+      border-radius: 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .game-card { padding: 14px; }
+    .hud {
+      display: grid;
+      grid-template-columns: 1.25fr repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hud-item {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 9px 11px;
+      background: rgba(255,255,255,.035);
+    }
+    .hud-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+    .hud-value { margin-top: 3px; font-size: 17px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #livesValue { color: var(--yellow); letter-spacing: 2px; }
+
+    .canvas-wrap {
+      position: relative;
+      width: min(100%, 520px);
+      margin: 0 auto;
+      aspect-ratio: 1;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #02040c;
+      border: 1px solid rgba(81, 119, 255, .28);
+      box-shadow: inset 0 0 60px rgba(35, 65, 180, .12);
+    }
+    canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
+
+    .pause-badge {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      padding: 7px 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 99px;
+      background: rgba(3, 7, 22, .88);
+      backdrop-filter: blur(8px);
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+    .pause-badge.visible { opacity: 1; }
+
+    .side { display: grid; gap: 12px; }
+    .side-card { padding: 16px; }
+    .side-title { margin: 0 0 12px; font-size: 15px; }
+
+    .progress-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+    .progress-row strong { color: white; }
+    .bar { height: 9px; margin-top: 9px; border-radius: 20px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .bar > div { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--cyan)); box-shadow: 0 0 14px var(--cyan); transition: width .3s; }
+
+    .legend { display: grid; gap: 10px; }
+    .legend-item { display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .dot, .power, .question-token { justify-self: center; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #ffe8a6; }
+    .power { width: 14px; height: 14px; border-radius: 50%; background: white; box-shadow: 0 0 12px white; }
+    .question-token { color: var(--yellow); font-weight: 1000; text-shadow: 0 0 10px var(--yellow); }
+
+    .ghosts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .ghost-chip { border-radius: 10px; padding: 8px 2px; text-align: center; background: rgba(255,255,255,.045); font-size: 10px; color: var(--muted); }
+    .ghost-icon { width: 20px; height: 18px; margin: 0 auto 5px; border-radius: 10px 10px 4px 4px; background: currentColor; }
+    .ghost-chip:nth-child(1) { color: #ff4d60; }
+    .ghost-chip:nth-child(2) { color: #ff80c8; }
+    .ghost-chip:nth-child(3) { color: #4de8f0; }
+    .ghost-chip:nth-child(4) { color: #ffad52; }
+
+    .controls { display: none; width: 174px; margin: 14px auto 0; grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(2, 54px); gap: 6px; }
+    .control-button {
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 15px;
+      background: rgba(255,255,255,.07);
+      color: white;
+      font-size: 21px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .control-button:active { background: rgba(49,91,255,.38); transform: scale(.96); }
+    .control-button.up { grid-column: 2; }
+    .control-button.left { grid-column: 1; grid-row: 2; }
+    .control-button.down { grid-column: 2; grid-row: 2; }
+    .control-button.right { grid-column: 3; grid-row: 2; }
+
+    .overlay {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(2, 4, 14, .8);
+      backdrop-filter: blur(12px);
+      transition: opacity .2s ease;
+    }
+    .overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .modal {
+      width: min(600px, 100%);
+      max-height: min(92vh, 780px);
+      overflow: auto;
+      border: 1px solid rgba(111, 141, 255, .32);
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(17, 25, 64, .98), rgba(7, 11, 31, .99));
+      box-shadow: 0 30px 100px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08);
+      padding: clamp(22px, 4vw, 36px);
+    }
+    .modal-kicker { color: var(--cyan); text-transform: uppercase; letter-spacing: .13em; font-size: 11px; font-weight: 900; }
+    .modal h2 { margin: 9px 0 10px; font-size: clamp(26px, 6vw, 44px); letter-spacing: -.04em; line-height: 1.03; }
+    .modal p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .name-input {
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px 17px;
+      color: white;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(255,255,255,.06);
+      transition: .2s;
+    }
+    .name-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(66,232,255,.1); }
+    .error-text { min-height: 18px; margin: 7px 2px 0; color: var(--red); font-size: 12px; }
+
+    .primary-button, .secondary-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      border: 0;
+      transition: transform .18s, filter .18s;
+    }
+    .primary-button { color: #07101c; background: linear-gradient(135deg, var(--yellow), #ffad32); box-shadow: 0 10px 30px rgba(255, 193, 51, .22); }
+    .secondary-button { color: white; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+    .primary-button:hover, .secondary-button:hover { transform: translateY(-1px); filter: brightness(1.06); }
+
+    .quick-rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .quick-rule { padding: 11px 8px; text-align: center; border-radius: 12px; background: rgba(255,255,255,.045); color: var(--muted); font-size: 11px; }
+    .quick-rule b { display: block; margin-bottom: 5px; color: white; font-size: 18px; }
+
+    .question-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .question-counter { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .bonus { padding: 6px 10px; color: var(--yellow); background: rgba(255,217,61,.1); border: 1px solid rgba(255,217,61,.18); border-radius: 99px; font-size: 12px; font-weight: 900; }
+    .question-title { margin: 0 0 17px; font-size: clamp(19px, 3.4vw, 25px); line-height: 1.35; white-space: pre-wrap; }
+    .answers { display: grid; gap: 9px; }
+    .answer-button {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 13px;
+      background: rgba(255,255,255,.05);
+      color: white;
+      text-align: left;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .answer-button:hover:not(:disabled) { border-color: rgba(66,232,255,.5); background: rgba(66,232,255,.08); transform: translateX(3px); }
+    .answer-button.correct { border-color: var(--green); background: rgba(92,242,163,.13); color: var(--green); }
+    .answer-button.wrong { border-color: var(--red); background: rgba(255,90,117,.13); color: #ff9aaa; }
+    .answer-button:disabled { cursor: default; }
+    .feedback { display: none; margin-top: 13px; padding: 12px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; }
+    .feedback.visible { display: block; }
+    .feedback.good { color: var(--green); background: rgba(92,242,163,.1); }
+    .feedback.bad { color: #ff9aaa; background: rgba(255,90,117,.1); }
+
+    .result-icon { font-size: 62px; line-height: 1; filter: drop-shadow(0 0 22px rgba(255,217,61,.28)); }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0 3px; }
+    .result-stat { padding: 12px 7px; text-align: center; border-radius: 13px; background: rgba(255,255,255,.045); }
+    .result-stat strong { display: block; font-size: 21px; color: white; }
+    .result-stat span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+
+    .toast {
+      position: fixed;
+      z-index: 40;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      min-width: min(340px, calc(100vw - 32px));
+      padding: 12px 18px;
+      text-align: center;
+      border-radius: 13px;
+      background: rgba(13, 20, 50, .96);
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: 0 16px 50px rgba(0,0,0,.45);
+      font-weight: 800;
+      transition: .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.success { color: var(--green); }
+    .toast.danger { color: #ff9aaa; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { grid-template-columns: 1fr 1fr; }
+      .side-card:last-child { grid-column: 1 / -1; }
+      .controls { display: grid; }
+    }
+
+    @media (max-width: 570px) {
+      .app { padding: 12px 10px 22px; }
+      .subtitle { display: none; }
+      .action-button span { display: none; }
+      .action-button { min-width: 42px; padding: 0; font-size: 17px; }
+      .game-card { padding: 8px; border-radius: 17px; }
+      .hud { grid-template-columns: 1fr 1fr; }
+      .hud-item { padding: 7px 9px; }
+      .hud-value { font-size: 15px; }
+      .canvas-wrap { border-radius: 12px; }
+      .side { grid-template-columns: 1fr; }
+      .side-card:last-child { grid-column: auto; }
+      .quick-rules { grid-template-columns: 1fr; }
+      .quick-rule { text-align: left; display: flex; align-items: center; gap: 10px; }
+      .quick-rule b { margin: 0; }
+      .modal { padding: 22px 18px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Инфо-Пакман</h1>
+          <div class="subtitle">Закрепление тем «Ввод, вывод, условия и циклы Python»</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="action-button" id="pauseButton" aria-label="Поставить игру на паузу">⏸ <span>Пауза</span></button>
+        <button class="action-button" id="fullscreenButton" aria-label="Открыть игру на весь экран">⛶ <span>На весь экран</span></button>
+        <button class="help-button" id="helpButton" aria-label="Показать правила">?</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="game-card">
+        <div class="hud" aria-label="Игровая статистика">
+          <div class="hud-item"><div class="hud-label">Игрок</div><div class="hud-value" id="playerValue">—</div></div>
+          <div class="hud-item"><div class="hud-label">Уровень</div><div class="hud-value" id="levelValue">1 / 3</div></div>
+          <div class="hud-item"><div class="hud-label">Очки</div><div class="hud-value" id="scoreValue">0</div></div>
+          <div class="hud-item"><div class="hud-label">Жизни</div><div class="hud-value" id="livesValue">● ● ●</div></div>
+          <div class="hud-item"><div class="hud-label">Осталось</div><div class="hud-value" id="pelletsValue">0</div></div>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="gameCanvas" width="600" height="600" aria-label="Игровой лабиринт Инфо-Пакман"></canvas>
+          <div class="pause-badge" id="pauseBadge">ПАУЗА</div>
+        </div>
+
+        <div class="controls" aria-label="Сенсорное управление">
+          <button class="control-button up" data-dir="up" aria-label="Вверх">▲</button>
+          <button class="control-button left" data-dir="left" aria-label="Влево">◀</button>
+          <button class="control-button down" data-dir="down" aria-label="Вниз">▼</button>
+          <button class="control-button right" data-dir="right" aria-label="Вправо">▶</button>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="side-card">
+          <h3 class="side-title">Учебный прогресс</h3>
+          <div class="progress-row"><span id="questionProgressLabel">Уровень 1</span><strong id="questionProgress">0 / 10</strong></div>
+          <div class="bar"><div id="questionBar"></div></div>
+          <div class="progress-row" style="margin-top:12px"><span>Верных ответов</span><strong id="correctProgress">0</strong></div>
+          <div class="progress-row" style="margin-top:8px"><span>Всего вопросов</span><strong id="totalQuestionProgress">0 / 30</strong></div>
+        </div>
+
+        <div class="side-card">
+          <h3 class="side-title">Обозначения</h3>
+          <div class="legend">
+            <div class="legend-item"><span class="dot"></span><span>Обычная точка: <b>+10</b></span></div>
+            <div class="legend-item"><span class="question-token">?</span><span>Учебный вопрос: до <b>+100</b></span></div>
+            <div class="legend-item"><span class="power"></span><span>Супер-точка: <b>+50</b> и сила</span></div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <h3 class="side-title">Призраки</h3>
+          <div class="ghosts">
+            <div class="ghost-chip"><div class="ghost-icon"></div>Блинки</div>
+            <div class="ghost-chip"><div class="ghost-icon"></div>Пинки</div>
+            <div class="ghost-chip"><div class="ghost-icon"></div>Инки</div>
+            <div class="ghost-chip"><div class="ghost-icon"></div>Клайд</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="overlay" id="startOverlay">
+    <div class="modal">
+      <div class="modal-kicker">Учебная мини-игра</div>
+      <h2>Готов войти<br>в инфо-лабиринт?</h2>
+      <p>Пройди 3 небольших лабиринта, ответь на 10 вопросов в каждом и не дай призракам поймать тебя.</p>
+      <input class="name-input" id="nameInput" type="text" maxlength="24" autocomplete="off" placeholder="Введи своё имя" aria-label="Имя игрока">
+      <div class="error-text" id="nameError"></div>
+      <button class="primary-button" id="startButton">Начать игру</button>
+      <button class="secondary-button" id="startFullscreenButton">⛶ Начать на весь экран</button>
+      <div class="quick-rules">
+        <div class="quick-rule"><b>⌨️</b>Стрелки или WASD</div>
+        <div class="quick-rule"><b>?</b>Ответь на вопрос</div>
+        <div class="quick-rule"><b>●</b>Суперсила на 8 секунд</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="questionOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="questionTitle">
+      <div class="question-top">
+        <span class="question-counter" id="modalQuestionCounter">Уровень 1 · вопрос 1 из 10</span>
+        <span class="bonus">+100 очков</span>
+      </div>
+      <h3 class="question-title" id="questionTitle"></h3>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" role="status"></div>
+      <button class="primary-button" id="continueButton" style="display:none">Продолжить игру</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="helpOverlay">
+    <div class="modal">
+      <div class="modal-kicker">Как играть</div>
+      <h2>Правила</h2>
+      <p>Управляй Пакманом стрелками или клавишами WASD. В игре 3 уровня по 10 вопросов. Жёлтые знаки вопроса открывают задания, а большие белые точки позволяют временно съедать призраков. Пробел или верхняя кнопка ставят игру на паузу. Рядом находится кнопка полноэкранного режима.</p>
+      <button class="primary-button" id="closeHelpButton">Понятно</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="resultOverlay">
+    <div class="modal" style="text-align:center">
+      <div class="result-icon" id="resultIcon">🏆</div>
+      <div class="modal-kicker" id="resultKicker">Лабиринт пройден</div>
+      <h2 id="resultTitle">Отличная работа!</h2>
+      <p id="resultText"></p>
+      <div class="result-grid">
+        <div class="result-stat"><strong id="finalScore">0</strong><span>очков</span></div>
+        <div class="result-stat"><strong id="finalCorrect">0/30</strong><span>верно</span></div>
+        <div class="result-stat"><strong id="finalPellets">0</strong><span>точек</span></div>
+      </div>
+      <button class="primary-button" id="restartButton">Сыграть ещё раз</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="levelOverlay">
+    <div class="modal" style="text-align:center">
+      <div class="result-icon">⭐</div>
+      <div class="modal-kicker">Этап завершён</div>
+      <h2 id="levelCompleteTitle">Уровень 1 пройден!</h2>
+      <p id="levelCompleteText">Отлично! Впереди новый лабиринт и следующие 10 вопросов.</p>
+      <div class="result-grid">
+        <div class="result-stat"><strong id="levelScore">0</strong><span>всего очков</span></div>
+        <div class="result-stat"><strong id="levelCorrect">0/10</strong><span>верно</span></div>
+        <div class="result-stat"><strong id="nextLevelNumber">2</strong><span>следующий</span></div>
+      </div>
+      <button class="primary-button" id="nextLevelButton">Начать уровень 2</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    'use strict';
+
+    const QUESTIONS = [
+      { q: 'Какая команда используется для вывода информации в Python?', a: ['input()', 'print()', 'if', 'for'], c: 1 },
+      { q: 'Какая команда используется для ввода данных с клавиатуры?', a: ['input()', 'print()', 'while', 'else'], c: 0 },
+      { q: 'Какой тип данных возвращает команда input()?', a: ['int', 'float', 'str', 'bool'], c: 2 },
+      { q: 'Какая команда позволяет ввести целое число?', a: ['str(input())', 'print(input())', 'float(input())', 'int(input())'], c: 3 },
+      { q: 'Какое ключевое слово используется для проверки условия?', a: ['for', 'if', 'input', 'while'], c: 1 },
+      { q: 'Какая команда выполняется, если условие if оказалось ложным?', a: ['else', 'for', 'print', 'input'], c: 0 },
+      { q: 'Какая команда позволяет проверить дополнительное условие?', a: ['while', 'else', 'elif', 'print'], c: 2 },
+      { q: 'Какой цикл обычно используют, когда количество повторений известно заранее?', a: ['if', 'for', 'else', 'input'], c: 1 },
+      { q: 'Какой цикл работает, пока заданное условие является истинным?', a: ['while', 'if', 'elif', 'print'], c: 0 },
+      { q: 'Сколько раз выполнится тело цикла?\n\nfor i in range(5):\n    print("Привет")', a: ['4 раза', '5 раз', '6 раз', 'Бесконечно'], c: 1 },
+
+      { q: 'Что выведет программа?\n\nprint(2 + 3 * 4)', a: ['20', '14', '24', '9'], c: 1 },
+      { q: 'Пользователь ввёл число 15. Что будет храниться в переменной age?\n\nage = int(input())', a: ['Строка "15"', 'Целое число 15', 'Число 15.0', 'Логическое значение True'], c: 1 },
+      { q: 'Что выведет программа?\n\nx = 7\n\nif x > 5:\n    print("Большое")\nelse:\n    print("Маленькое")', a: ['Большое', 'Маленькое', '7', 'Ничего'], c: 0 },
+      { q: 'Что выведет программа?\n\nx = 4\n\nif x % 2 == 0:\n    print("Чётное")\nelse:\n    print("Нечётное")', a: ['Нечётное', '4', 'Чётное', '0'], c: 2 },
+      { q: 'Что выведет программа?\n\nx = 0\n\nif x > 0:\n    print("Положительное")\nelif x < 0:\n    print("Отрицательное")\nelse:\n    print("Ноль")', a: ['Положительное', 'Отрицательное', 'Ноль', 'Ничего'], c: 2 },
+      { q: 'Какие числа выведет программа?\n\nfor i in range(3):\n    print(i)', a: ['1, 2, 3', '0, 1, 2', '0, 1, 2, 3', '1, 2'], c: 1 },
+      { q: 'Какие числа принимает переменная i?\n\nfor i in range(2, 6):\n    print(i)', a: ['2, 3, 4, 5', '2, 3, 4, 5, 6', '1, 2, 3, 4, 5', '3, 4, 5, 6'], c: 0 },
+      { q: 'Что выведет программа?\n\nx = 1\n\nwhile x <= 3:\n    print(x)\n    x = x + 1', a: ['0, 1, 2', '1, 2', '1, 2, 3', 'Цикл будет бесконечным'], c: 2 },
+      { q: 'Что выведет программа?\n\ntotal = 0\n\nfor i in range(1, 6):\n    total = total + i\n\nprint(total)', a: ['10', '15', '21', '5'], c: 1 },
+      { q: 'Сколько раз выполнится тело цикла?\n\nfor i in range(1, 10, 2):\n    print(i)', a: ['4 раза', '5 раз', '9 раз', '10 раз'], c: 1 },
+
+      { q: 'Что выведет программа?\n\nx = 15\n\nif x >= 10 and x <= 20:\n    print("Подходит")\nelse:\n    print("Не подходит")', a: ['Подходит', 'Не подходит', '15', 'Произойдёт ошибка'], c: 0 },
+      { q: 'Что выведет программа?\n\nx = 10\n\nif x > 0:\n    print("A")\nelif x > 5:\n    print("B")\nelse:\n    print("C")', a: ['A', 'B', 'A и B', 'C'], c: 0 },
+      { q: 'Какие числа выведет программа?\n\nfor i in range(2, 10, 2):\n    print(i)', a: ['2, 4, 6, 8', '2, 4, 6, 8, 10', '1, 3, 5, 7, 9', '2, 3, 4, 5, 6, 7, 8, 9'], c: 0 },
+      { q: 'Что выведет программа?\n\nx = 2\n\nwhile x < 20:\n    print(x)\n    x = x * 2', a: ['2, 4, 6, 8', '2, 4, 8, 16', '2, 4, 8, 16, 32', 'Цикл будет бесконечным'], c: 1 },
+      { q: 'Что выведет программа?\n\ntotal = 0\n\nfor i in range(1, 7):\n    if i % 2 == 0:\n        total = total + i\n\nprint(total)', a: ['6', '9', '12', '21'], c: 2 },
+      { q: 'Что выведет программа?\n\nx = 1\n\nwhile x < 4:\n    print(x)\n    x = x + 1', a: ['1, 2, 3', '1, 2, 3, 4', '0, 1, 2, 3', 'Цикл будет бесконечным'], c: 0 },
+      { q: 'Что выведет программа?\n\nage = 16\n\nif age >= 18:\n    print("Совершеннолетний")\nelse:\n    print("Несовершеннолетний")', a: ['Совершеннолетний', 'Несовершеннолетний', '16', 'Ничего'], c: 1 },
+      { q: 'Сколько раз программа выведет слово Python?\n\nfor i in range(1, 4):\n    print("Python")', a: ['2 раза', '3 раза', '4 раза', '5 раз'], c: 1 },
+      { q: 'Что выведет программа?\n\nscore = 75\n\nif score >= 90:\n    print("Отлично")\nelif score >= 50:\n    print("Зачёт")\nelse:\n    print("Повтори тему")', a: ['Отлично', 'Зачёт', 'Повтори тему', '75'], c: 1 },
+      { q: 'Что выведет программа?\n\nn = 3\n\nwhile n > 0:\n    print(n)\n    n = n - 1', a: ['1, 2, 3', '3, 2, 1', '3, 2, 1, 0', 'Цикл будет бесконечным'], c: 1 }
+    ];
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const SIZE = 15;
+    const LEVEL_COUNT = 3;
+    const QUESTIONS_PER_LEVEL = 10;
+    const TILE = canvas.width / SIZE;
+    const DIRS = {
+      up: { x: 0, y: -1, angle: -Math.PI / 2 },
+      down: { x: 0, y: 1, angle: Math.PI / 2 },
+      left: { x: -1, y: 0, angle: Math.PI },
+      right: { x: 1, y: 0, angle: 0 }
+    };
+    const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' };
+    const GHOST_DATA = [
+      { name: 'Блинки', color: '#ff4d60', mode: 'chase' },
+      { name: 'Пинки', color: '#ff80c8', mode: 'ahead' },
+      { name: 'Инки', color: '#4de8f0', mode: 'vector' },
+      { name: 'Клайд', color: '#ffad52', mode: 'shy' }
+    ];
+
+    let grid = [];
+    let pellets = new Set();
+    let questionCells = new Map();
+    let powerCells = new Set();
+    let player = null;
+    let ghosts = [];
+    let state = 'start';
+    let playerName = '';
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+    let correctAnswers = 0;
+    let answeredCount = 0;
+    let collectedCount = 0;
+    let totalPellets = 0;
+    let currentDirection = null;
+    let queuedDirection = null;
+    let frightenedUntil = 0;
+    let lastPlayerMove = 0;
+    let lastGhostMove = 0;
+    let resetUntil = 0;
+    let pausedAt = 0;
+    let levelCorrectStart = 0;
+    let toastTimer = null;
+    let helpReturnState = 'paused';
+    let mouthPhase = 0;
+
+    const els = {
+      startOverlay: document.getElementById('startOverlay'),
+      questionOverlay: document.getElementById('questionOverlay'),
+      helpOverlay: document.getElementById('helpOverlay'),
+      resultOverlay: document.getElementById('resultOverlay'),
+      levelOverlay: document.getElementById('levelOverlay'),
+      nameInput: document.getElementById('nameInput'),
+      nameError: document.getElementById('nameError'),
+      startButton: document.getElementById('startButton'),
+      playerValue: document.getElementById('playerValue'),
+      levelValue: document.getElementById('levelValue'),
+      scoreValue: document.getElementById('scoreValue'),
+      livesValue: document.getElementById('livesValue'),
+      pelletsValue: document.getElementById('pelletsValue'),
+      questionProgress: document.getElementById('questionProgress'),
+      questionProgressLabel: document.getElementById('questionProgressLabel'),
+      totalQuestionProgress: document.getElementById('totalQuestionProgress'),
+      correctProgress: document.getElementById('correctProgress'),
+      questionBar: document.getElementById('questionBar'),
+      questionTitle: document.getElementById('questionTitle'),
+      modalQuestionCounter: document.getElementById('modalQuestionCounter'),
+      answers: document.getElementById('answers'),
+      feedback: document.getElementById('feedback'),
+      continueButton: document.getElementById('continueButton'),
+      pauseBadge: document.getElementById('pauseBadge'),
+      pauseButton: document.getElementById('pauseButton'),
+      fullscreenButton: document.getElementById('fullscreenButton'),
+      toast: document.getElementById('toast')
+    };
+
+    function seededRandom(seed = 593827) {
+      let value = seed >>> 0;
+      return () => {
+        value += 0x6D2B79F5;
+        let t = value;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function shuffle(array, random) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function key(x, y) { return `${x},${y}`; }
+    function inside(x, y) { return x >= 0 && x < SIZE && y >= 0 && y < SIZE; }
+    function isFloor(x, y) { return inside(x, y) && grid[y][x] === 0; }
+
+    function generateMaze() {
+      const random = seededRandom(593827 + currentLevel * 104729);
+      grid = Array.from({ length: SIZE }, () => Array(SIZE).fill(1));
+      const stack = [{ x: 1, y: 1 }];
+      grid[1][1] = 0;
+
+      while (stack.length) {
+        const cell = stack[stack.length - 1];
+        const options = shuffle([
+          { x: cell.x + 2, y: cell.y }, { x: cell.x - 2, y: cell.y },
+          { x: cell.x, y: cell.y + 2 }, { x: cell.x, y: cell.y - 2 }
+        ], random).filter(n => n.x > 0 && n.x < SIZE - 1 && n.y > 0 && n.y < SIZE - 1 && grid[n.y][n.x] === 1);
+
+        if (!options.length) { stack.pop(); continue; }
+        const next = options[0];
+        grid[(cell.y + next.y) / 2][(cell.x + next.x) / 2] = 0;
+        grid[next.y][next.x] = 0;
+        stack.push(next);
+      }
+
+      const breakable = [];
+      for (let y = 2; y < SIZE - 2; y++) {
+        for (let x = 2; x < SIZE - 2; x++) {
+          if (grid[y][x] === 0) continue;
+          const horizontal = isFloor(x - 1, y) && isFloor(x + 1, y);
+          const vertical = isFloor(x, y - 1) && isFloor(x, y + 1);
+          if (horizontal || vertical) breakable.push({ x, y });
+        }
+      }
+      shuffle(breakable, random).slice(0, 12).forEach(p => { grid[p.y][p.x] = 0; });
+
+      const floors = [];
+      for (let y = 1; y < SIZE - 1; y++) {
+        for (let x = 1; x < SIZE - 1; x++) if (isFloor(x, y)) floors.push({ x, y });
+      }
+
+      const playerSpawn = { x: 1, y: 1 };
+      const ghostTargets = [
+        { x: SIZE - 2, y: 1 },
+        { x: 1, y: SIZE - 2 },
+        { x: SIZE - 2, y: SIZE - 2 },
+        { x: Math.floor(SIZE / 2), y: Math.floor(SIZE / 2) }
+      ];
+      const ghostSpawns = ghostTargets.map(t => nearestFloor(t.x, t.y, floors));
+      const blocked = new Set([key(playerSpawn.x, playerSpawn.y), ...ghostSpawns.map(p => key(p.x, p.y))]);
+
+      pellets = new Set(floors.filter(p => !blocked.has(key(p.x, p.y))).map(p => key(p.x, p.y)));
+      const eligible = floors.filter(p => !blocked.has(key(p.x, p.y)) && manhattan(p, playerSpawn) > 5);
+
+      const cornerTargets = [
+        { x: 1, y: 1 }, { x: SIZE - 2, y: 1 },
+        { x: 1, y: SIZE - 2 }, { x: SIZE - 2, y: SIZE - 2 }
+      ];
+      powerCells = new Set();
+      cornerTargets.forEach(t => {
+        const p = nearestFloor(t.x, t.y, eligible.filter(f => !powerCells.has(key(f.x, f.y))));
+        powerCells.add(key(p.x, p.y));
+      });
+
+      const questionPool = shuffle(eligible.filter(p => !powerCells.has(key(p.x, p.y))), random);
+      questionCells = new Map();
+      const levelQuestionStart = (currentLevel - 1) * QUESTIONS_PER_LEVEL;
+      const spacing = Math.max(1, Math.floor(questionPool.length / QUESTIONS_PER_LEVEL));
+      for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
+        const p = questionPool[Math.min(i * spacing, questionPool.length - 1)];
+        questionCells.set(key(p.x, p.y), levelQuestionStart + i);
+      }
+
+      player = { ...playerSpawn, prevX: playerSpawn.x, prevY: playerSpawn.y, movedAt: 0, spawn: playerSpawn };
+      ghosts = GHOST_DATA.map((data, i) => ({
+        ...data,
+        ...ghostSpawns[i],
+        prevX: ghostSpawns[i].x,
+        prevY: ghostSpawns[i].y,
+        movedAt: 0,
+        spawn: ghostSpawns[i],
+        dir: null
+      }));
+      totalPellets = pellets.size;
+    }
+
+    function nearestFloor(tx, ty, floors) {
+      return floors.reduce((best, p) => manhattan(p, { x: tx, y: ty }) < manhattan(best, { x: tx, y: ty }) ? p : best, floors[0]);
+    }
+
+    function manhattan(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+
+    function resetGame() {
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      correctAnswers = 0;
+      answeredCount = 0;
+      collectedCount = 0;
+      levelCorrectStart = 0;
+      prepareLevel();
+    }
+
+    function prepareLevel() {
+      currentDirection = null;
+      queuedDirection = null;
+      frightenedUntil = 0;
+      resetUntil = 0;
+      pausedAt = 0;
+      lastPlayerMove = 0;
+      lastGhostMove = 0;
+      generateMaze();
+      els.pauseBadge.classList.remove('visible');
+      updatePauseButton(false);
+      updateHud();
+    }
+
+    function updateHud() {
+      els.playerValue.textContent = playerName || '—';
+      els.levelValue.textContent = `${currentLevel} / ${LEVEL_COUNT}`;
+      els.scoreValue.textContent = score.toLocaleString('ru-RU');
+      els.livesValue.textContent = Array(Math.max(0, lives)).fill('●').join(' ');
+      els.pelletsValue.textContent = pellets.size;
+      const answeredOnLevel = answeredCount - (currentLevel - 1) * QUESTIONS_PER_LEVEL;
+      els.questionProgressLabel.textContent = `Уровень ${currentLevel}`;
+      els.questionProgress.textContent = `${answeredOnLevel} / ${QUESTIONS_PER_LEVEL}`;
+      els.totalQuestionProgress.textContent = `${answeredCount} / ${QUESTIONS.length}`;
+      els.correctProgress.textContent = correctAnswers;
+      els.questionBar.style.width = `${answeredOnLevel / QUESTIONS_PER_LEVEL * 100}%`;
+    }
+
+    function startGame() {
+      const name = els.nameInput.value.trim();
+      if (!name) {
+        els.nameError.textContent = 'Сначала введи имя игрока.';
+        els.nameInput.focus();
+        return;
+      }
+      playerName = name;
+      els.nameError.textContent = '';
+      resetGame();
+      state = 'playing';
+      els.startOverlay.classList.add('hidden');
+      showToast(`Удачи, ${playerName}!`, 'success');
+    }
+
+    function startFullscreenGame() {
+      if (!els.nameInput.value.trim()) {
+        startGame();
+        return;
+      }
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {
+          showToast('Браузер не разрешил полноэкранный режим.', 'danger');
+        });
+      }
+      startGame();
+    }
+
+    function canMove(entity, dirName) {
+      if (!dirName) return false;
+      const d = DIRS[dirName];
+      return isFloor(entity.x + d.x, entity.y + d.y);
+    }
+
+    function movePlayer(time) {
+      if (queuedDirection && canMove(player, queuedDirection)) currentDirection = queuedDirection;
+      if (!currentDirection || !canMove(player, currentDirection)) return;
+      const d = DIRS[currentDirection];
+      player.prevX = player.x;
+      player.prevY = player.y;
+      player.x += d.x;
+      player.y += d.y;
+      player.movedAt = time;
+      collectAtPlayer();
+      checkCollisions();
+    }
+
+    function collectAtPlayer() {
+      const cellKey = key(player.x, player.y);
+      if (!pellets.has(cellKey)) return;
+      pellets.delete(cellKey);
+      collectedCount++;
+
+      if (powerCells.has(cellKey)) {
+        powerCells.delete(cellKey);
+        score += 50;
+        frightenedUntil = performance.now() + 8000;
+        showToast('Суперсила: призраков можно съесть!', 'success');
+      } else {
+        score += 10;
+      }
+
+      updateHud();
+      if (questionCells.has(cellKey)) {
+        const questionIndex = questionCells.get(cellKey);
+        questionCells.delete(cellKey);
+        openQuestion(questionIndex);
+      } else {
+        checkWin();
+      }
+    }
+
+    function openQuestion(index) {
+      state = 'question';
+      pausedAt = performance.now();
+      const item = QUESTIONS[index];
+      const levelQuestionNumber = index - (currentLevel - 1) * QUESTIONS_PER_LEVEL + 1;
+      els.modalQuestionCounter.textContent = `Уровень ${currentLevel} · вопрос ${levelQuestionNumber} из ${QUESTIONS_PER_LEVEL}`;
+      els.questionTitle.textContent = item.q;
+      els.answers.innerHTML = '';
+      els.feedback.className = 'feedback';
+      els.feedback.textContent = '';
+      els.continueButton.style.display = 'none';
+
+      item.a.forEach((answer, answerIndex) => {
+        const button = document.createElement('button');
+        button.className = 'answer-button';
+        button.textContent = `${['А', 'Б', 'В', 'Г'][answerIndex]}) ${answer}`;
+        button.addEventListener('click', () => answerQuestion(item, answerIndex, button));
+        els.answers.appendChild(button);
+      });
+      els.questionOverlay.classList.remove('hidden');
+    }
+
+    function answerQuestion(item, selected, selectedButton) {
+      const buttons = [...els.answers.querySelectorAll('button')];
+      buttons.forEach(button => { button.disabled = true; });
+      buttons[item.c].classList.add('correct');
+      answeredCount++;
+
+      if (selected === item.c) {
+        selectedButton.classList.add('correct');
+        score += 100;
+        correctAnswers++;
+        els.feedback.textContent = 'Верно! Начислено 100 дополнительных очков.';
+        els.feedback.className = 'feedback visible good';
+      } else {
+        selectedButton.classList.add('wrong');
+        els.feedback.textContent = `Неверно. Правильный ответ: ${['А', 'Б', 'В', 'Г'][item.c]}) ${item.a[item.c]}.`;
+        els.feedback.className = 'feedback visible bad';
+      }
+      els.continueButton.style.display = 'block';
+      updateHud();
+    }
+
+    function closeQuestion() {
+      els.questionOverlay.classList.add('hidden');
+      resumeTimers();
+      state = 'playing';
+      lastPlayerMove = performance.now();
+      lastGhostMove = performance.now();
+      checkWin();
+    }
+
+    function floorNeighbors(entity) {
+      return Object.entries(DIRS)
+        .filter(([, d]) => isFloor(entity.x + d.x, entity.y + d.y))
+        .map(([name, d]) => ({ name, x: entity.x + d.x, y: entity.y + d.y }));
+    }
+
+    function distanceMap(target) {
+      const safeTarget = isFloor(target.x, target.y) ? target : nearestFloor(target.x, target.y, allFloors());
+      const distances = new Map([[key(safeTarget.x, safeTarget.y), 0]]);
+      const queue = [safeTarget];
+      for (let i = 0; i < queue.length; i++) {
+        const p = queue[i];
+        const nextDistance = distances.get(key(p.x, p.y)) + 1;
+        Object.values(DIRS).forEach(d => {
+          const nx = p.x + d.x, ny = p.y + d.y, k = key(nx, ny);
+          if (isFloor(nx, ny) && !distances.has(k)) {
+            distances.set(k, nextDistance);
+            queue.push({ x: nx, y: ny });
+          }
+        });
+      }
+      return distances;
+    }
+
+    function allFloors() {
+      const result = [];
+      for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) if (isFloor(x, y)) result.push({ x, y });
+      return result;
+    }
+
+    function ghostTarget(ghost, index) {
+      const d = DIRS[currentDirection || 'right'];
+      if (ghost.mode === 'ahead') return { x: player.x + d.x * 4, y: player.y + d.y * 4 };
+      if (ghost.mode === 'vector') {
+        const ahead = { x: player.x + d.x * 2, y: player.y + d.y * 2 };
+        const blinky = ghosts[0];
+        return { x: ahead.x * 2 - blinky.x, y: ahead.y * 2 - blinky.y };
+      }
+      if (ghost.mode === 'shy' && manhattan(ghost, player) < 7) return { x: 1, y: SIZE - 2 };
+      return { x: player.x, y: player.y };
+    }
+
+    function moveGhost(ghost, index, time) {
+      let options = floorNeighbors(ghost);
+      if (options.length > 1 && ghost.dir) {
+        const withoutReverse = options.filter(o => o.name !== OPPOSITE[ghost.dir]);
+        if (withoutReverse.length) options = withoutReverse;
+      }
+      if (!options.length) return;
+
+      const frightened = performance.now() < frightenedUntil;
+      const distances = distanceMap(ghostTarget(ghost, index));
+      options.sort((a, b) => {
+        const da = distances.get(key(a.x, a.y)) ?? 999;
+        const db = distances.get(key(b.x, b.y)) ?? 999;
+        return frightened ? db - da : da - db;
+      });
+      const bestValue = distances.get(key(options[0].x, options[0].y)) ?? 999;
+      const best = options.filter(o => (distances.get(key(o.x, o.y)) ?? 999) === bestValue);
+      const choice = frightened ? best[Math.floor(Math.random() * best.length)] : best[0];
+      ghost.prevX = ghost.x;
+      ghost.prevY = ghost.y;
+      ghost.x = choice.x;
+      ghost.y = choice.y;
+      ghost.movedAt = time;
+      ghost.dir = choice.name;
+    }
+
+    function checkCollisions() {
+      if (state !== 'playing') return;
+      const ghost = ghosts.find(g => g.x === player.x && g.y === player.y);
+      if (!ghost) return;
+
+      if (performance.now() < frightenedUntil) {
+        score += 200;
+        ghost.x = ghost.spawn.x;
+        ghost.y = ghost.spawn.y;
+        ghost.prevX = ghost.spawn.x;
+        ghost.prevY = ghost.spawn.y;
+        ghost.movedAt = performance.now();
+        ghost.dir = null;
+        showToast(`${ghost.name} пойман! +200`, 'success');
+        updateHud();
+      } else {
+        loseLife();
+      }
+    }
+
+    function loseLife() {
+      lives--;
+      currentDirection = null;
+      queuedDirection = null;
+      frightenedUntil = 0;
+      updateHud();
+      if (lives <= 0) {
+        finishGame(false);
+        return;
+      }
+      player.x = player.spawn.x;
+      player.y = player.spawn.y;
+      player.prevX = player.spawn.x;
+      player.prevY = player.spawn.y;
+      player.movedAt = performance.now();
+      ghosts.forEach(g => {
+        g.x = g.spawn.x;
+        g.y = g.spawn.y;
+        g.prevX = g.spawn.x;
+        g.prevY = g.spawn.y;
+        g.movedAt = performance.now();
+        g.dir = null;
+      });
+      resetUntil = performance.now() + 1200;
+      showToast(`Осталось жизней: ${lives}`, 'danger');
+    }
+
+    function checkWin() {
+      if (pellets.size !== 0 || state !== 'playing') return;
+      if (currentLevel >= LEVEL_COUNT) {
+        finishGame(true);
+      } else {
+        completeLevel();
+      }
+    }
+
+    function completeLevel() {
+      state = 'levelComplete';
+      const levelCorrect = correctAnswers - levelCorrectStart;
+      const nextLevel = currentLevel + 1;
+      document.getElementById('levelCompleteTitle').textContent = `Уровень ${currentLevel} пройден!`;
+      document.getElementById('levelCompleteText').textContent = `Ты очистил лабиринт и ответил на 10 вопросов. На уровне ${nextLevel} призраки станут немного быстрее.`;
+      document.getElementById('levelScore').textContent = score.toLocaleString('ru-RU');
+      document.getElementById('levelCorrect').textContent = `${levelCorrect}/${QUESTIONS_PER_LEVEL}`;
+      document.getElementById('nextLevelNumber').textContent = nextLevel;
+      document.getElementById('nextLevelButton').textContent = `Начать уровень ${nextLevel}`;
+      els.levelOverlay.classList.remove('hidden');
+    }
+
+    function startNextLevel() {
+      els.levelOverlay.classList.add('hidden');
+      currentLevel++;
+      levelCorrectStart = correctAnswers;
+      prepareLevel();
+      state = 'playing';
+      showToast(`Уровень ${currentLevel}. Следующие 10 вопросов!`, 'success');
+    }
+
+    function finishGame(won) {
+      state = 'finished';
+      els.resultOverlay.classList.remove('hidden');
+      document.getElementById('resultIcon').textContent = won ? '🏆' : '👻';
+      document.getElementById('resultKicker').textContent = won ? 'Лабиринт пройден' : 'Игра окончена';
+      document.getElementById('resultTitle').textContent = won ? `Молодец, ${playerName}!` : `${playerName}, попробуй ещё раз!`;
+      document.getElementById('resultText').textContent = won
+        ? 'Все точки собраны, а знания успешно проверены.'
+        : 'Призраки забрали все жизни, но твой результат сохранён на итоговом экране.';
+      document.getElementById('finalScore').textContent = score.toLocaleString('ru-RU');
+      document.getElementById('finalCorrect').textContent = `${correctAnswers}/${answeredCount}`;
+      document.getElementById('finalPellets').textContent = collectedCount;
+    }
+
+    function restartGame() {
+      els.resultOverlay.classList.add('hidden');
+      resetGame();
+      state = 'playing';
+      showToast('Новая попытка началась!', 'success');
+    }
+
+    function togglePause() {
+      if (state === 'playing') {
+        state = 'paused';
+        pausedAt = performance.now();
+        els.pauseBadge.classList.add('visible');
+        updatePauseButton(true);
+      } else if (state === 'paused') {
+        resumeTimers();
+        state = 'playing';
+        lastPlayerMove = performance.now();
+        lastGhostMove = performance.now();
+        els.pauseBadge.classList.remove('visible');
+        updatePauseButton(false);
+      }
+    }
+
+    function resumeTimers() {
+      if (!pausedAt) return;
+      const delay = performance.now() - pausedAt;
+      if (frightenedUntil) frightenedUntil += delay;
+      if (resetUntil) resetUntil += delay;
+      if (player) player.movedAt += delay;
+      ghosts.forEach(g => { g.movedAt += delay; });
+      pausedAt = 0;
+    }
+
+    function updatePauseButton(paused) {
+      els.pauseButton.innerHTML = paused ? '▶ <span>Продолжить</span>' : '⏸ <span>Пауза</span>';
+      els.pauseButton.classList.toggle('active', paused);
+      els.pauseButton.setAttribute('aria-label', paused ? 'Продолжить игру' : 'Поставить игру на паузу');
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        showToast('Браузер не разрешил полноэкранный режим.', 'danger');
+      }
+    }
+
+    function updateFullscreenButton() {
+      const full = Boolean(document.fullscreenElement);
+      els.fullscreenButton.innerHTML = full ? '⤢ <span>Выйти из полного экрана</span>' : '⛶ <span>На весь экран</span>';
+      els.fullscreenButton.classList.toggle('active', full);
+    }
+
+    function showHelp() {
+      if (state === 'question' || state === 'start' || state === 'finished' || state === 'levelComplete') return;
+      helpReturnState = state;
+      if (state === 'playing') pausedAt = performance.now();
+      state = 'help';
+      els.helpOverlay.classList.remove('hidden');
+    }
+
+    function closeHelp() {
+      els.helpOverlay.classList.add('hidden');
+      state = helpReturnState;
+      if (state === 'playing') resumeTimers();
+      lastPlayerMove = performance.now();
+      lastGhostMove = performance.now();
+    }
+
+    function showToast(message, type = '') {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.className = `toast show ${type}`;
+      toastTimer = setTimeout(() => { els.toast.className = 'toast'; }, 2200);
+    }
+
+    function drawRoundedRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+    }
+
+    function drawMaze(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#02040c';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let y = 0; y < SIZE; y++) {
+        for (let x = 0; x < SIZE; x++) {
+          const px = x * TILE, py = y * TILE;
+          if (grid[y][x] === 1) {
+            const glow = ctx.createLinearGradient(px, py, px + TILE, py + TILE);
+            glow.addColorStop(0, '#142b91');
+            glow.addColorStop(1, '#234ee6');
+            ctx.fillStyle = glow;
+            drawRoundedRect(px + 2, py + 2, TILE - 4, TILE - 4, 6);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(91, 174, 255, .5)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      pellets.forEach(cellKey => {
+        const [x, y] = cellKey.split(',').map(Number);
+        const cx = (x + .5) * TILE, cy = (y + .5) * TILE;
+        if (questionCells.has(cellKey)) {
+          ctx.save();
+          ctx.shadowColor = '#ffd93d';
+          ctx.shadowBlur = 11;
+          ctx.fillStyle = '#ffd93d';
+          ctx.font = `900 ${TILE * .58}px Arial`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('?', cx, cy + 1);
+          ctx.restore();
+        } else if (powerCells.has(cellKey)) {
+          const pulse = 4.7 + Math.sin(time / 150) * 1.7;
+          ctx.save();
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 15;
+          ctx.fillStyle = 'white';
+          ctx.beginPath();
+          ctx.arc(cx, cy, pulse, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.fillStyle = '#ffe7a3';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    function playerMoveDelay() { return 190; }
+    function ghostMoveDelay() { return 390 - (currentLevel - 1) * 32; }
+
+    function interpolatedPosition(entity, time, duration) {
+      const progress = Math.max(0, Math.min(1, (time - entity.movedAt) / duration));
+      const eased = progress * progress * (3 - 2 * progress);
+      return {
+        x: entity.prevX + (entity.x - entity.prevX) * eased,
+        y: entity.prevY + (entity.y - entity.prevY) * eased
+      };
+    }
+
+    function drawPacman(time) {
+      const position = interpolatedPosition(player, time, playerMoveDelay());
+      const cx = (position.x + .5) * TILE, cy = (position.y + .5) * TILE;
+      const angle = DIRS[currentDirection || queuedDirection || 'right'].angle;
+      mouthPhase = .18 + Math.abs(Math.sin(time / 90)) * .22;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      ctx.shadowColor = '#ffd93d';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#ffd93d';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, TILE * .39, mouthPhase, Math.PI * 2 - mouthPhase);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawGhost(ghost, time, index) {
+      const position = interpolatedPosition(ghost, time, ghostMoveDelay());
+      const cx = (position.x + .5) * TILE, cy = (position.y + .5) * TILE;
+      const frightened = time < frightenedUntil;
+      const flashing = frightened && frightenedUntil - time < 2200 && Math.floor(time / 180) % 2 === 0;
+      const color = frightened ? (flashing ? '#f3f6ff' : '#3956df') : ghost.color;
+      const r = TILE * .36;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 9;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(0, -r * .12, r, Math.PI, 0);
+      ctx.lineTo(r, r * .72);
+      ctx.lineTo(r * .5, r * .43);
+      ctx.lineTo(0, r * .72);
+      ctx.lineTo(-r * .5, r * .43);
+      ctx.lineTo(-r, r * .72);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.ellipse(-r * .37, -r * .17, r * .24, r * .31, 0, 0, Math.PI * 2);
+      ctx.ellipse(r * .37, -r * .17, r * .24, r * .31, 0, 0, Math.PI * 2);
+      ctx.fill();
+      const look = ghost.dir ? DIRS[ghost.dir] : { x: 0, y: 0 };
+      ctx.fillStyle = frightened ? '#17255c' : '#1b2769';
+      ctx.beginPath();
+      ctx.arc(-r * .37 + look.x * 2.2, -r * .17 + look.y * 2.2, r * .11, 0, Math.PI * 2);
+      ctx.arc(r * .37 + look.x * 2.2, -r * .17 + look.y * 2.2, r * .11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function gameLoop(time) {
+      if (state === 'playing' && time >= resetUntil) {
+        const playerDelay = playerMoveDelay();
+        const ghostDelay = ghostMoveDelay();
+        if (time - lastPlayerMove >= playerDelay) {
+          movePlayer(time);
+          lastPlayerMove = time;
+        }
+        if (state === 'playing' && time - lastGhostMove >= ghostDelay) {
+          ghosts.forEach((g, i) => moveGhost(g, i, time));
+          checkCollisions();
+          lastGhostMove = time;
+        }
+      }
+      const renderTime = pausedAt && ['paused', 'help', 'question'].includes(state) ? pausedAt : time;
+      drawMaze(renderTime);
+      if (player) drawPacman(renderTime);
+      ghosts.forEach((g, i) => drawGhost(g, renderTime, i));
+      requestAnimationFrame(gameLoop);
+    }
+
+    function setDirection(dir) {
+      if (state !== 'playing' || !DIRS[dir]) return;
+      queuedDirection = dir;
+    }
+
+    window.addEventListener('keydown', event => {
+      const map = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' };
+      if (map[event.key]) {
+        event.preventDefault();
+        setDirection(map[event.key]);
+      } else if (event.code === 'Space') {
+        event.preventDefault();
+        togglePause();
+      } else if (event.key === 'Enter' && state === 'start') {
+        startGame();
+      }
+    }, { passive: false });
+
+    document.querySelectorAll('[data-dir]').forEach(button => {
+      button.addEventListener('pointerdown', () => setDirection(button.dataset.dir));
+    });
+    els.startButton.addEventListener('click', startGame);
+    document.getElementById('startFullscreenButton').addEventListener('click', startFullscreenGame);
+    els.nameInput.addEventListener('input', () => { els.nameError.textContent = ''; });
+    els.continueButton.addEventListener('click', closeQuestion);
+    document.getElementById('restartButton').addEventListener('click', restartGame);
+    document.getElementById('nextLevelButton').addEventListener('click', startNextLevel);
+    document.getElementById('helpButton').addEventListener('click', showHelp);
+    document.getElementById('closeHelpButton').addEventListener('click', closeHelp);
+    els.pauseButton.addEventListener('click', togglePause);
+    els.fullscreenButton.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+    generateMaze();
+    updateHud();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
