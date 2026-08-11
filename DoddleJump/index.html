@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Doodle Jump — Линейные алгоритмы</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2b2b36;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #222;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 480px;
+            height: 640px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f7f4eb;
+        }
+
+        /* Тетрадный лист в клетку как в оригинальном Doodle Jump */
+        canvas {
+            display: block;
+            background-color: #f7f4eb;
+            background-image: 
+                linear-gradient(#e1dad0 1px, transparent 1px),
+                linear-gradient(90deg, #e1dad0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Оверлеи и Экраны */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(247, 244, 235, 0.97);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            color: #558b2f;
+            margin: 0 0 10px 0;
+            font-size: 30px;
+            text-shadow: 1px 1px 0px #8bc34a;
+        }
+
+        /* Блок с правилами */
+        .rules-card {
+            background: #ffffff;
+            border: 3px solid #8bc34a;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .rules-card h2 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #33691e;
+            text-align: center;
+        }
+
+        .rules-list {
+            margin: 0;
+            padding-left: 18px;
+            line-height: 1.5;
+        }
+
+        .rules-list li {
+            margin-bottom: 6px;
+        }
+
+        .platform-demo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            background: #f1f8e9;
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        .plat-icon {
+            width: 40px;
+            height: 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .plat-green { background: #7cb342; border: 2px solid #558b2f; }
+        .plat-gold { background: #ffca28; border: 2px solid #f57c00; }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #a1887f;
+            background: #fff;
+            color: #333;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: #7cb342;
+            color: #fff;
+            border: 2px solid #558b2f;
+            padding: 12px 30px;
+            border-radius: 24px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #558b2f;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: #8bc34a;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px #558b2f;
+        }
+
+        /* HUD Верхняя панель */
+        #hud {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .hud-box {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #a1887f;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #pause-btn {
+            pointer-events: auto;
+            cursor: pointer;
+            background: #ffb74d;
+            border: 2px solid #f57c00;
+            color: #fff;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Всплывающее уведомление правильного/неправильного ответа */
+        #toast-notification {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            z-index: 30;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            width: 85%;
+        }
+
+        .toast-correct {
+            background: #2e7d32;
+            border: 2px solid #a5d6a7;
+        }
+
+        .toast-wrong {
+            background: #c62828;
+            border: 2px solid #ef9a9a;
+        }
+
+        /* Модальное окно с вопросом */
+        #quiz-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(247, 244, 235, 0.98);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .quiz-title {
+            font-size: 16px;
+            color: #e65100;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .quiz-question {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #263238;
+            line-height: 1.4;
+            white-space: pre-line;
+            background: #fff;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px dashed #8bc34a;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #90a4ae;
+            color: #37474f;
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: #7cb342;
+            background: #f1f8e9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #a1887f;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #558b2f;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #78909c;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Уведомление об ответе -->
+    <div id="toast-notification" class="hidden"></div>
+
+    <!-- Панель счета -->
+    <div id="hud">
+        <div class="hud-box">Игрок: <span id="hud-name">Ученик</span></div>
+        <div class="hud-box">Очки: <span id="hud-score">0</span></div>
+        <button id="pause-btn">⏸</button>
+    </div>
+
+    <!-- Игровое поле -->
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+    <!-- СТАРТОВЫЙ ЭКРАН И ПРАВИЛА ИГРЫ -->
+    <div id="start-screen" class="overlay">
+        <h1>Python Doodle Jump</h1>
+        
+        <div class="rules-card">
+            <h2>📜 ОБЪЯСНЕНИЕ И ПРАВИЛА ИГРЫ:</h2>
+            <ul class="rules-list">
+                <li><b>Управление:</b> Нажимайте стрелки <b>← / →</b> или клавиши <b>A / D</b> для перемещения персонажа.</li>
+                <li><b>Цель:</b> Прыгайте по ступенькам как можно выше и наберите максимальное количество очков!</li>
+                <li><b>Без препятствий:</b> В игре нет падающих ступенек или врагов — можно играть спокойно и уверенно.</li>
+            </ul>
+            <div class="platform-demo">
+                <span class="plat-icon plat-green"></span>
+                <span><b>Зелёные ступеньки</b> — обычные надежные платформы.</span>
+            </div>
+            <div class="platform-demo">
+                <span class="plat-icon plat-gold"></span>
+                <span><b>Золотые ступеньки (?)</b> — открывают задание. Правильный ответ <b>УДВАИВАЕТ</b> очки и дает СУПЕР-ПРЫЖОК!</span>
+            </div>
+        </div>
+
+        <input type="text" id="player-nickname" placeholder="Введите ваше имя или ник" maxlength="15">
+        <button class="btn" id="start-btn">НАЧАТЬ ИГРУ</button>
+    </div>
+
+    <!-- ЭКРАН ПАУЗЫ -->
+    <div id="pause-screen" class="overlay hidden">
+        <h1>ПАУЗА</h1>
+        <p>Игра приостановлена</p>
+        <button class="btn" id="resume-btn" style="margin-bottom: 10px;">Продолжить</button>
+        <button class="btn" id="restart-btn" style="background: #90a4ae; border-color: #607d8b; box-shadow: 0 4px 0px #607d8b;">Заново</button>
+    </div>
+
+    <!-- ЭКРАН ОКОНЧАНИЯ ИГРЫ -->
+    <div id="gameover-screen" class="overlay hidden">
+        <h1 style="color: #e53935;">ИГРА ОКОНЧЕНА</h1>
+        <p id="gameover-user">Игрок: -</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="final-score">0</div>
+                <div class="stat-label">Заработано очков</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="final-questions">0/27</div>
+                <div class="stat-label">Правильных ответов</div>
+            </div>
+        </div>
+
+        <button class="btn" id="retry-btn">Прыгать снова</button>
+    </div>
+
+    <!-- ОКНО ВОПРОСА -->
+    <div id="quiz-modal" class="hidden">
+        <div class="quiz-title" id="quiz-number">Задание №1 (Бонус: Очки x2!)</div>
+        <div class="quiz-question" id="quiz-text">Текст вопроса...</div>
+        <div class="quiz-options" id="quiz-options"></div>
+    </div>
+</div>
+
+<script>
+    // --- 27 ВОПРОСОВ ПО PYTHON ДЛЯ 6 КЛАССА ---
+    const questionsDatabase = [
+        { q: "Что называется линейным алгоритмом?", options: ["А) Алгоритм, в котором действия выполняются последовательно", "B) Алгоритм, содержащий условие", "C) Алгоритм, содержащий повторение", "D) Алгоритм без команд"], correct: 0 },
+        { q: "Какая команда используется для вывода информации?", options: ["A) input()", "B) print()", "C) int()", "D) float()"], correct: 1 },
+        { q: "Какая команда используется для ввода информации?", options: ["A) input()", "B) print()", "C) str()", "D) type()"], correct: 0 },
+        { q: "Какие числа относятся к типу int?", options: ["A) 2.5, 7.1, 3.14", "B) \"10\", \"25\", \"100\"", "C) -8, 0, 15", "D) \"Python\", \"Школа\""], correct: 2 },
+        { q: "Какие значения относятся к типу float?", options: ["A) 12, 0, -7", "B) 3.14, -2.5, 10.0", "C) \"3.14\", \"2.5\"", "D) \"Python\", \"10\""], correct: 1 },
+        { q: "Какие значения относятся к типу str?", options: ["A) \"Алматы\", \"Python\", \"15\"", "B) 15, 20, -5", "C) 2.5, 3.7, 10.0", "D) 15, \"Python\", 2.5"], correct: 0 },
+        { q: "Какая команда позволяет ввести целое число?", options: ["A) input()", "B) int(input())", "C) str(input())", "D) print(input())"], correct: 1 },
+        { q: "Какая команда позволяет ввести дробное число?", options: ["A) float(input())", "B) int(input())", "C) print(float)", "D) str(input())"], correct: 0 },
+        { q: "Какое имя переменной записано правильно?", options: ["A) 2number", "B) my number", "C) my_number", "D) my-number"], correct: 2 },
+        { q: "С какого символа НЕ может начинаться имя переменной?", options: ["A) С буквы", "B) С символа _", "C) С цифры", "D) С маленькой буквы"], correct: 2 },
+        { q: "Как правильно сохранить имя пользователя?", options: ["A) name = int(input())", "B) name = input()", "C) name = float(input())", "D) input = name()"], correct: 1 },
+        { q: "Как правильно вывести значение переменной age?", options: ["A) print(age)", "B) print = age", "C) input(age)", "D) age(print)"], correct: 0 },
+        { q: "Какой знак используется для умножения в Python?", options: ["A) ×", "B) *", "C) :", "D) ^"], correct: 1 },
+        { q: "Как в Python записывается выражение a+b, умноженное на c?", options: ["A) a + b * c", "B) (a + b) * c", "C) a + (b * c)", "D) a + b × c"], correct: 1 },
+        { q: "Какой результат выведет программа?\na = 8\nb = 2\nprint(a + b)", options: ["A) 82", "B) 6", "C) 10", "D) 16"], correct: 2 },
+        { q: "Какой результат выведет программа?\na = 5\nb = 2\nresult = a + b * 3\nprint(result)", options: ["A) 21", "B) 11", "C) 15", "D) 9"], correct: 1 },
+        { q: "Какой результат выведет программа?\na = 5\nb = 2\nresult = (a + b) * 3\nprint(result)", options: ["A) 11", "B) 15", "C) 21", "D) 10"], correct: 2 },
+        { q: "Какой тип данных будет иметь переменная x = 25?", options: ["A) str", "B) float", "C) int", "D) input"], correct: 2 },
+        { q: "Какой тип данных будет иметь переменная price = 1500.5?", options: ["A) int", "B) float", "C) str", "D) print"], correct: 1 },
+        { q: "В какой строке допущена ошибка?", options: ["A) name = input()", "B) age = int(input())", "C) print(\"Привет!\")", "D) 2name = \"Алия\""], correct: 3 },
+        { q: "Укажи верное соответствие между значением \"15\" и его типом данных:", options: ["A) int", "B) float", "C) str", "D) bool"], correct: 2 },
+        { q: "Какое назначение имеет функция print()?", options: ["A) Ввод информации", "B) Вывод информации", "C) Преобразование в целое число", "D) Преобразование в строку"], correct: 1 },
+        { q: "Вставь пропущенную команду вывода:\n________(\"Я изучаю Python!\")", options: ["A) input", "B) print", "C) output", "D) write"], correct: 1 },
+        { q: "Заполни пропуск для ввода строки:\nname = ________(\"Введите имя: \")", options: ["A) input", "B) print", "C) int", "D) str"], correct: 0 },
+        { q: "Заполни пропуск для ввода ЦЕЛОГО числа:\nage = ________(input(\"Введите возраст: \"))", options: ["A) float", "B) str", "C) int", "D) print"], correct: 2 },
+        { q: "Заполни пропуск для ввода ДРОБНОГО числа:\nheight = ________(input(\"Введите рост: \"))", options: ["A) int", "B) float", "C) str", "D) input"], correct: 1 },
+        { q: "Закончи программу вычисления суммы:\na = int(input())\nb = int(input())\nresult = __________", options: ["A) a - b", "B) a * b", "C) a + b", "D) a / b"], correct: 2 }
+    ];
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const startScreen = document.getElementById('start-screen');
+    const pauseScreen = document.getElementById('pause-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const quizModal = document.getElementById('quiz-modal');
+    const toastNotification = document.getElementById('toast-notification');
+    
+    const nicknameInput = document.getElementById('player-nickname');
+    const hudName = document.getElementById('hud-name');
+    const hudScore = document.getElementById('hud-score');
+    
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const resumeBtn = document.getElementById('resume-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const retryBtn = document.getElementById('retry-btn');
+
+    let playerName = "Ученик";
+    let score = 0;
+    let questionsSolved = 0;
+    let currentQuestionIndex = 0;
+    let gameLoopId = null;
+    let isPaused = false;
+    let isQuizActive = false;
+    let toastTimeout = null;
+
+    // Счетчик платформ до появления следующего вопроса (от 3 до 5)
+    let platformsUntilQuiz = 4;
+
+    // Персонаж Doodle
+    const player = {
+        x: 220,
+        y: 400,
+        width: 44,
+        height: 44,
+        vx: 0,
+        vy: 0,
+        gravity: 0.36,
+        jumpPower: -11.5,
+        facingLeft: false
+    };
+
+    const keys = { left: false, right: false };
+    let platforms = [];
+
+    // Управление клавишами
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { keys.left = true; player.facingLeft = true; }
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { keys.right = true; player.facingLeft = false; }
+        if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') togglePause();
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+    });
+
+    startBtn.addEventListener('click', startGame);
+    pauseBtn.addEventListener('click', togglePause);
+    resumeBtn.addEventListener('click', togglePause);
+    restartBtn.addEventListener('click', () => { togglePause(); initGame(); });
+    retryBtn.addEventListener('click', () => { gameoverScreen.classList.add('hidden'); initGame(); });
+
+    function startGame() {
+        if (nicknameInput.value.trim() !== "") {
+            playerName = nicknameInput.value.trim();
+        }
+        hudName.textContent = playerName;
+        startScreen.classList.add('hidden');
+        initGame();
+    }
+
+    function initGame() {
+        score = 0;
+        questionsSolved = 0;
+        currentQuestionIndex = 0;
+        platformsUntilQuiz = Math.floor(Math.random() * 3) + 3; // От 3 до 5 платформ
+        hudScore.textContent = "0";
+
+        player.x = canvas.width / 2 - 22;
+        player.y = 400;
+        player.vx = 0;
+        player.vy = player.jumpPower;
+
+        platforms = [];
+
+        // Базовая нижняя платформа
+        platforms.push({ x: canvas.width / 2 - 45, y: 540, width: 90, height: 16, type: 'normal' });
+
+        // Генерация начальных платформ
+        for (let i = 0; i < 9; i++) {
+            generatePlatform(canvas.height - (i * 65) - 90);
+        }
+
+        isPaused = false;
+        isQuizActive = false;
+
+        if (gameLoopId) cancelAnimationFrame(gameLoopId);
+        gameLoop();
+    }
+
+    function generatePlatform(y) {
+        const width = 80;
+        const x = Math.random() * (canvas.width - width);
+        let type = 'normal';
+
+        platformsUntilQuiz--;
+
+        // Появление вопроса строго через интервал 3-5 зеленых ступенек
+        if (platformsUntilQuiz <= 0) {
+            type = 'quiz';
+            platformsUntilQuiz = Math.floor(Math.random() * 3) + 3; // Сброс счетчика на 3, 4 или 5
+        }
+
+        platforms.push({
+            x: x,
+            y: y,
+            width: width,
+            height: 16,
+            type: type
+        });
+    }
+
+    function togglePause() {
+        if (isQuizActive || gameoverScreen.classList.contains('hidden') === false) return;
+        isPaused = !isPaused;
+        if (isPaused) {
+            pauseScreen.classList.remove('hidden');
+        } else {
+            pauseScreen.classList.add('hidden');
+            gameLoop();
+        }
+    }
+
+    function gameLoop() {
+        if (isPaused || isQuizActive) return;
+
+        update();
+        render();
+
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+        // Движение влево/вправо
+        if (keys.left) player.vx = -6;
+        else if (keys.right) player.vx = 6;
+        else player.vx = 0;
+
+        player.x += player.vx;
+
+        // Переход через границы экрана
+        if (player.x < -player.width) player.x = canvas.width;
+        if (player.x > canvas.width) player.x = -player.width;
+
+        // Физика падения
+        player.vy += player.gravity;
+        player.y += player.vy;
+
+        // Отталкивание от ступенек (только когда персонаж летит вниз)
+        if (player.vy > 0) {
+            platforms.forEach(p => {
+                if (
+                    player.x + player.width * 0.75 > p.x &&
+                    player.x + player.width * 0.25 < p.x + p.width &&
+                    player.y + player.height >= p.y &&
+                    player.y + player.height <= p.y + 15
+                ) {
+                    player.vy = player.jumpPower;
+
+                    // Если попали на платформу с вопросом
+                    if (p.type === 'quiz') {
+                        p.type = 'normal';
+                        triggerQuiz();
+                    }
+                }
+            });
+        }
+
+        // Прокрутка экрана вверх
+        if (player.y < canvas.height / 2) {
+            const diff = canvas.height / 2 - player.y;
+            player.y = canvas.height / 2;
+
+            score += Math.floor(diff);
+            hudScore.textContent = score;
+
+            platforms.forEach(p => p.y += diff);
+            platforms = platforms.filter(p => p.y < canvas.height);
+
+            while (platforms.length < 9) {
+                const highestY = Math.min(...platforms.map(p => p.y));
+                generatePlatform(highestY - 60 - Math.random() * 15);
+            }
+        }
+
+        // Поражение при падении в самый низ
+        if (player.y > canvas.height) {
+            gameOver();
+        }
+    }
+
+    // --- ОТРИСОВКА В СТИЛЕ ОРИГИНАЛЬНОГО DOODLE JUMP ---
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Отрисовка ступенек
+        platforms.forEach(p => {
+            let fillColor = '#7cb342'; // Оригинальный зеленый
+            let borderColor = '#558b2f';
+
+            if (p.type === 'quiz') {
+                fillColor = '#ffca28'; // Золотисто-желтый
+                borderColor = '#f57c00';
+            }
+
+            // Платформа
+            ctx.fillStyle = fillColor;
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, p.width, p.height, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Значок "?"
+            if (p.type === 'quiz') {
+                ctx.fillStyle = '#e65100';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillText('?', p.x + p.width / 2 - 4, p.y + 12);
+            }
+        });
+
+        // 2. Отрисовка Персонажа (Doodle)
+        const px = player.x;
+        const py = player.y;
+
+        // Тело Дудла
+        ctx.fillStyle = '#8bc34a';
+        ctx.strokeStyle = '#558b2f';
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.roundRect(px, py, player.width, player.height, [20, 20, 10, 10]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Глаза и Хоботок
+        ctx.fillStyle = '#222';
+        if (player.facingLeft) {
+            // Глазки влево
+            ctx.beginPath(); ctx.arc(px + 12, py + 14, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + 22, py + 14, 3.5, 0, Math.PI * 2); ctx.fill();
+
+            // Хоботок влево
+            ctx.fillStyle = '#8bc34a';
+            ctx.beginPath();
+            ctx.roundRect(px - 10, py + 18, 16, 9, 4);
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            // Глазки вправо
+            ctx.beginPath(); ctx.arc(px + 22, py + 14, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + 32, py + 14, 3.5, 0, Math.PI * 2); ctx.fill();
+
+            // Хоботок вправо
+            ctx.fillStyle = '#8bc34a';
+            ctx.beginPath();
+            ctx.roundRect(px + player.width - 6, py + 18, 16, 9, 4);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Ножки
+        ctx.fillStyle = '#558b2f';
+        ctx.fillRect(px + 8, py + player.height, 7, 6);
+        ctx.fillRect(px + player.width - 15, py + player.height, 7, 6);
+    }
+
+    // --- ОБРАБОТКА ВОПРОСОВ И БОНУСОВ ---
+    function triggerQuiz() {
+        if (currentQuestionIndex >= questionsDatabase.length) {
+            currentQuestionIndex = 0;
+        }
+
+        isQuizActive = true;
+        const qData = questionsDatabase[currentQuestionIndex];
+
+        document.getElementById('quiz-number').textContent = `Задание №${currentQuestionIndex + 1} (Бонус: Очки x2!)`;
+        document.getElementById('quiz-text').textContent = qData.q;
+
+        const optionsContainer = document.getElementById('quiz-options');
+        optionsContainer.innerHTML = '';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => handleAnswer(idx === qData.correct);
+            optionsContainer.appendChild(btn);
+        });
+
+        quizModal.classList.remove('hidden');
+    }
+
+    function showToast(message, isCorrect) {
+        if (toastTimeout) clearTimeout(toastTimeout);
+
+        toastNotification.textContent = message;
+        toastNotification.className = isCorrect ? 'toast-correct' : 'toast-wrong';
+        toastNotification.classList.remove('hidden');
+
+        toastTimeout = setTimeout(() => {
+            toastNotification.classList.add('hidden');
+        }, 2200);
+    }
+
+    function handleAnswer(isCorrect) {
+        // Закрываем окно вопроса
+        quizModal.classList.add('hidden');
+
+        // Отрисовываем игровое поле, чтобы игрок заранее увидел ступеньки
+        render();
+
+        if (isCorrect) {
+            score = Math.max(10, score * 2); // Удвоение очков
+            questionsSolved++;
+            hudScore.textContent = score;
+            showToast("🎉 Правильно! (Очки x2)\nПриготовься к супер-прыжку...", true);
+        } else {
+            showToast("❌ Неправильно!\nПриготовься к прыжку...", false);
+        }
+
+        // Задержка 1.2 секунды перед фактическим прыжком
+        setTimeout(() => {
+            if (isCorrect) {
+                player.vy = -17; // Супер-прыжок
+            } else {
+                player.vy = player.jumpPower; // Обычный прыжок
+            }
+            
+            isQuizActive = false;
+            currentQuestionIndex++;
+            gameLoop();
+        }, 1200);
+    }
+
+    function gameOver() {
+        cancelAnimationFrame(gameLoopId);
+        document.getElementById('gameover-user').textContent = `Игрок: ${playerName}`;
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('final-questions').textContent = `${questionsSolved}/${questionsDatabase.length}`;
+        gameoverScreen.classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
