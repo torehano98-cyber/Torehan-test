@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Возведение степени в степень</title>
+
+  <style>
+    :root {
+      --background: #07101f;
+      --card: #0e1d34;
+      --card-light: #142945;
+      --text: #f4f8ff;
+      --muted: #93a6bf;
+      --blue: #52d8ff;
+      --violet: #687cff;
+      --green: #3de58d;
+      --red: #ff5571;
+      --yellow: #ffd166;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, #153259 0%, transparent 45%),
+        linear-gradient(145deg, #030812, var(--background));
+      font-family: Arial, sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .game {
+      width: min(900px, 100%);
+      min-height: 650px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      background: rgba(14, 29, 52, 0.96);
+      box-shadow: 0 35px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .logo-icon {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(82, 216, 255, 0.4);
+      border-radius: 15px;
+      color: var(--blue);
+      background: rgba(82, 216, 255, 0.08);
+      font-family: Georgia, serif;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .logo h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .logo p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .formula {
+      padding: 11px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      color: var(--blue);
+      background: rgba(0, 0, 0, 0.18);
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+
+    .screen {
+      min-height: 520px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Начальный экран */
+
+    .start-screen,
+    .finish-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 45px 20px 20px;
+      text-align: center;
+    }
+
+    .level-circle {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 25px;
+      display: grid;
+      place-content: center;
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      color: var(--blue);
+      background: rgba(82, 216, 255, 0.06);
+      box-shadow: 0 0 40px rgba(82, 216, 255, 0.14);
+    }
+
+    .level-circle strong {
+      font-size: 43px;
+      line-height: 1;
+    }
+
+    .level-circle span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin: 0;
+      font-size: clamp(35px, 6vw, 63px);
+      line-height: 1.05;
+    }
+
+    .description {
+      max-width: 660px;
+      margin: 22px auto 28px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .rules {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .rule {
+      min-height: 95px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.15);
+      text-align: left;
+    }
+
+    .rule strong {
+      color: var(--blue);
+      font-size: 12px;
+    }
+
+    .rule:last-child strong {
+      color: var(--red);
+    }
+
+    .rule p {
+      margin: 9px 0 0;
+      line-height: 1.35;
+    }
+
+    .main-button {
+      min-width: 220px;
+      min-height: 58px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 15px;
+      color: #03140c;
+      background: linear-gradient(135deg, var(--green), #8affbd);
+      box-shadow: 0 13px 35px rgba(61, 229, 141, 0.25);
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .main-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 17px 42px rgba(61, 229, 141, 0.35);
+    }
+
+    .keyboard-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Игровой экран */
+
+    .quiz-screen {
+      padding-top: 28px;
+    }
+
+    .progress-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .level-info {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .level-info strong {
+      margin-left: 8px;
+      color: var(--text);
+      font-size: 25px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+    }
+
+    .progress {
+      height: 8px;
+      margin-top: 15px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--violet), var(--blue));
+      transition: width 0.4s ease;
+    }
+
+    .question-area {
+      padding: 58px 10px 42px;
+      text-align: center;
+    }
+
+    .question-title {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .question {
+      min-height: 125px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, serif;
+      font-size: clamp(52px, 10vw, 95px);
+      font-weight: bold;
+    }
+
+    sup {
+      font-size: 0.52em;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .answer {
+      min-height: 85px;
+      padding: 13px 16px;
+      display: grid;
+      grid-template-columns: 36px 1fr 36px;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 17px;
+      color: var(--text);
+      background: rgba(5, 15, 30, 0.62);
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .answer:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: var(--card-light);
+      transform: translateY(-2px);
+    }
+
+    .answer:disabled {
+      cursor: default;
+    }
+
+    .answer-number {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .answer-text {
+      font-family: Georgia, serif;
+      font-size: clamp(23px, 4vw, 32px);
+    }
+
+    .answer-icon {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .answer.correct {
+      border-color: var(--green);
+      color: #02150c;
+      background: var(--green);
+      transform: scale(1.015);
+    }
+
+    .answer.wrong {
+      border-color: var(--red);
+      color: white;
+      background: var(--red);
+      animation: shake 0.35s;
+    }
+
+    .quiz-footer {
+      margin-top: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .restart-button {
+      border: none;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .restart-button:hover {
+      color: var(--blue);
+    }
+
+    /* Экран ошибки */
+
+    .failure-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 9, 18, 0.96);
+      text-align: center;
+    }
+
+    .failure-icon {
+      width: 90px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 20px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      color: var(--red);
+      font-size: 55px;
+    }
+
+    .failure-overlay h2 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .failure-overlay p {
+      color: var(--muted);
+    }
+
+    /* Финал */
+
+    .trophy {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 28px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--green);
+      border-radius: 35px;
+      color: var(--green);
+      background: rgba(61, 229, 141, 0.08);
+      font-size: 47px;
+      font-weight: bold;
+      transform: rotate(-3deg);
+    }
+
+    .finish-screen h2 {
+      margin: 0;
+      font-size: clamp(38px, 7vw, 65px);
+    }
+
+    .success {
+      color: var(--green);
+    }
+
+    @keyframes shake {
+      25% { transform: translateX(-7px); }
+      50% { transform: translateX(7px); }
+      75% { transform: translateX(-5px); }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+      }
+
+      .game {
+        min-height: calc(100vh - 20px);
+        padding: 18px;
+        border-radius: 21px;
+      }
+
+      .formula {
+        padding: 9px 12px;
+        font-size: 16px;
+      }
+
+      .logo p {
+        display: none;
+      }
+
+      .rules {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .rule {
+        min-height: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .rule p {
+        margin: 0;
+      }
+
+      .answers {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .answer {
+        min-height: 68px;
+      }
+
+      .question-area {
+        padding: 45px 5px 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="game">
+
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">x<sup>n</sup></div>
+
+        <div>
+          <h2>Степень мощности</h2>
+          <p>Возведение степени в степень</p>
+        </div>
+      </div>
+
+      <div class="formula">
+        (a<sup>m</sup>)<sup>n</sup> = a<sup>m · n</sup>
+      </div>
+    </header>
+
+    <!-- Начальный экран -->
+    <section class="screen start-screen" id="startScreen">
+
+      <div class="level-circle">
+        <strong>30</strong>
+        <span>уровней</span>
+      </div>
+
+      <p class="eyebrow">Режим точности</p>
+
+      <h1>Пройди всю цепочку без ошибки</h1>
+
+      <p class="description">
+        Выбирай правильный ответ. Верный вариант откроет следующий уровень,
+        а неверный вернёт игру к самому началу.
+      </p>
+
+      <div class="rules">
+        <div class="rule">
+          <strong>01</strong>
+          <p>Умножай показатели степени</p>
+        </div>
+
+        <div class="rule">
+          <strong>02</strong>
+          <p>Выбирай один из четырёх ответов</p>
+        </div>
+
+        <div class="rule">
+          <strong>03</strong>
+          <p>Одна ошибка — полный сброс игры</p>
+        </div>
+      </div>
+
+      <button class="main-button" id="startButton">
+        Начать игру →
+      </button>
+
+      <div class="keyboard-note">
+        Также можно использовать клавиши 1–4
+      </div>
+    </section>
+
+    <!-- Экран игры -->
+    <section class="screen quiz-screen hidden" id="quizScreen">
+
+      <div class="progress-info">
+        <div class="level-info">
+          Уровень
+          <strong>
+            <span id="currentLevel">1</span> / 30
+          </strong>
+        </div>
+
+        <div class="status">
+          <span class="status-dot"></span>
+          Серия активна
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="question-area">
+        <div class="question-title">
+          Выбери правильный результат
+        </div>
+
+        <div class="question" id="question"></div>
+
+        <p class="hint">
+          При возведении степени в степень показатели перемножаются
+        </p>
+      </div>
+
+      <div class="answers" id="answers"></div>
+
+      <div class="quiz-footer">
+        <span>
+          Пройдено: <strong id="completed">0</strong>
+        </span>
+
+        <button class="restart-button" id="restartButton">
+          Начать заново
+        </button>
+      </div>
+    </section>
+
+    <!-- Экран завершения -->
+    <section class="screen finish-screen hidden" id="finishScreen">
+
+      <div class="trophy">
+        30<sup>/30</sup>
+      </div>
+
+      <p class="eyebrow success">Цепочка завершена</p>
+
+      <h2>Безупречная степень!</h2>
+
+      <p class="description">
+        Все 30 примеров решены без ошибок.
+        Правило возведения степени в степень закреплено.
+      </p>
+
+      <button class="main-button" id="playAgainButton">
+        Сыграть ещё раз ↻
+      </button>
+    </section>
+
+    <!-- Сообщение об ошибке -->
+    <div class="failure-overlay hidden" id="failureOverlay">
+
+      <div class="failure-icon">×</div>
+
+      <h2>Ответ неверный</h2>
+
+      <p>Прогресс сброшен. Возвращаемся на начальный экран…</p>
+    </div>
+
+  </main>
+
+  <script>
+    const questions = [
+      {
+        q: "(x<sup>2</sup>)<sup>3</sup>",
+        answer: "x<sup>6</sup>",
+        options: [
+          "x<sup>5</sup>",
+          "x<sup>6</sup>",
+          "x<sup>8</sup>",
+          "x<sup>9</sup>"
+        ]
+      },
+      {
+        q: "(a<sup>4</sup>)<sup>2</sup>",
+        answer: "a<sup>8</sup>",
+        options: [
+          "a<sup>6</sup>",
+          "a<sup>8</sup>",
+          "a<sup>16</sup>",
+          "2a<sup>4</sup>"
+        ]
+      },
+      {
+        q: "(y<sup>3</sup>)<sup>4</sup>",
+        answer: "y<sup>12</sup>",
+        options: [
+          "y<sup>7</sup>",
+          "y<sup>12</sup>",
+          "y<sup>16</sup>",
+          "4y<sup>3</sup>"
+        ]
+      },
+      {
+        q: "(b<sup>5</sup>)<sup>3</sup>",
+        answer: "b<sup>15</sup>",
+        options: [
+          "b<sup>8</sup>",
+          "b<sup>15</sup>",
+          "b<sup>25</sup>",
+          "3b<sup>5</sup>"
+        ]
+      },
+      {
+        q: "(m<sup>7</sup>)<sup>2</sup>",
+        answer: "m<sup>14</sup>",
+        options: [
+          "m<sup>9</sup>",
+          "m<sup>14</sup>",
+          "m<sup>49</sup>",
+          "2m<sup>7</sup>"
+        ]
+      },
+      {
+        q: "(c<sup>2</sup>)<sup>5</sup>",
+        answer: "c<sup>10</sup>",
+        options: [
+          "c<sup>7</sup>",
+          "c<sup>10</sup>",
+          "c<sup>25</sup>",
+          "5c<sup>2</sup>"
+        ]
+      },
+      {
+        q: "(p<sup>3</sup>)<sup>3</sup>",
+        answer: "p<sup>9</sup>",
+        options: [
+          "p<sup>6</sup>",
+          "p<sup>9</sup>",
+          "p<sup>27</sup>",
+          "3p<sup>3</sup>"
+        ]
+      },
+      {
+        q: "(k<sup>6</sup>)<sup>4</sup>",
+        answer: "k<sup>24</sup>",
+        options: [
+          "k<sup>10</sup>",
+          "k<sup>24</sup>",
+          "k<sup>36</sup>",
+          "k<sup>64</sup>"
+        ]
+      },
+      {
+        q: "((z<sup>2</sup>)<sup>3</sup>)<sup>2</sup>",
+        answer: "z<sup>12</sup>",
+        options: [
+          "z<sup>7</sup>",
+          "z<sup>10</sup>",
+          "z<sup>12</sup>",
+          "z<sup>36</sup>"
+        ]
+      },
+      {
+        q: "((q<sup>3</sup>)<sup>2</sup>)<sup>4</sup>",
+        answer: "q<sup>24</sup>",
+        options: [
+          "q<sup>9</sup>",
+          "q<sup>14</sup>",
+          "q<sup>24</sup>",
+          "q<sup>64</sup>"
+        ]
+      },
+      {
+        q: "(2<sup>3</sup>)<sup>2</sup>",
+        answer: "64",
+        options: ["32", "36", "64", "512"]
+      },
+      {
+        q: "(3<sup>2</sup>)<sup>3</sup>",
+        answer: "729",
+        options: ["81", "243", "729", "6561"]
+      },
+      {
+        q: "(5<sup>2</sup>)<sup>2</sup>",
+        answer: "625",
+        options: ["100", "125", "625", "3125"]
+      },
+      {
+        q: "(2<sup>4</sup>)<sup>3</sup>",
+        answer: "4096",
+        options: ["128", "512", "1024", "4096"]
+      },
+      {
+        q: "(10<sup>2</sup>)<sup>3</sup>",
+        answer: "1 000 000",
+        options: [
+          "10 000",
+          "100 000",
+          "1 000 000",
+          "100 000 000"
+        ]
+      },
+      {
+        q: "((-2)<sup>3</sup>)<sup>2</sup>",
+        answer: "64",
+        options: ["-64", "-32", "32", "64"]
+      },
+      {
+        q: "((-3)<sup>2</sup>)<sup>2</sup>",
+        answer: "81",
+        options: ["-81", "36", "81", "729"]
+      },
+      {
+        q: "((-1)<sup>5</sup>)<sup>4</sup>",
+        answer: "1",
+        options: ["-20", "-1", "0", "1"]
+      },
+      {
+        q: "(a<sup>2</sup>b<sup>3</sup>)<sup>4</sup>",
+        answer: "a<sup>8</sup>b<sup>12</sup>",
+        options: [
+          "a<sup>6</sup>b<sup>7</sup>",
+          "a<sup>8</sup>b<sup>12</sup>",
+          "a<sup>8</sup>b<sup>7</sup>",
+          "a<sup>16</sup>b<sup>81</sup>"
+        ]
+      },
+      {
+        q: "(x<sup>3</sup>y<sup>2</sup>)<sup>2</sup>",
+        answer: "x<sup>6</sup>y<sup>4</sup>",
+        options: [
+          "x<sup>5</sup>y<sup>4</sup>",
+          "x<sup>6</sup>y<sup>4</sup>",
+          "x<sup>6</sup>y<sup>2</sup>",
+          "x<sup>9</sup>y<sup>4</sup>"
+        ]
+      },
+      {
+        q: "((m<sup>2</sup>n)<sup>3</sup>)<sup>2</sup>",
+        answer: "m<sup>12</sup>n<sup>6</sup>",
+        options: [
+          "m<sup>7</sup>n<sup>5</sup>",
+          "m<sup>10</sup>n<sup>6</sup>",
+          "m<sup>12</sup>n<sup>5</sup>",
+          "m<sup>12</sup>n<sup>6</sup>"
+        ]
+      },
+      {
+        q: "((ab<sup>2</sup>)<sup>3</sup>)<sup>2</sup>",
+        answer: "a<sup>6</sup>b<sup>12</sup>",
+        options: [
+          "a<sup>5</sup>b<sup>7</sup>",
+          "a<sup>6</sup>b<sup>10</sup>",
+          "a<sup>6</sup>b<sup>12</sup>",
+          "a<sup>9</sup>b<sup>12</sup>"
+        ]
+      },
+      {
+        q: "(t<sup>8</sup>)<sup>1</sup>",
+        answer: "t<sup>8</sup>",
+        options: [
+          "t",
+          "t<sup>8</sup>",
+          "t<sup>9</sup>",
+          "8t"
+        ]
+      },
+      {
+        q: "(r<sup>1</sup>)<sup>9</sup>",
+        answer: "r<sup>9</sup>",
+        options: [
+          "r",
+          "r<sup>9</sup>",
+          "r<sup>10</sup>",
+          "9r"
+        ]
+      },
+      {
+        q: "(u<sup>5</sup>)<sup>6</sup>",
+        answer: "u<sup>30</sup>",
+        options: [
+          "u<sup>11</sup>",
+          "u<sup>25</sup>",
+          "u<sup>30</sup>",
+          "u<sup>56</sup>"
+        ]
+      },
+      {
+        q: "((v<sup>2</sup>)<sup>4</sup>)<sup>3</sup>",
+        answer: "v<sup>24</sup>",
+        options: [
+          "v<sup>9</sup>",
+          "v<sup>14</sup>",
+          "v<sup>24</sup>",
+          "v<sup>64</sup>"
+        ]
+      },
+      {
+        q: "((s<sup>3</sup>)<sup>5</sup>)<sup>2</sup>",
+        answer: "s<sup>30</sup>",
+        options: [
+          "s<sup>10</sup>",
+          "s<sup>17</sup>",
+          "s<sup>25</sup>",
+          "s<sup>30</sup>"
+        ]
+      },
+      {
+        q: "(d<sup>4</sup>)<sup>7</sup>",
+        answer: "d<sup>28</sup>",
+        options: [
+          "d<sup>11</sup>",
+          "d<sup>28</sup>",
+          "d<sup>47</sup>",
+          "d<sup>49</sup>"
+        ]
+      },
+      {
+        q: "((2<sup>2</sup>)<sup>3</sup>)<sup>2</sup>",
+        answer: "4096",
+        options: ["256", "1024", "2048", "4096"]
+      },
+      {
+        q: "(4<sup>2</sup>)<sup>3</sup>",
+        answer: "4096",
+        options: ["64", "256", "1024", "4096"]
+      }
+    ];
+
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const finishScreen = document.getElementById("finishScreen");
+    const failureOverlay = document.getElementById("failureOverlay");
+
+    const startButton = document.getElementById("startButton");
+    const restartButton = document.getElementById("restartButton");
+    const playAgainButton = document.getElementById("playAgainButton");
+
+    const questionElement = document.getElementById("question");
+    const answersElement = document.getElementById("answers");
+    const currentLevelElement = document.getElementById("currentLevel");
+    const completedElement = document.getElementById("completed");
+    const progressFill = document.getElementById("progressFill");
+
+    let gameQuestions = [];
+    let currentQuestionIndex = 0;
+    let answerLocked = false;
+
+    function shuffle(array) {
+      const copy = [...array];
+
+      for (let i = copy.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+
+        [copy[i], copy[randomIndex]] =
+          [copy[randomIndex], copy[i]];
+      }
+
+      return copy;
+    }
+
+    function showScreen(screen) {
+      startScreen.classList.add("hidden");
+      quizScreen.classList.add("hidden");
+      finishScreen.classList.add("hidden");
+
+      screen.classList.remove("hidden");
+    }
+
+    function startGame() {
+      gameQuestions = shuffle(questions);
+      currentQuestionIndex = 0;
+      answerLocked = false;
+
+      failureOverlay.classList.add("hidden");
+      showScreen(quizScreen);
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const currentQuestion =
+        gameQuestions[currentQuestionIndex];
+
+      answerLocked = false;
+
+      currentLevelElement.textContent =
+        currentQuestionIndex + 1;
+
+      completedElement.textContent =
+        currentQuestionIndex;
+
+      progressFill.style.width =
+        `${(currentQuestionIndex / questions.length) * 100}%`;
+
+      questionElement.innerHTML = currentQuestion.q;
+      answersElement.innerHTML = "";
+
+      const shuffledOptions =
+        shuffle(currentQuestion.options);
+
+      shuffledOptions.forEach((option, index) => {
+        const button = document.createElement("button");
+
+        button.className = "answer";
+        button.type = "button";
+        button.dataset.answer = option;
+
+        button.innerHTML = `
+          <span class="answer-number">${index + 1}</span>
+          <span class="answer-text">${option}</span>
+          <span class="answer-icon"></span>
+        `;
+
+        button.addEventListener("click", () => {
+          checkAnswer(button, currentQuestion.answer);
+        });
+
+        answersElement.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, correctAnswer) {
+      if (answerLocked) {
+        return;
+      }
+
+      answerLocked = true;
+
+      const answerButtons =
+        document.querySelectorAll(".answer");
+
+      answerButtons.forEach(item => {
+        item.disabled = true;
+      });
+
+      if (button.dataset.answer === correctAnswer) {
+        button.classList.add("correct");
+
+        button.querySelector(".answer-icon")
+          .textContent = "✓";
+
+        setTimeout(() => {
+          currentQuestionIndex++;
+
+          if (currentQuestionIndex === questions.length) {
+            finishGame();
+          } else {
+            showQuestion();
+          }
+        }, 700);
+
+      } else {
+        button.classList.add("wrong");
+
+        button.querySelector(".answer-icon")
+          .textContent = "×";
+
+        setTimeout(() => {
+          failureOverlay.classList.remove("hidden");
+        }, 400);
+
+        setTimeout(() => {
+          resetGame();
+        }, 2100);
+      }
+    }
+
+    function resetGame() {
+      currentQuestionIndex = 0;
+      answerLocked = false;
+
+      progressFill.style.width = "0%";
+      failureOverlay.classList.add("hidden");
+
+      showScreen(startScreen);
+    }
+
+    function finishGame() {
+      progressFill.style.width = "100%";
+      showScreen(finishScreen);
+    }
+
+    startButton.addEventListener("click", startGame);
+    restartButton.addEventListener("click", resetGame);
+    playAgainButton.addEventListener("click", startGame);
+
+    document.addEventListener("keydown", event => {
+      if (
+        quizScreen.classList.contains("hidden") ||
+        answerLocked
+      ) {
+        return;
+      }
+
+      const number = Number(event.key);
+
+      if (number >= 1 && number <= 4) {
+        const buttons =
+          answersElement.querySelectorAll(".answer");
+
+        if (buttons[number - 1]) {
+          buttons[number - 1].click();
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
