@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#2455df">
+  <meta name="description" content="Найди делители и первые кратные натурального числа. Интерактивная математика для 5–6 классов от Just_4_teacher.">
+  <title>Делители и кратные натурального числа — Just_4_teacher</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232455df'/%3E%3Cpath d='M17 32h30' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='17' r='4' fill='%23ffe173'/%3E%3Ccircle cx='32' cy='47' r='4' fill='%23ffe173'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #172640;
+      --muted: #52647d;
+      --blue: #2455df;
+      --blue-dark: #1942bb;
+      --blue-soft: #edf3ff;
+      --red: #c72d42;
+      --red-soft: #fff0f2;
+      --teal: #087d81;
+      --yellow: #ffe173;
+      --line: #dce4ef;
+      --surface: #ffffff;
+      --page: #f4f7fc;
+      --focus: #0b7780;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      font-size: 16px;
+      color: var(--ink);
+      background: var(--page);
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; min-width: 280px; line-height: 1.5; }
+    button, input, select { font: inherit; }
+    button, select { cursor: pointer; }
+    button { touch-action: manipulation; }
+    button:disabled { cursor: default; }
+    a { color: var(--blue); }
+    button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible,
+    [tabindex="-1"]:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 4px;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: fixed; top: 8px; left: 16px; z-index: 5; padding: 12px 20px;
+      background: white; border: 2px solid var(--blue); border-radius: 10px;
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .topbar-inner {
+      max-width: 1280px; margin: auto; padding: 17px 32px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 11px; background: var(--blue);
+      color: white; display: grid; place-items: center; font-size: 1.8rem; font-weight: 700;
+      line-height: 1; flex-shrink: 0;
+    }
+    .brand-name { font-weight: 750; font-size: 1.2rem; letter-spacing: -.025em; }
+    .class-label {
+      color: #08696e; background: #e7f6f6; font-size: .9rem; font-weight: 650;
+      padding: 5px 13px; border-radius: 999px; white-space: nowrap;
+    }
+    main { max-width: 1280px; margin: auto; padding: 29px 32px 36px; }
+    .intro { margin-bottom: 23px; }
+    h1 { margin: 0; font-size: clamp(1.9rem, 3.2vw, 2.9rem); line-height: 1.17; letter-spacing: -.045em; font-weight: 760; }
+    h1 .continuation { color: var(--muted); font-weight: 550; }
+    .intro p { color: var(--muted); margin: 12px 0 0; font-size: 1.05rem; }
+    .control-panel {
+      padding: 24px; border: 1px solid var(--line); border-radius: 23px; background: white;
+      box-shadow: 0 5px 21px rgb(25 52 96 / 4%);
+    }
+    .fields { display: grid; grid-template-columns: minmax(0, 1.45fr) repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+    .field { min-width: 0; }
+    .field > label { display: block; margin-bottom: 10px; font-size: 1.05rem; font-weight: 700; line-height: 1.4; }
+    .label-detail { display: block; color: var(--muted); font-size: .9rem; font-weight: 450; }
+    .number-field label { min-height: 2.75rem; display: flex; align-items: center; }
+    #number-input {
+      width: 100%; height: 65px; padding: 9px 18px; background: #f7faff; color: var(--ink);
+      font-size: 1.75rem; font-weight: 700; border: 2px solid #a8bef9; border-radius: 12px;
+      font-variant-numeric: tabular-nums; min-width: 0;
+    }
+    #number-input::placeholder { color: #7084a0; font-size: 1.2rem; font-weight: 450; }
+    #number-input:focus { border-color: var(--blue); }
+    #number-input[aria-invalid="true"] { border-color: var(--red); background: #fff7f8; }
+    .hint { color: var(--muted); font-size: .875rem; margin: 7px 0 0; }
+    .counter {
+      display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; height: 65px;
+      border: 1px solid var(--line); background: #f8faff; border-radius: 12px;
+    }
+    .counter button {
+      margin: 7px; padding: 0; min-width: 36px; color: var(--ink); background: white;
+      border: 1px solid var(--line); border-radius: 8px; font-size: 1.45rem; line-height: 1;
+      transition: background .16s, border-color .16s;
+    }
+    .counter button:hover:not(:disabled) { background: var(--blue-soft); border-color: #a8bef9; }
+    .counter button:disabled { opacity: .38; }
+    .counter select {
+      width: 100%; min-width: 0; color: var(--ink); font-size: 1.55rem; font-weight: 700;
+      border: 0; border-radius: 4px; background-color: transparent; text-align: center;
+      text-align-last: center; font-variant-numeric: tabular-nums; padding: 0 3px;
+    }
+    .action-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+    .btn {
+      min-height: 51px; padding: 11px 21px; border: 1px solid transparent; border-radius: 11px;
+      font-size: 1.05rem; font-weight: 650; display: inline-flex; align-items: center;
+      justify-content: center; gap: 12px; line-height: 1.4;
+      transition: background .16s, border-color .16s, transform .16s;
+    }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn-primary { min-width: 223px; color: white; background: var(--blue); box-shadow: 0 4px 9px rgb(36 85 223 / 16%); }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-secondary { color: #135d68; background: #ebf8f8; border-color: #c4e5e6; }
+    .btn-secondary:hover { background: #dcf1f1; }
+    .btn-quiet { color: var(--muted); background: transparent; }
+    .btn-quiet:hover { background: #f0f3f8; color: var(--ink); }
+    .error {
+      margin: 14px 0 0; padding: 11px 14px; border-radius: 10px; font-weight: 600;
+      color: #a11c30; background: #fff0f2; border: 1px solid #f3c4cd;
+    }
+    .results { margin-top: 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+    .result-card {
+      padding: 23px; background: white; border: 1px solid var(--line); border-radius: 21px;
+      min-width: 0; position: relative; border-top: 4px solid var(--blue);
+    }
+    .result-card.multiples { border-top-color: var(--red); }
+    .result-heading { margin: 0 0 7px; font-size: clamp(1.3rem, 2vw, 1.7rem); font-weight: 740; line-height: 1.3; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .divisors .result-heading { color: var(--blue-dark); }
+    .multiples .result-heading { color: #b52035; }
+    .rule { margin: 0; color: var(--muted); font-size: .95rem; }
+    .number-grid {
+      list-style: none; padding: 0; margin: 20px 0 16px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 10px;
+    }
+    .number-grid.large-numbers { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); }
+    .number-tile {
+      display: grid; place-items: center; min-height: 77px; padding: 15px 8px; border-radius: 12px;
+      font-size: 1.8rem; font-weight: 730; font-variant-numeric: tabular-nums;
+      color: #1c48bf; background: var(--blue-soft); border: 1px solid #d6e2ff;
+      line-height: 1.25; white-space: nowrap;
+      animation: arrive .25s ease-out both; animation-delay: var(--delay, 0ms);
+    }
+    .multiples .number-tile { color: #b52035; background: var(--red-soft); border-color: #f7d7dd; }
+    .large-numbers .number-tile { font-size: clamp(1rem, 3vw, 1.25rem); }
+    .many-items .number-tile { animation: none; }
+    .result-summary { font-size: .95rem; color: var(--muted); margin: 0; }
+    .show-all {
+      color: var(--blue-dark); background: #f0f5ff; border: 1px solid #d0defb;
+      padding: 9px 15px; min-height: 45px; border-radius: 9px; font-weight: 650;
+      margin-top: 14px; font-size: .95rem;
+    }
+    .show-all:hover { background: #e3ecff; }
+    .empty {
+      min-height: 125px; margin: 18px 0 0; display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: center; gap: 6px; color: var(--muted);
+      border-top: 1px dashed var(--line); font-size: 1rem;
+    }
+    .empty strong { color: var(--ink); font-weight: 600; }
+    .remember {
+      margin-top: 22px; padding: 19px 23px; background: #fff8db; border: 1px solid #eddfa1;
+      border-left: 5px solid #e4b529; border-radius: 15px;
+      display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 17px;
+    }
+    .remember h2 { margin: 0; font-size: 1.1rem; color: #69510a; }
+    .remember p { margin: 0; font-size: 1rem; color: #493e20; line-height: 1.65; }
+    .relation {
+      margin-top: 22px; padding: 20px 2px 0; border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 20px; align-items: center;
+    }
+    .relation h2 { margin: 0; font-size: 1.15rem; font-weight: 650; }
+    .relation button { color: #126775; border: 1px solid #b4d6dd; background: white; border-radius: 10px; padding: 10px 17px; font-size: 1rem; min-height: 45px; }
+    .relation button:hover { background: #edf8fa; }
+    .relation-answer {
+      grid-column: 1 / -1; margin: 0; padding: 16px 20px; border-radius: 12px;
+      background: #e8f5f6; border: 1px solid #c6e7e9; color: #134e59; font-size: 1.1rem;
+    }
+    .noscript { margin: 16px 32px; color: #a11c30; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (min-width: 1600px) {
+      main, .topbar-inner { max-width: 1440px; }
+      main { padding-top: 37px; }
+      .control-panel { padding: 29px; }
+      .result-card { padding: 27px; }
+      .number-tile { min-height: 88px; }
+    }
+    @media (max-width: 850px) {
+      .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+      .number-field { grid-column: 1 / -1; }
+      .number-field label { min-height: 0; }
+      main { padding: 24px; }
+      .topbar-inner { padding-left: 24px; padding-right: 24px; }
+      h1 { max-width: 700px; }
+      .result-card { padding: 18px; }
+      .results { gap: 16px; }
+    }
+    @media (max-width: 600px) {
+      main { padding: 22px 16px 30px; }
+      .topbar-inner { padding: 13px 16px; gap: 8px; }
+      .brand { gap: 8px; }
+      .brand-name { font-size: 1.06rem; }
+      .brand-mark { width: 32px; height: 32px; border-radius: 9px; font-size: 1.5rem; }
+      .class-label { font-size: .8125rem; padding: 5px 9px; }
+      h1 { font-size: 1.9rem; }
+      h1 .continuation { display: block; font-size: 1.45rem; margin-top: 4px; }
+      .intro { margin-bottom: 18px; }
+      .intro p { font-size: 1rem; }
+      .control-panel { padding: 18px; border-radius: 18px; }
+      .fields { gap: 16px 13px; }
+      .field > label { font-size: .95rem; }
+      .label-detail { font-size: .875rem; }
+      .counter { grid-template-columns: 39px minmax(0, 1fr) 39px; height: 58px; }
+      .counter button { margin: 6px 3px; min-width: 30px; }
+      .counter select { font-size: 1.25rem; padding: 0; }
+      .action-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; margin-top: 18px; }
+      .btn { padding: 11px 12px; font-size: .95rem; }
+      .btn-primary { grid-column: 1 / -1; width: 100%; font-size: 1.12rem; }
+      .results { grid-template-columns: 1fr; margin-top: 18px; gap: 17px; }
+      .result-card { padding: 19px; }
+      .result-heading { font-size: 1.4rem; }
+      .number-grid { grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; }
+      .number-tile { min-height: 68px; font-size: 1.6rem; }
+      .remember { display: block; padding: 17px 18px; margin-top: 18px; }
+      .remember h2 { margin-bottom: 6px; }
+      .relation { grid-template-columns: 1fr; }
+      .relation button { justify-self: start; }
+    }
+    @media (max-width: 370px) {
+      .fields { grid-template-columns: 1fr; }
+      .number-field { grid-column: auto; }
+      .field > label .label-detail { display: inline; }
+      .field > label .label-detail::before { content: " "; }
+      .counter { grid-template-columns: 52px minmax(0, 1fr) 52px; }
+      .action-row { grid-template-columns: 1fr; }
+      .btn-primary { min-width: 0; }
+      .topbar-inner { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+    @media print {
+      body { background: white; }
+      main { max-width: none; padding: 16px 0; }
+      .topbar-inner { padding: 0; }
+      .control-panel, .show-all, .relation button, .skip-link { display: none; }
+      .result-card, .remember, .relation { break-inside: avoid; }
+      .number-tile { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#calculator-form">Перейти к вычислению</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">÷</span><span class="brand-name">Just_4_teacher</span></div>
+      <span class="class-label">5–6 класс</span>
+    </div>
+  </header>
+  <noscript><p class="noscript">Чтобы вычислять делители и кратные, включите JavaScript в настройках браузера. Интернет не требуется.</p></noscript>
+  <main>
+    <div class="intro">
+      <h1>Делители и кратные <span class="continuation">натурального числа</span></h1>
+      <p>Введите число и выберите, сколько делителей и кратных показать.</p>
+    </div>
+
+    <form id="calculator-form" class="control-panel" novalidate aria-label="Вычисление делителей и кратных">
+      <div class="fields">
+        <div class="field number-field">
+          <label for="number-input">Введите натуральное число</label>
+          <input id="number-input" name="number" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="128" value="12" placeholder="Например, 12" aria-describedby="number-hint input-error" aria-invalid="false" required>
+          <p class="hint" id="number-hint">От 1 до 1 000 000 000 включительно.</p>
+        </div>
+        <div class="field">
+          <label for="divisor-count">Количество делителей <span class="label-detail">для показа</span></label>
+          <div class="counter">
+            <button type="button" id="divisor-minus" data-counter="divisor" data-step="-1" aria-label="Уменьшить количество делителей" aria-controls="divisor-count">−</button>
+            <select id="divisor-count" name="divisorCount"><option value="5" selected>5</option></select>
+            <button type="button" id="divisor-plus" data-counter="divisor" data-step="1" aria-label="Увеличить количество делителей" aria-controls="divisor-count">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="multiple-count">Количество кратных <span class="label-detail">для показа</span></label>
+          <div class="counter">
+            <button type="button" id="multiple-minus" data-counter="multiple" data-step="-1" aria-label="Уменьшить количество кратных" aria-controls="multiple-count">−</button>
+            <select id="multiple-count" name="multipleCount"><option value="5" selected>5</option></select>
+            <button type="button" id="multiple-plus" data-counter="multiple" data-step="1" aria-label="Увеличить количество кратных" aria-controls="multiple-count">+</button>
+          </div>
+        </div>
+      </div>
+      <p id="input-error" class="error" role="alert" hidden></p>
+      <div class="action-row">
+        <button class="btn btn-primary" id="calculate-button" type="submit">Выполнить <span aria-hidden="true">→</span></button>
+        <button class="btn btn-secondary" id="random-button" type="button">Случайное число</button>
+        <button class="btn btn-quiet" id="clear-button" type="button">Очистить</button>
+      </div>
+    </form>
+
+    <div id="live-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div class="results" id="results">
+      <section class="result-card divisors" aria-labelledby="divisor-heading">
+        <h2 class="result-heading" id="divisor-heading" tabindex="-1">Делители числа</h2>
+        <p class="rule">Число делится на них без остатка.</p>
+        <div class="empty" id="divisor-empty"><strong>Здесь появятся делители</strong><span>Введите число и нажмите «Выполнить».</span></div>
+        <ol class="number-grid" id="divisor-list" aria-label="Делители по возрастанию" hidden></ol>
+        <p class="result-summary" id="divisor-summary" hidden></p>
+        <button class="show-all" id="show-all-button" type="button" aria-controls="divisor-list" hidden>Показать все делители</button>
+      </section>
+      <section class="result-card multiples" aria-labelledby="multiple-heading">
+        <h2 class="result-heading" id="multiple-heading" tabindex="-1">Кратные числа</h2>
+        <p class="rule">Умножаем число на 1, 2, 3 и так далее.</p>
+        <div class="empty" id="multiple-empty"><strong>Здесь появятся кратные</strong><span>Введите число и нажмите «Выполнить».</span></div>
+        <ol class="number-grid" id="multiple-list" aria-label="Первые положительные кратные по возрастанию" hidden></ol>
+        <p class="result-summary" id="multiple-summary" hidden></p>
+      </section>
+    </div>
+
+    <aside class="remember" aria-labelledby="remember-title">
+      <h2 id="remember-title">Запомни</h2>
+      <p>Делители числа — это числа, на которые оно делится без остатка. Кратные числа получают умножением данного числа на натуральные числа: 1, 2, 3, 4 и так далее.</p>
+    </aside>
+    <section class="relation" aria-labelledby="relation-heading">
+      <h2 id="relation-heading">Как связаны делители и кратные?</h2>
+      <button id="answer-button" type="button" aria-expanded="false" aria-controls="relation-answer">Показать ответ</button>
+      <p id="relation-answer" class="relation-answer" hidden>Если число <strong>a</strong> является делителем числа <strong>b</strong>, то число <strong>b</strong> является кратным числа <strong>a</strong>.</p>
+    </section>
+  </main>
+
+  <script id="app-script">
+    (() => {
+      "use strict";
+
+      const MAX_NUMBER = 1_000_000_000;
+      const MAX_COUNT = 20;
+      const formatter = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+      const format = (value) => formatter.format(value);
+
+      // Проверяем именно целую десятичную запись: без дробей и записи вида 1e3.
+      // Слишком длинные числа отсекаем до преобразования в Number и до вычислений.
+      function parseNatural(raw) {
+        const value = String(raw ?? "").trim();
+        if (!value) return { error: "Введите натуральное число" };
+        if (!/^\d+$/.test(value)) return { error: "Можно вводить только натуральные числа" };
+        const normalized = value.replace(/^0+(?=\d)/, "");
+        if (normalized === "0") return { error: "Число должно быть больше нуля" };
+        if (normalized.length > 10 || (normalized.length === 10 && normalized > String(MAX_NUMBER))) {
+          return { error: "Введите число не больше 1 000 000 000" };
+        }
+        return { value: Number(normalized) };
+      }
+
+      function validateCount(value) {
+        const count = Number(value);
+        if (!Number.isInteger(count) || count < 1 || count > MAX_COUNT) {
+          throw new RangeError("Количество должно быть целым числом от 1 до 20");
+        }
+        return count;
+      }
+
+      // Ищем делители парами до квадратного корня. Для 10^9 это всего 31 622 шага.
+      // У полного квадрата центральный делитель добавляется только один раз.
+      function findDivisors(number) {
+        if (!Number.isSafeInteger(number) || number < 1 || number > MAX_NUMBER) {
+          throw new RangeError("Число должно быть натуральным и не превышать 1 000 000 000");
+        }
+        const small = [];
+        const large = [];
+        for (let divisor = 1; divisor * divisor <= number; divisor++) {
+          if (number % divisor !== 0) continue;
+          small.push(divisor);
+          const partner = number / divisor;
+          if (partner !== divisor) large.push(partner);
+        }
+        return small.concat(large.reverse());
+      }
+
+      function calculateValues(raw, divisorCount = 5, multipleCount = 5) {
+        const parsed = parseNatural(raw);
+        if (parsed.error) return parsed;
+        const dCount = validateCount(divisorCount);
+        const mCount = validateCount(multipleCount);
+        const number = parsed.value;
+        const allDivisors = findDivisors(number);
+        // Наибольшее произведение равно 20 000 000 000 — оно точно представимо в JS.
+        const multiples = Array.from({ length: mCount }, (_, i) => number * (i + 1));
+        return {
+          number, allDivisors, divisors: allDivisors.slice(0, dCount), multiples,
+          divisorCount: dCount, multipleCount: mCount
+        };
+      }
+
+      function divisorWord(count) {
+        const lastTwo = count % 100;
+        if (lastTwo >= 11 && lastTwo <= 14) return "делителей";
+        if (count % 10 === 1) return "делитель";
+        if (count % 10 >= 2 && count % 10 <= 4) return "делителя";
+        return "делителей";
+      }
+
+      // Чистые функции отделены от интерфейса: их можно проверять без браузера.
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "NumberExplorerMath", {
+          value: Object.freeze({ parseNatural, findDivisors, calculateValues }),
+          writable: false, configurable: false
+        });
+      }
+      if (typeof document === "undefined") return;
+
+      const byId = (id) => document.getElementById(id);
+      const form = byId("calculator-form");
+      const numberInput = byId("number-input");
+      const divisorCountInput = byId("divisor-count");
+      const multipleCountInput = byId("multiple-count");
+      const errorBox = byId("input-error");
+      const liveStatus = byId("live-status");
+      const divisorHeading = byId("divisor-heading");
+      const multipleHeading = byId("multiple-heading");
+      const divisorList = byId("divisor-list");
+      const multipleList = byId("multiple-list");
+      const divisorEmpty = byId("divisor-empty");
+      const multipleEmpty = byId("multiple-empty");
+      const divisorSummary = byId("divisor-summary");
+      const multipleSummary = byId("multiple-summary");
+      const showAllButton = byId("show-all-button");
+      const answerButton = byId("answer-button");
+      const relationAnswer = byId("relation-answer");
+      let current = null;
+      let showAll = false;
+
+      // Выпадающие списки остаются обычными HTML select: работают с клавиатуры.
+      for (const select of [divisorCountInput, multipleCountInput]) {
+        const options = document.createDocumentFragment();
+        for (let value = 1; value <= MAX_COUNT; value++) {
+          const option = document.createElement("option");
+          option.value = String(value);
+          option.textContent = String(value);
+          options.append(option);
+        }
+        select.replaceChildren(options);
+        select.value = "5";
+      }
+
+      function clearError() {
+        errorBox.hidden = true;
+        errorBox.textContent = "";
+        numberInput.setAttribute("aria-invalid", "false");
+      }
+
+      function syncCounterButtons() {
+        for (const [name, select] of [["divisor", divisorCountInput], ["multiple", multipleCountInput]]) {
+          byId(`${name}-minus`).disabled = Number(select.value) <= 1;
+          byId(`${name}-plus`).disabled = Number(select.value) >= MAX_COUNT;
+        }
+      }
+
+      function resetResults() {
+        current = null;
+        showAll = false;
+        divisorHeading.textContent = "Делители числа";
+        multipleHeading.textContent = "Кратные числа";
+        for (const list of [divisorList, multipleList]) {
+          list.replaceChildren();
+          list.hidden = true;
+        }
+        divisorEmpty.hidden = false;
+        multipleEmpty.hidden = false;
+        divisorSummary.hidden = true;
+        multipleSummary.hidden = true;
+        showAllButton.hidden = true;
+        liveStatus.textContent = "";
+      }
+
+      function renderTiles(list, numbers) {
+        const fragment = document.createDocumentFragment();
+        const longest = Math.max(...numbers.map((n) => format(n).length));
+        list.classList.toggle("large-numbers", longest > 5);
+        list.classList.toggle("many-items", numbers.length > 80);
+        numbers.forEach((number, index) => {
+          const tile = document.createElement("li");
+          tile.className = "number-tile";
+          // textContent не позволяет превратить пользовательский ввод в HTML.
+          tile.textContent = format(number);
+          tile.style.setProperty("--delay", `${Math.min(index, 9) * 24}ms`);
+          fragment.append(tile);
+        });
+        list.replaceChildren(fragment);
+        list.hidden = false;
+      }
+
+      function renderResults() {
+        if (!current) return;
+        const numberLabel = format(current.number);
+        const total = current.allDivisors.length;
+        const visible = showAll ? current.allDivisors : current.divisors;
+        divisorHeading.textContent = `Делители числа ${numberLabel}`;
+        multipleHeading.textContent = `Кратные числа ${numberLabel}`;
+        divisorEmpty.hidden = true;
+        multipleEmpty.hidden = true;
+        renderTiles(divisorList, visible);
+        renderTiles(multipleList, current.multiples);
+
+        if (visible.length < total) {
+          divisorSummary.textContent = `Показаны первые ${visible.length} из ${total} делителей.`;
+        } else if (total < current.divisorCount) {
+          divisorSummary.textContent = `У этого числа всего ${total} ${divisorWord(total)}.`;
+        } else {
+          divisorSummary.textContent = total === 1 ? "Показан единственный делитель." : `Показаны все ${total} ${divisorWord(total)}.`;
+        }
+        multipleSummary.textContent = current.multipleCount === 1
+          ? "Показано первое положительное кратное. Кратных бесконечно много."
+          : `Показаны первые ${current.multipleCount} кратных. Кратных бесконечно много.`;
+        divisorSummary.hidden = false;
+        multipleSummary.hidden = false;
+        showAllButton.hidden = showAll || total <= current.divisorCount;
+        liveStatus.textContent = `Результат для числа ${numberLabel}. ${divisorSummary.textContent} Показано кратных: ${current.multiples.length}.`;
+      }
+
+      function performCalculation({ focusOnError = true } = {}) {
+        const result = calculateValues(numberInput.value, divisorCountInput.value, multipleCountInput.value);
+        clearError();
+        if (result.error) {
+          resetResults();
+          errorBox.hidden = false;
+          errorBox.textContent = result.error;
+          numberInput.setAttribute("aria-invalid", "true");
+          if (focusOnError) numberInput.focus();
+          return result;
+        }
+        numberInput.value = String(result.number);
+        current = result;
+        showAll = false;
+        syncCounterButtons();
+        renderResults();
+        return result;
+      }
+
+      // Enter в поле числа отправляет форму обычным браузерным способом.
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        performCalculation();
+      });
+
+      // При изменении числа старый результат убирается, чтобы не смешивать данные.
+      numberInput.addEventListener("input", () => {
+        clearError();
+        resetResults();
+      });
+
+      function onCountChange() {
+        syncCounterButtons();
+        if (current) performCalculation({ focusOnError: false });
+      }
+      divisorCountInput.addEventListener("change", onCountChange);
+      multipleCountInput.addEventListener("change", onCountChange);
+
+      for (const button of document.querySelectorAll("[data-step]")) {
+        button.addEventListener("click", () => {
+          const select = button.dataset.counter === "divisor" ? divisorCountInput : multipleCountInput;
+          const next = Math.min(MAX_COUNT, Math.max(1, Number(select.value) + Number(button.dataset.step)));
+          select.value = String(next);
+          onCountChange();
+        });
+      }
+
+      byId("clear-button").addEventListener("click", () => {
+        numberInput.value = "";
+        clearError();
+        resetResults();
+        numberInput.focus();
+        liveStatus.textContent = "Число и результаты очищены. Настройки количества сохранены.";
+      });
+
+      byId("random-button").addEventListener("click", () => {
+        numberInput.value = String(2 + Math.floor(Math.random() * 99));
+        clearError();
+        resetResults();
+        numberInput.focus();
+        numberInput.select();
+        liveStatus.textContent = `Выбрано число ${numberInput.value}. Нажмите «Выполнить».`;
+      });
+
+      showAllButton.addEventListener("click", () => {
+        if (!current) return;
+        showAll = true;
+        renderResults();
+        // Кнопка скрылась: переносим фокус к заголовку, сохраняя позицию страницы.
+        divisorHeading.focus({ preventScroll: true });
+      });
+
+      answerButton.addEventListener("click", () => {
+        const expanded = answerButton.getAttribute("aria-expanded") === "true";
+        answerButton.setAttribute("aria-expanded", String(!expanded));
+        relationAnswer.hidden = expanded;
+        answerButton.textContent = expanded ? "Показать ответ" : "Скрыть ответ";
+      });
+
+      syncCounterButtons();
+      performCalculation({ focusOnError: false });
+
+      // Необязательный браузерный API для помощников. В обычном браузере этот
+      // блок ничего не делает и не требует ни интернета, ни сторонних библиотек.
+      const modelContext = document.modelContext;
+      if (modelContext && typeof modelContext.registerTool === "function") {
+        const lifecycle = new AbortController();
+        try {
+          Promise.resolve(modelContext.registerTool({
+            name: "calculate_divisors_and_multiples",
+            title: "Вычислить делители и кратные",
+            description: "Вычисляет делители и первые положительные кратные натурального числа и обновляет видимые результаты на странице.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                number: { type: "integer", minimum: 1, maximum: MAX_NUMBER },
+                divisorCount: { type: "integer", minimum: 1, maximum: MAX_COUNT, default: 5 },
+                multipleCount: { type: "integer", minimum: 1, maximum: MAX_COUNT, default: 5 }
+              },
+              required: ["number"], additionalProperties: false
+            },
+            annotations: { readOnlyHint: false, untrustedContentHint: false },
+            execute(input) {
+              if (!input || typeof input !== "object" || !Number.isInteger(input.number)) {
+                throw new TypeError("Укажите натуральное число");
+              }
+              const requestedDivisors = input.divisorCount ?? 5;
+              const requestedMultiples = input.multipleCount ?? 5;
+              if (!Number.isInteger(requestedDivisors) || !Number.isInteger(requestedMultiples)) {
+                throw new TypeError("Количество должно быть целым числом от 1 до 20");
+              }
+              const result = calculateValues(input.number, requestedDivisors, requestedMultiples);
+              if (result.error) throw new RangeError(result.error);
+              // Сначала проверяем все значения, затем изменяем интерфейс.
+              numberInput.value = String(result.number);
+              divisorCountInput.value = String(result.divisorCount);
+              multipleCountInput.value = String(result.multipleCount);
+              performCalculation({ focusOnError: false });
+              return {
+                number: result.number, totalDivisors: result.allDivisors.length,
+                shownDivisors: result.divisors, shownMultiples: result.multiples
+              };
+            }
+          }, { signal: lifecycle.signal })).catch(() => {});
+          window.addEventListener("pagehide", (event) => { if (!event.persisted) lifecycle.abort(); });
+        } catch {
+          // При отсутствии поддержки дополнительного API калькулятор продолжает работать.
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
